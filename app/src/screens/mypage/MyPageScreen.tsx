@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
 import ScaleButton from '../../components/common/ScaleButton';
-import { useUserStore, NotifSettings } from '../../store/userStore';
+import { useUserStore } from '../../store/userStore';
 import { useRecordStore } from '../../store/recordStore';
 import { RootStackParamList } from '../../types';
 import {
@@ -101,7 +101,7 @@ export default function MyPageScreen() {
   };
 
   const menuItems = [
-    { label: '알림 설정', onPress: () => { setNotifDraft(notifSettings); setShowNotif(true); } },
+    { label: '알림 설정', onPress: () => setShowNotif(true) },
     { label: '계정 설정', onPress: () => { setNicknameDraft(nickname); setShowAccount(true); } },
     { label: '로그아웃', danger: true, onPress: handleLogout },
   ];
