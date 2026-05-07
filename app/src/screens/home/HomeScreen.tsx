@@ -42,12 +42,14 @@ function getThisMonday(today: Date): Date {
   return d;
 }
 
-// 이번 주 (월~오늘) 날짜 배열
+// 이번 주 월~일 7일 전체
 function getThisWeekDays(today: Date): Date[] {
   const monday = getThisMonday(today);
   const days: Date[] = [];
-  for (let d = new Date(monday); d <= today; d.setDate(d.getDate() + 1)) {
-    days.push(new Date(d));
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
   }
   return days;
 }
@@ -158,14 +160,16 @@ function SummaryCard({ records, onStartCheck }: { records: SessionRecord[]; onSt
           {weekDays.map((day, i) => {
             const coached = thisWeek.some((r) => isSameDay(new Date(r.created_at), day));
             const isToday = isSameDay(day, today);
+            const isFuture = day > today && !isToday;
             return (
               <View key={i} style={styles.dotWrap}>
                 <View style={[
                   styles.dot,
                   coached ? styles.dotFilled : styles.dotEmpty,
                   isToday && styles.dotToday,
+                  isFuture && styles.dotFuture,
                 ]} />
-                <Text style={[styles.dotLabel, isToday && styles.dotLabelToday]}>
+                <Text style={[styles.dotLabel, isToday && styles.dotLabelToday, isFuture && styles.dotLabelFuture]}>
                   {DAY_KR[day.getDay()]}
                 </Text>
               </View>
@@ -290,10 +294,13 @@ export default function HomeScreen() {
         </View>
 
         {/* 요약 카드 */}
-        <SummaryCard records={records} onStartCheck={() => setSheetVisible(true)} />
+        {isLoggedIn
+          ? <SummaryCard records={records} onStartCheck={() => setSheetVisible(true)} />
+          : <EmptyCard onPress={() => navigation.navigate('SignUp')} />
+        }
 
         {/* 최근 코칭 */}
-        {recentSessions.length > 0 && (
+        {isLoggedIn && recentSessions.length > 0 && (
           <View style={styles.recentSection}>
             <Text style={styles.sectionLabel}>최근 코칭</Text>
             {recentSessions.map((s) => (
@@ -400,8 +407,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.cta,
   },
+  dotFuture: { opacity: 0.25 },
   dotLabel: { fontSize: 10, color: Colors.textMuted },
   dotLabelToday: { color: Colors.cta, fontWeight: '600' },
+  dotLabelFuture: { opacity: 0.35 },
   weekSummaryText: {
     fontSize: 13,
     color: Colors.textSecondary,

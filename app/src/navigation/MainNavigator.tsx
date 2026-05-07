@@ -32,8 +32,8 @@ function TabNavigator() {
           backgroundColor: Colors.background,
           borderTopWidth: 0.5,
           borderTopColor: Colors.border,
-          paddingBottom: 6,
-          height: 58,
+          paddingBottom: 16,
+          height: 70,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '500', letterSpacing: 0.5 },
         tabBarIcon: ({ color }) => (

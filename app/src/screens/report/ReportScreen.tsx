@@ -183,7 +183,6 @@ function FearGreedCard() {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.sectionHeader}>시장 맥락</Text>
       <Text style={styles.cardTitle}>공포·탐욕 지수</Text>
 
       {loading ? (
@@ -355,7 +354,9 @@ export default function ReportScreen() {
           <BasicStats count={checkCount} avgImpulse={totalAvgImpulse} />
         )}
 
-        {/* 섹션 1 — 성장 요약 */}
+        {/* 섹션 1·2 — 성장 추이 */}
+        <Text style={styles.sectionHeader}>성장 추이</Text>
+
         <LockedSection
           locked={tier === 'insufficient'}
           lockMessage={`코칭 ${remaining5}번 더 하면 열려요`}
@@ -367,7 +368,6 @@ export default function ReportScreen() {
           />
         </LockedSection>
 
-        {/* 섹션 2 — 충동도 그래프 */}
         <LockedSection
           locked={tier === 'insufficient'}
           lockMessage={`코칭 ${remaining5}번 더 하면 열려요`}
@@ -380,7 +380,9 @@ export default function ReportScreen() {
           />
         </LockedSection>
 
-        {/* 섹션 3 — 참았을 때 vs 했을 때 */}
+        {/* 섹션 3·4 — 매매 패턴 */}
+        <Text style={styles.sectionHeader}>매매 패턴</Text>
+
         <LockedSection
           locked={tier !== 'full'}
           lockMessage={`코칭 ${remaining10}번 더 하면 열려요`}
@@ -392,7 +394,6 @@ export default function ReportScreen() {
           />
         </LockedSection>
 
-        {/* 섹션 4 — 감정 패턴 */}
         <LockedSection
           locked={tier !== 'full'}
           lockMessage={`코칭 ${remaining10}번 더 하면 열려요`}
@@ -469,7 +470,8 @@ export default function ReportScreen() {
           commentLoading={advLoading && !q1Impulse && checkCount >= 10}
         />
 
-        {/* 공포탐욕지수 */}
+        {/* 시장 맥락 */}
+        <Text style={styles.sectionHeader}>시장 맥락</Text>
         <FearGreedCard />
 
         <View style={{ height: 32 }} />
@@ -529,11 +531,11 @@ const styles = StyleSheet.create({
 
   // 잠금
   lockedWrap: { borderRadius: 16, overflow: 'hidden' },
-  lockedContent: { opacity: 0.1 },
+  lockedContent: { opacity: 0.45 },
   lockedOverlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     justifyContent: 'center', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(235,240,248,0.93)',
+    backgroundColor: 'rgba(235,240,248,0.65)',
   },
   lockBadge: {
     backgroundColor: Colors.border, borderRadius: 12,

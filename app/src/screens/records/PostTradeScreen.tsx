@@ -60,7 +60,7 @@ export default function PostTradeScreen() {
     if (!isLoggedIn) {
       setShowSignUp(true);
     } else {
-      navigation.navigate('Tabs');
+      navigation.goBack();
     }
   };
 
@@ -194,22 +194,22 @@ const styles = StyleSheet.create({
   directionRow: { flexDirection: 'row', gap: 10 },
   dirBtn: {
     flex: 1, paddingVertical: 13, borderRadius: 10,
-    backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
+    backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border,
     alignItems: 'center',
   },
-  dirBtnActive: { borderColor: Colors.cta, borderWidth: 1.5, backgroundColor: Colors.background },
+  dirBtnActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
   dirBtnText: { fontSize: 15, color: Colors.textSecondary, fontWeight: '500' },
-  dirBtnTextActive: { color: Colors.cta, fontWeight: '600' },
+  dirBtnTextActive: { color: '#FFF', fontWeight: '600' },
 
   emotionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   emotionChip: {
     paddingVertical: 11, paddingHorizontal: 20,
     borderRadius: 20, backgroundColor: Colors.surface,
-    borderWidth: 0.5, borderColor: Colors.border,
+    borderWidth: 1.5, borderColor: Colors.border,
   },
-  emotionChipActive: { borderColor: Colors.cta, borderWidth: 1.5, backgroundColor: Colors.background },
+  emotionChipActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
   emotionChipText: { fontSize: 14, color: Colors.textSecondary, fontWeight: '500' },
-  emotionChipTextActive: { color: Colors.cta, fontWeight: '600' },
+  emotionChipTextActive: { color: '#FFF', fontWeight: '600' },
 
   saveBtn: {
     backgroundColor: Colors.cta, borderRadius: 10,

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Animated } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { OnboardingStackParamList } from '../../types';
@@ -43,14 +43,63 @@ const PERSONALITY_DATA: Record<string, {
   },
 };
 
+const PERSONALITY_ORDER = ['analytical', 'reactive', 'optimistic', 'hesitant'];
+
+function AllTypesSection({ myType }: { myType: string }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  const toggle = (key: string) => {
+    setExpanded(prev => prev === key ? null : key);
+  };
+
+  return (
+    <View style={styles.allTypes}>
+      <Text style={styles.allTypesTitle}>모든 투자 성향 보기</Text>
+      {PERSONALITY_ORDER.map((key) => {
+        const d = PERSONALITY_DATA[key];
+        const isMe = key === myType;
+        const isOpen = expanded === key;
+
+        return (
+          <ScaleButton
+            key={key}
+            style={[styles.typeRow, isMe && styles.typeRowMe]}
+            onPress={() => toggle(key)}
+          >
+            <View style={styles.typeRowHeader}>
+              <View style={styles.typeRowLeft}>
+                {isMe && <View style={styles.meBadge}><Text style={styles.meBadgeText}>나</Text></View>}
+                <Text style={[styles.typeRowLabel, isMe && styles.typeRowLabelMe]}>{d.label}</Text>
+              </View>
+              <Text style={styles.typeRowChevron}>{isOpen ? '∧' : '∨'}</Text>
+            </View>
+            {isOpen && (
+              <View style={styles.typeRowBody}>
+                <Text style={styles.typeRowSummary}>{d.summary}</Text>
+                <View style={styles.typeRowDetails}>
+                  <Text style={styles.typeRowDetailLabel}>강점</Text>
+                  <Text style={styles.typeRowDetailText}>{d.strength}</Text>
+                  <Text style={styles.typeRowDetailLabel}>주의할 점</Text>
+                  <Text style={styles.typeRowDetailText}>{d.weakness}</Text>
+                </View>
+              </View>
+            )}
+          </ScaleButton>
+        );
+      })}
+    </View>
+  );
+}
+
 export default function PersonalityResultScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const setPersonalityType = useUserStore((s) => s.setPersonalityType);
-  const data = PERSONALITY_DATA[route.params.personalityType] ?? PERSONALITY_DATA.analytical;
+  const myType = route.params.personalityType;
+  const data = PERSONALITY_DATA[myType] ?? PERSONALITY_DATA.analytical;
 
   const handleNext = () => {
-    setPersonalityType(route.params.personalityType);
+    setPersonalityType(myType);
     navigation.navigate('InvestmentPrinciples');
   };
 
@@ -75,6 +124,8 @@ export default function PersonalityResultScreen() {
             <Text style={styles.cardBody}>{data.tip}</Text>
           </View>
         </View>
+
+        <AllTypesSection myType={myType} />
 
         <ScaleButton style={styles.btn} onPress={handleNext}>
           <Text style={styles.btnText}>다음</Text>
@@ -110,6 +161,43 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5, textTransform: 'uppercase', opacity: 0.45,
   },
   cardBody: { fontSize: 15, color: Colors.textPrimary, lineHeight: 15 * 1.7 },
+
+  allTypes: { gap: 8, marginTop: 8 },
+  allTypesTitle: {
+    fontSize: 11, fontWeight: '600', color: Colors.textMuted,
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
+  },
+
+  typeRow: {
+    backgroundColor: Colors.surface, borderRadius: 12,
+    borderWidth: 0.5, borderColor: Colors.border,
+    padding: 16, gap: 12,
+  },
+  typeRowMe: {
+    backgroundColor: '#EEF4FB',
+    borderWidth: 1.5, borderColor: Colors.cta,
+  },
+  typeRowHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+  },
+  typeRowLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  meBadge: {
+    backgroundColor: Colors.cta, borderRadius: 4,
+    paddingHorizontal: 6, paddingVertical: 2,
+  },
+  meBadgeText: { fontSize: 10, fontWeight: '700', color: '#FFF' },
+  typeRowLabel: { fontSize: 15, fontWeight: '500', color: Colors.textPrimary },
+  typeRowLabelMe: { fontWeight: '700', color: Colors.cta },
+  typeRowChevron: { fontSize: 12, color: Colors.textMuted },
+
+  typeRowBody: { gap: 10 },
+  typeRowSummary: { fontSize: 14, color: Colors.textSecondary, lineHeight: 14 * 1.7 },
+  typeRowDetails: { gap: 6 },
+  typeRowDetailLabel: {
+    fontSize: 11, fontWeight: '600', color: Colors.textMuted,
+    letterSpacing: 1, textTransform: 'uppercase',
+  },
+  typeRowDetailText: { fontSize: 13, color: Colors.textPrimary, lineHeight: 13 * 1.7 },
 
   btn: {
     backgroundColor: Colors.cta, borderRadius: 10,

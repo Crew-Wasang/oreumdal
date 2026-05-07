@@ -76,14 +76,14 @@ export default function PersonalityTestScreen() {
   const navigation = useNavigation<Nav>();
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
   const question = QUESTIONS[current];
-  const isLast = current === QUESTIONS.length - 1; // used in handleSelect
+  const isLast = current === QUESTIONS.length - 1;
   const progress = (current + 1) / QUESTIONS.length;
 
-  const handleSelect = (type: string) => {
-    setSelected(type);
+  const handleSelect = (type: string, label: string) => {
+    setSelectedLabel(label);
     setTimeout(() => {
       const newAnswers = [...answers, type];
       if (isLast) {
@@ -91,15 +91,28 @@ export default function PersonalityTestScreen() {
       } else {
         setAnswers(newAnswers);
         setCurrent(prev => prev + 1);
-        setSelected(null);
+        setSelectedLabel(null);
       }
     }, 220);
+  };
+
+  const handleBack = () => {
+    if (current === 0) {
+      navigation.goBack();
+    } else {
+      setAnswers(prev => prev.slice(0, -1));
+      setCurrent(prev => prev - 1);
+      setSelectedLabel(null);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.content}>
         <View style={styles.topBar}>
+          <ScaleButton onPress={handleBack} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>←</Text>
+          </ScaleButton>
           <View style={styles.progressBg}>
             <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
           </View>
@@ -114,10 +127,10 @@ export default function PersonalityTestScreen() {
             {question.options.map((opt) => (
               <ScaleButton
                 key={opt.label}
-                style={[styles.option, selected === opt.type && styles.optionActive]}
-                onPress={() => handleSelect(opt.type)}
+                style={[styles.option, selectedLabel === opt.label && styles.optionActive]}
+                onPress={() => handleSelect(opt.type, opt.label)}
               >
-                <Text style={[styles.optionText, selected === opt.type && styles.optionTextActive]}>
+                <Text style={[styles.optionText, selectedLabel === opt.label && styles.optionTextActive]}>
                   {opt.label}
                 </Text>
               </ScaleButton>
@@ -134,6 +147,8 @@ const styles = StyleSheet.create({
   content: { flex: 1, padding: 24, paddingBottom: 48, gap: 24 },
 
   topBar: { gap: 8, paddingTop: 8 },
+  backBtn: { width: 44, height: 44, justifyContent: 'center' },
+  backBtnText: { fontSize: 26, color: Colors.textSecondary },
   progressBg: { height: 2, backgroundColor: Colors.border, borderRadius: 1, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: Colors.cta, borderRadius: 1 },
   progressLabel: {

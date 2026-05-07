@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { Colors } from '../constants/colors';
 import { useUserStore } from '../store/userStore';
+import { useRecordStore } from '../store/recordStore';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Splash'>;
@@ -18,7 +19,10 @@ export default function SplashScreen({ navigation }: Props) {
         loadFromStorage(),
         new Promise<void>((r) => setTimeout(r, 1800)),
       ]);
-      const { hasCompletedOnboarding } = useUserStore.getState();
+      const { hasCompletedOnboarding, isLoggedIn } = useUserStore.getState();
+      if (isLoggedIn) {
+        await useRecordStore.getState().loadUserRecords();
+      }
       navigation.replace(hasCompletedOnboarding ? 'Main' : 'Onboarding');
     };
     init();

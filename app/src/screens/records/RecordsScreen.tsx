@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView,
   TextInput,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
 import { MainStackParamList, SessionRecord, TradeOutcome } from '../../types';
@@ -20,7 +20,7 @@ const FILTER_PILLS: { value: Filter; label: string }[] = [
   { value: 'buy',        label: '매수' },
   { value: 'sell',       label: '매도' },
   { value: 'ok',         label: '괜찮아요' },
-  { value: 'reconsider', label: '다시생각해봐요' },
+  { value: 'reconsider', label: '다시 생각해봐요' },
   { value: 'traded',     label: '매매함' },
   { value: 'skipped',    label: '참았어요' },
 ];
@@ -60,16 +60,22 @@ function OutcomeBadge({ outcome }: { outcome: TradeOutcome }) {
   );
 }
 
-function applyFilter(records: SessionRecord[], filter: Filter): SessionRecord[] {
-  switch (filter) {
-    case 'buy':        return records.filter((r) => r.direction === 'buy');
-    case 'sell':       return records.filter((r) => r.direction === 'sell');
-    case 'ok':         return records.filter((r) => r.type === 'check' && r.verdict === 'ok');
-    case 'reconsider': return records.filter((r) => r.type === 'check' && r.verdict === 'reconsider');
-    case 'traded':     return records.filter((r) => r.trade_outcome === 'traded');
-    case 'skipped':    return records.filter((r) => r.trade_outcome === 'skipped');
-    default:           return records;
-  }
+function applyFilters(records: SessionRecord[], filters: Filter[]): SessionRecord[] {
+  const active = filters.filter((f) => f !== 'all');
+  if (active.length === 0) return records;
+  return records.filter((r) =>
+    active.every((f) => {
+      switch (f) {
+        case 'buy':        return r.direction === 'buy';
+        case 'sell':       return r.direction === 'sell';
+        case 'ok':         return r.type === 'check' && r.verdict === 'ok';
+        case 'reconsider': return r.type === 'check' && r.verdict === 'reconsider';
+        case 'traded':     return r.trade_outcome === 'traded';
+        case 'skipped':    return r.trade_outcome === 'skipped';
+        default:           return true;
+      }
+    })
+  );
 }
 
 export default function RecordsScreen() {
@@ -77,24 +83,40 @@ export default function RecordsScreen() {
   const records = useRecordStore((s) => s.records);
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!isLoggedIn) {
-        navigation.navigate('SignUp');
-      }
-    }, [isLoggedIn])
-  );
-
   const [search, setSearch] = useState('');
-  const [activeFilter, setActiveFilter] = useState<Filter>('all');
+  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
+
+  const toggleFilter = (f: Filter) => {
+    if (f === 'all') { setActiveFilters([]); return; }
+    setActiveFilters((prev) =>
+      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]
+    );
+  };
 
   const filtered = useMemo(() => {
-    let result = applyFilter(records, activeFilter);
+    let result = applyFilters(records, activeFilters);
     if (search.trim()) {
       result = result.filter((r) => r.stock_name.includes(search.trim()));
     }
     return result;
-  }, [records, activeFilter, search]);
+  }, [records, activeFilters, search]);
+
+  if (!isLoggedIn) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.header}>
+          <Text style={styles.title}>기록</Text>
+        </View>
+        <View style={styles.lockedWrap}>
+          <Text style={styles.lockedTitle}>로그인하면 기록을 볼 수 있어요</Text>
+          <Text style={styles.lockedDesc}>코칭 기록과 매매 내역이 저장됩니다</Text>
+          <ScaleButton style={styles.lockedBtn} onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.lockedBtnText}>로그인하기</Text>
+          </ScaleButton>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -122,12 +144,12 @@ export default function RecordsScreen() {
           contentContainerStyle={styles.filterRow}
         >
           {FILTER_PILLS.map(({ value, label }) => {
-            const active = activeFilter === value;
+            const active = value === 'all' ? activeFilters.length === 0 : activeFilters.includes(value);
             return (
               <ScaleButton
                 key={value}
                 style={[styles.pill, active && styles.pillActive]}
-                onPress={() => setActiveFilter(value)}
+                onPress={() => toggleFilter(value)}
               >
                 <Text style={[styles.pillText, active && styles.pillTextActive]}>
                   {label}
@@ -225,6 +247,15 @@ const styles = StyleSheet.create({
   },
   pillText: { fontSize: 13, color: Colors.textSecondary, fontWeight: '500' },
   pillTextActive: { color: '#FFF' },
+
+  lockedWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
+  lockedTitle: { fontSize: 17, fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
+  lockedDesc: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
+  lockedBtn: {
+    marginTop: 8, backgroundColor: Colors.cta, borderRadius: 10,
+    paddingVertical: 14, paddingHorizontal: 32,
+  },
+  lockedBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
 
   // 목록
   list: { paddingHorizontal: 16, gap: 12 },

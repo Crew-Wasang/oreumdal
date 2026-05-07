@@ -47,6 +47,7 @@ export type RootStackParamList = {
 
 // Login 제거 — 비로그인 상태로 바로 시작
 export type OnboardingStackParamList = {
+  PersonalityIntro: undefined;
   PersonalityTest: undefined;
   PersonalityResult: { personalityType: string };
   InvestmentPrinciples: undefined;

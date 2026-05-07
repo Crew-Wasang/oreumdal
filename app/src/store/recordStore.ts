@@ -1,5 +1,8 @@
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SessionRecord, TradeOutcome, ChatMessage } from '../types';
+
+const STORAGE_KEY = 'user_records';
 
 function daysAgo(d: number): string {
   return new Date(Date.now() - d * 86400000).toISOString();
@@ -150,24 +153,52 @@ interface RecordStore {
   addRecord: (record: Omit<SessionRecord, 'id' | 'created_at'>) => void;
   updateTradeOutcome: (id: string, outcome: TradeOutcome) => void;
   clearRecords: () => void;
+  loadUserRecords: () => Promise<void>;
+  saveUserRecords: (records: SessionRecord[]) => void;
 }
 
-export const useRecordStore = create<RecordStore>((set) => ({
+export const useRecordStore = create<RecordStore>((set, get) => ({
   records: MOCK_RECORDS,
+
   addRecord: (record) => {
     const newRecord: SessionRecord = {
       ...record,
       id: Date.now().toString(),
       created_at: new Date().toISOString(),
     };
-    set((state) => ({ records: [newRecord, ...state.records] }));
+    set((state) => {
+      const next = [newRecord, ...state.records];
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return { records: next };
+    });
   },
+
   updateTradeOutcome: (id, outcome) => {
-    set((state) => ({
-      records: state.records.map((r) =>
+    set((state) => {
+      const next = state.records.map((r) =>
         r.id === id ? { ...r, trade_outcome: outcome } : r
-      ),
-    }));
+      );
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return { records: next };
+    });
   },
-  clearRecords: () => set({ records: [] }),
+
+  clearRecords: () => {
+    AsyncStorage.removeItem(STORAGE_KEY);
+    set({ records: [] });
+  },
+
+  loadUserRecords: async () => {
+    try {
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      const parsed: SessionRecord[] = raw ? JSON.parse(raw) : [];
+      set({ records: parsed });
+    } catch {
+      set({ records: [] });
+    }
+  },
+
+  saveUserRecords: (records) => {
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  },
 }));
