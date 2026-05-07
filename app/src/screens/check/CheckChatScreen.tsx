@@ -21,9 +21,12 @@ type Route = RouteProp<MainStackParamList, 'CheckChat'>;
 type InputMode = 'q1' | 'q2' | 'q3' | 'done';
 type TradeOutcome = 'pending' | 'done' | 'cancelled' | null;
 
-const Q1_OPTIONS = ['가격 흐름이 좋아서', '뉴스·이슈 봤어요', '감이 좋아서', '내 원칙에 따라'];
-const Q2_OPTIONS = ['시장 흐름을 보고 판단했어요', '뉴스나 정보를 봤어요', '왠지 불안해서요', '다들 하는 것 같아서요'];
-const Q3_OPTIONS = ['원칙이랑 맞아요', '잘 모르겠어요', '솔직히 아닌 것 같아요'];
+const INPUT_PLACEHOLDERS: Record<InputMode, string> = {
+  q1: '예) 감이 좋아서요, 뉴스 봤어요',
+  q2: '예) 왠지 불안해서요, 다들 하는 것 같아서요',
+  q3: '예) 원칙이랑 맞아요, 잘 모르겠어요',
+  done: '',
+};
 
 interface ResultData {
   score: number;
@@ -161,11 +164,6 @@ export default function CheckChatScreen() {
     }
   };
 
-  const handleQ3Choice = (choice: string) => {
-    const text = customText.trim() ? `${choice} — ${customText.trim()}` : choice;
-    handleUserChoice(text);
-  };
-
   useEffect(() => {
     const init = async () => {
       sessionCtx.current.recordSummary = buildRecordSummary(records, stockName);
@@ -217,23 +215,17 @@ export default function CheckChatScreen() {
     scrollToBottom();
   };
 
-  const renderChoiceArea = (options: string[], onSelect: (v: string) => void) => (
+  const renderInputArea = (mode: InputMode) => (
     <View style={styles.inputArea}>
-      <View style={styles.choiceGrid}>
-        {options.map(opt => (
-          <ScaleButton key={opt} style={styles.choiceBtn} onPress={() => onSelect(opt)}>
-            <Text style={styles.choiceBtnText}>{opt}</Text>
-          </ScaleButton>
-        ))}
-      </View>
       <View style={styles.customRow}>
         <TextInput
           style={styles.customInput}
-          placeholder="직접 입력..."
+          placeholder={INPUT_PLACEHOLDERS[mode]}
           placeholderTextColor={Colors.textMuted}
           value={customText}
           onChangeText={setCustomText}
           returnKeyType="send"
+          autoFocus
           onSubmitEditing={() => handleUserChoice(customText.trim())}
         />
         <ScaleButton
@@ -332,41 +324,7 @@ export default function CheckChatScreen() {
           <View style={{ height: 20 }} />
         </ScrollView>
 
-        {!result && inputMode !== 'done' && (
-          <>
-            {inputMode === 'q1' && renderChoiceArea(Q1_OPTIONS, handleUserChoice)}
-            {inputMode === 'q2' && renderChoiceArea(Q2_OPTIONS, handleUserChoice)}
-            {inputMode === 'q3' && (
-              <View style={styles.inputArea}>
-                <View style={styles.choiceGrid}>
-                  {Q3_OPTIONS.map(opt => (
-                    <ScaleButton key={opt} style={styles.choiceBtn} onPress={() => handleQ3Choice(opt)}>
-                      <Text style={styles.choiceBtnText}>{opt}</Text>
-                    </ScaleButton>
-                  ))}
-                </View>
-                <View style={styles.customRow}>
-                  <TextInput
-                    style={styles.customInput}
-                    placeholder="덧붙이고 싶은 말 (선택)"
-                    placeholderTextColor={Colors.textMuted}
-                    value={customText}
-                    onChangeText={setCustomText}
-                    returnKeyType="send"
-                    onSubmitEditing={() => handleUserChoice(customText.trim())}
-                  />
-                  <ScaleButton
-                    style={[styles.sendBtn, !customText.trim() && styles.sendBtnDisabled]}
-                    onPress={() => handleUserChoice(customText.trim())}
-                    disabled={!customText.trim()}
-                  >
-                    <Text style={styles.sendBtnText}>→</Text>
-                  </ScaleButton>
-                </View>
-              </View>
-            )}
-          </>
-        )}
+        {!result && inputMode !== 'done' && renderInputArea(inputMode)}
       </KeyboardAvoidingView>
       <SignUpBottomSheet
         visible={showSignUp}
@@ -457,13 +415,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5, borderTopColor: Colors.border,
     padding: 20, gap: 12, backgroundColor: Colors.background,
   },
-  choiceGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  choiceBtn: {
-    paddingVertical: 12, paddingHorizontal: 18,
-    borderRadius: 20, backgroundColor: Colors.surface,
-    borderWidth: 0.5, borderColor: Colors.border,
-  },
-  choiceBtnText: { fontSize: 14, color: Colors.textSecondary, fontWeight: '500' },
   customRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   customInput: {
     flex: 1, backgroundColor: Colors.surface, borderRadius: 10,
