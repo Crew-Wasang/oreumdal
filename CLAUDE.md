@@ -66,52 +66,107 @@
 ### 홈
 | ID | 화면 | 설명 |
 |----|------|------|
-| HOME-01 | 홈 | "지금 매매하고 싶어?" CTA 중앙 배치. 오늘 감정 체크인. 최근 코칭 요약 카드 1~2개 |
+| HOME-01 | 홈 | "지금 매매하고 싶어?" CTA 그라디언트 카드 중앙. 오늘 감정 체크인. 최근 코칭 요약 카드 1~2개 |
 
 ### 부수 기능
 | ID | 화면 | 설명 |
 |----|------|------|
-| REC-01 | 매매 기록 목록 | 과거 충동 체크 + 매매 기록 리스트 |
+| REC-01 | 매매 기록 목록 | 과거 충동 체크 + 매매 기록 리스트. 3탭 필터 (전체/조언따름/그대로매매) |
 | REC-02 | 매매 기록 상세 | 당시 AI 코칭 내용 + 결과 기록 |
-| REP-01 | AI 리포트 | 감정 패턴, 반복 실수, 성향 분석 요약 |
-| MGT-01 | 마이페이지 | 내 투자 원칙 설정 (AI 컨텍스트 유일한 소스) |
+| REC-03 | 매매 기록 남기기 | 이미 매매한 경우 사후 기록 |
+| REP-01 | AI 리포트 | 성장 추이, 매매 패턴, AI 심화 분석, 심화 인사이트, 시장 맥락 |
+| MGT-01 | 마이페이지 | 프로필, 투자 원칙 설정 (AI 컨텍스트 유일한 소스), 메뉴 |
 | MGT-02 | 설정 | 알림, 계정, 로그아웃 |
 
 ### 하단 탭
 홈 | 기록 | 리포트 | 마이
 
-## 기술 스택 조건
-- iOS + Android 동시 지원 (앱스토어 + 구글플레이 배포)
-- Claude API 연동 (심리 코치 AI 구현)
-- 소셜 로그인 (구글/애플)
-- 사용자 데이터 저장 (코칭 기록, 투자 원칙, 충동도 점수)
-- 1인 또는 소규모 팀 기준, 유지보수 쉬운 스택
-- 추천 스택은 Claude Code가 제안
+## 기술 스택
+
+### 프레임워크
+- **React Native + Expo** (TypeScript)
+- iOS + Android 동시 지원
+
+### 주요 라이브러리
+| 역할 | 라이브러리 |
+|------|-----------|
+| 내비게이션 | `@react-navigation/native` + `@react-navigation/native-stack` + `@react-navigation/bottom-tabs` |
+| 상태 관리 | Zustand (`useRecordStore`, `useUserStore`, `usePrinciplesStore`) |
+| 백엔드/인증 | Supabase |
+| 그라디언트 | `expo-linear-gradient` |
+| SVG 아이콘 | `react-native-svg` (커스텀 컴포넌트, 외부 아이콘 라이브러리 미사용) |
+| AI | Claude API (`ANTHROPIC_API_KEY`) — 기본 프로바이더 |
+
+### 환경 변수
+- `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+- `ANTHROPIC_API_KEY` — 서버사이드 전용 (EXPO_PUBLIC_ 붙이지 않음)
+- `EXPO_PUBLIC_AI_PROVIDER` — `'claude'` 또는 `'openai'`
+- `.env` 파일은 gitignore됨. `.env.example`을 참조해 로컬 설정
 
 ## 디자인 방향
 
 ### 컨셉
 - 토스처럼 깔끔하고 세련된 화이트 베이스
-- 딥 네이비 포인트로 신뢰감 + 금융 느낌
-- 버튼은 누를 때 살짝 꺼지는 느낌 필수 (scale 0.97 + 배경 살짝 어두워짐)
+- 인디고 포인트로 신뢰감 + 세련미
+- 버튼은 누를 때 살짝 꺼지는 느낌 필수 (`ScaleButton` 컴포넌트: scale 0.97, 100ms)
 - 이모지 전면 금지
 
-### 컬러 팔레트
-- 배경: #FFFFFF
-- 서피스/카드: #EBF0F8
-- 포인트 (CTA, 강조): #0D2137
-- 보조 포인트: #1A6FA8
-- 충동도/경고: #C97A3A (앰버 유지)
-- 주 텍스트: #0D2137
-- 보조 텍스트: #8B95A1
-- 보더: #D0DAE8
+### 컬러 팔레트 (`app/src/constants/colors.ts`)
+| 용도 | 토큰 | 값 |
+|------|------|----|
+| 배경 | `Colors.background` | `#FFFFFF` |
+| 서피스/카드 | `Colors.surface` | `#FAFAFA` (zinc-50) |
+| 서피스 강조 | `Colors.surfaceElevated` | `#F4F4F5` (zinc-100) |
+| 보더 | `Colors.border` | `#E4E4E7` (zinc-200) |
+| CTA / 포인트 | `Colors.cta` | `#6366F1` (indigo-500) |
+| CTA 딥 | `Colors.ctaDeep` | `#4F46E5` (indigo-600) |
+| CTA 라이트 배경 | `Colors.ctaLight` | `#EEF2FF` (indigo-50) |
+| CTA 보더 | `Colors.ctaBorder` | `#C7D2FE` (indigo-200) |
+| 그라디언트 시작 | `Colors.gradientStart` | `#6366F1` |
+| 그라디언트 끝 | `Colors.gradientEnd` | `#7C3AED` (purple-700) |
+| 주 텍스트 | `Colors.textPrimary` | `#18181B` (zinc-900) |
+| 보조 텍스트 | `Colors.textSecondary` | `#71717A` (zinc-500) |
+| 뮤트 텍스트 | `Colors.textMuted` | `#A1A1AA` (zinc-400) |
+| 충동도/경고 | `Colors.impulse` | `#B45309` (amber-700) |
+| 충동도 배경 | `Colors.impulseBg` | `#FEF3C7` (amber-100) |
+| 괜찮음 | `Colors.ok` | `#047857` (emerald-700) |
+| 괜찮음 배경 | `Colors.okBg` | `#D1FAE5` (emerald-100) |
+| 매수 | `Colors.buy` | `#E11D48` (rose-600) |
+| 매수 배경 | `Colors.buyBg` | `#FFE4E6` (rose-100) |
+| 매도 | `Colors.sell` | `#0284C7` (sky-600) |
+| 매도 배경 | `Colors.sellBg` | `#E0F2FE` (sky-100) |
 
 ### 인터랙션
-- 모든 버튼 클릭 시: transform scale(0.97) + background 살짝 어두워짐
-- 트랜지션: 0.1s ease
+- 모든 탭/버튼: `ScaleButton` 컴포넌트 사용 (scale 0.97, 100ms, `activeOpacity` 대신)
+- 트랜지션: 100ms ease
 
-### 컴포넌트
-- border-radius: 10px (버튼, 인풋) / 16px (카드)
-- 보더: 0.5px solid #D0DAE8
-- CTA 버튼: background #0D2137, color white
-- 세컨더리 버튼: background #EBF0F8, color #0D2137
+### 컴포넌트 규칙
+- `border-radius`: 버튼 12–16px / 카드 16–20px / 그라디언트 히어로 24–28px
+- 보더: `0.5px solid Colors.border`
+- CTA 버튼: `Colors.cta` bg + white text
+- 세컨더리 버튼: `Colors.surfaceElevated` bg + `Colors.textPrimary` text
+- 그라디언트 카드: `expo-linear-gradient` (`gradientStart → gradientMid → gradientEnd`)
+- 아이콘: `app/src/components/common/Icons.tsx` 커스텀 SVG (lucide 등 외부 라이브러리 사용 금지)
+
+## 개발 규칙
+
+### 절대 수정 금지
+- `useRecordStore`, `useUserStore` — 비즈니스 로직 스토어
+- `lib/reportUtils.ts` 내 계산 로직 — UI 변경 시에도 함부로 수정하지 않음
+
+### 내비게이션
+- `MainStackParamList` 타입 기준으로 navigate 호출
+- `SignUp` 화면은 반드시 `{ trigger: 'chk' | 'save' | 'report' }` 파라미터 필요
+
+### AI 리포트 섹션 구성
+| 섹션 | 컴포넌트 | 잠금 조건 |
+|------|---------|-----------|
+| 성장 추이 | `GrowthSummaryCard`, `ImpulseGraph` | 코칭 5회 미만 |
+| 매매 패턴 | `OutcomeComparisonCard`, `EmotionPatternCard` | 코칭 10회 미만 |
+| AI 심화 분석 | `InsightCard` × 4 | 각각 5/5/3/10회 기준 |
+| 심화 인사이트 | `Heatmap7Day`, `TickerTrendCard` | 7회 미만 / 취약 종목 없으면 숨김 |
+| 시장 맥락 | `FearGreedCard` | 항상 표시 (외부 API) |
+
+### 보안 주의
+- `EXPO_PUBLIC_` prefix가 붙은 키는 클라이언트 번들에 포함됨
+- AI API 키(`ANTHROPIC_API_KEY`)는 `EXPO_PUBLIC_` 없이 유지 — 현재는 직접 호출 중이나 향후 서버 프록시 전환 필요
