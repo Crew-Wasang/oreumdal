@@ -1,9 +1,9 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
 import { MainStackParamList, MainTabParamList } from '../types';
 import { Colors } from '../constants/colors';
+import { TabHomeIcon, TabRecordsIcon, TabReportIcon, TabMyIcon } from '../components/common/Icons';
 
 import HomeScreen from '../screens/home/HomeScreen';
 import RecordsScreen from '../screens/records/RecordsScreen';
@@ -17,29 +17,34 @@ import SignUpScreen from '../screens/onboarding/SignUpScreen';
 const Stack = createNativeStackNavigator<MainStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const TAB_ICONS: Record<string, string> = {
-  Home: '○', Records: '≡', Report: '◫', My: '◯',
-};
+const TAB_ICON_MAP = {
+  Home: TabHomeIcon,
+  Records: TabRecordsIcon,
+  Report: TabReportIcon,
+  My: TabMyIcon,
+} as const;
 
 function TabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: Colors.tabActive,
-        tabBarInactiveTintColor: Colors.tabInactive,
-        tabBarStyle: {
-          backgroundColor: Colors.background,
-          borderTopWidth: 0.5,
-          borderTopColor: Colors.border,
-          paddingBottom: 16,
-          height: 70,
-        },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '500', letterSpacing: 0.5 },
-        tabBarIcon: ({ color }) => (
-          <Text style={{ fontSize: 16, color }}>{TAB_ICONS[route.name] ?? '·'}</Text>
-        ),
-      })}
+      screenOptions={({ route }) => {
+        const IconComponent = TAB_ICON_MAP[route.name as keyof typeof TAB_ICON_MAP];
+        return {
+          headerShown: false,
+          tabBarActiveTintColor: Colors.tabActive,
+          tabBarInactiveTintColor: Colors.tabInactive,
+          tabBarStyle: {
+            backgroundColor: Colors.background,
+            borderTopWidth: 0.5,
+            borderTopColor: Colors.border,
+            paddingBottom: 16,
+            height: 70,
+          },
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
+          tabBarIcon: ({ color }) =>
+            IconComponent ? <IconComponent size={22} color={color} /> : null,
+        };
+      }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: '홈' }} />
       <Tab.Screen name="Records" component={RecordsScreen} options={{ tabBarLabel: '기록' }} />
