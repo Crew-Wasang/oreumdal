@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { OnboardingStackParamList } from '../../types';
 import { Colors } from '../../constants/colors';
 import ScaleButton from '../../components/common/ScaleButton';
+import { ChevronLeft } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'PersonalityTest'>;
 
@@ -76,14 +77,14 @@ export default function PersonalityTestScreen() {
   const navigation = useNavigation<Nav>();
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
   const question = QUESTIONS[current];
   const isLast = current === QUESTIONS.length - 1;
   const progress = (current + 1) / QUESTIONS.length;
 
-  const handleSelect = (type: string, label: string) => {
-    setSelectedLabel(label);
+  const handleSelect = (type: string, idx: number) => {
+    setSelectedIdx(idx);
     setTimeout(() => {
       const newAnswers = [...answers, type];
       if (isLast) {
@@ -91,9 +92,9 @@ export default function PersonalityTestScreen() {
       } else {
         setAnswers(newAnswers);
         setCurrent(prev => prev + 1);
-        setSelectedLabel(null);
+        setSelectedIdx(null);
       }
-    }, 220);
+    }, 180);
   };
 
   const handleBack = () => {
@@ -102,81 +103,93 @@ export default function PersonalityTestScreen() {
     } else {
       setAnswers(prev => prev.slice(0, -1));
       setCurrent(prev => prev - 1);
-      setSelectedLabel(null);
+      setSelectedIdx(null);
     }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.content}>
-        <View style={styles.topBar}>
-          <ScaleButton onPress={handleBack} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>←</Text>
-          </ScaleButton>
-          <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
-          </View>
-          <Text style={styles.progressLabel}>{current + 1} / {QUESTIONS.length}</Text>
-        </View>
+      <View style={styles.header}>
+        <ScaleButton onPress={handleBack} style={styles.backBtn}>
+          <ChevronLeft size={26} color={Colors.textPrimary} />
+        </ScaleButton>
+        <Text style={styles.headerTitle}>{current + 1} / {QUESTIONS.length}</Text>
+        <View style={styles.backBtn} />
+      </View>
 
-        <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-          <Text style={styles.stepLabel}>투자 성향 파악</Text>
-          <Text style={styles.question}>{question.question}</Text>
+      <View style={styles.progressBg}>
+        <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
+      </View>
 
-          <View style={styles.options}>
-            {question.options.map((opt) => (
+      <ScrollView
+        contentContainerStyle={styles.body}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.stepLabel}>투자 성향 진단</Text>
+        <Text style={styles.question}>{question.question}</Text>
+
+        <View style={styles.options}>
+          {question.options.map((opt, i) => {
+            const active = selectedIdx === i;
+            return (
               <ScaleButton
                 key={opt.label}
-                style={[styles.option, selectedLabel === opt.label && styles.optionActive]}
-                onPress={() => handleSelect(opt.type, opt.label)}
+                style={[styles.option, active && styles.optionActive]}
+                onPress={() => handleSelect(opt.type, i)}
               >
-                <Text style={[styles.optionText, selectedLabel === opt.label && styles.optionTextActive]}>
+                <Text style={[styles.optionText, active && styles.optionTextActive]}>
                   {opt.label}
                 </Text>
               </ScaleButton>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+            );
+          })}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  content: { flex: 1, padding: 24, paddingBottom: 48, gap: 24 },
-
-  topBar: { gap: 8, paddingTop: 8 },
-  backBtn: { width: 44, height: 44, justifyContent: 'center' },
-  backBtnText: { fontSize: 26, color: Colors.textSecondary },
-  progressBg: { height: 2, backgroundColor: Colors.border, borderRadius: 1, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: Colors.cta, borderRadius: 1 },
-  progressLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase', textAlign: 'right',
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    height: 48,
   },
-
-  body: { gap: 28, paddingBottom: 8 },
-  stepLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  progressBg: {
+    height: 3,
+    marginHorizontal: 20,
+    backgroundColor: Colors.border,
+    borderRadius: 2,
+    overflow: 'hidden',
   },
+  progressFill: { height: '100%', backgroundColor: Colors.cta, borderRadius: 2 },
+  body: { padding: 24, paddingTop: 28, gap: 28, paddingBottom: 40 },
+  stepLabel: { fontSize: 12, fontWeight: '500', color: Colors.cta },
   question: {
-    fontSize: 22, fontWeight: '600', color: Colors.textPrimary,
-    lineHeight: 22 * 1.5, letterSpacing: -0.3,
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    lineHeight: 22 * 1.4,
   },
-
   options: { gap: 10 },
   option: {
-    borderRadius: 10, padding: 18,
-    borderWidth: 0.5, borderColor: Colors.border,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+    borderWidth: 0.5,
+    borderColor: Colors.border,
     backgroundColor: Colors.surface,
   },
   optionActive: {
-    borderWidth: 1.5, borderColor: Colors.cta,
-    backgroundColor: Colors.background,
+    borderWidth: 1.5,
+    borderColor: Colors.cta,
+    backgroundColor: Colors.ctaLight,
   },
-  optionText: { fontSize: 15, color: Colors.textSecondary, lineHeight: 15 * 1.5 },
-  optionTextActive: { color: Colors.cta, fontWeight: '600' },
-
+  optionText: { fontSize: 14, color: Colors.textLight, lineHeight: 14 * 1.5 },
+  optionTextActive: { color: Colors.ctaLightText, fontWeight: '600' },
 });

@@ -6,11 +6,13 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as WebBrowser from 'expo-web-browser';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../types';
 import { Colors } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
 import { useRecordStore } from '../../store/recordStore';
 import ScaleButton from '../../components/common/ScaleButton';
+import { OremdalLogo, Sparkle } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList, 'SignUp'>;
 type Provider = 'google' | 'kakao' | 'apple';
@@ -43,7 +45,6 @@ export default function SignUpScreen() {
   const [agreeRequired, setAgreeRequired] = useState(false);
   const [agreeMarketing, setAgreeMarketing] = useState(false);
 
-  // 로그인 후 받은 토큰/유저 정보를 임시 보관
   const [pendingAuth, setPendingAuth] = useState<{
     userId: string;
     accessToken: string;
@@ -60,10 +61,7 @@ export default function SignUpScreen() {
         `${API_BASE}/api/auth/${provider}` +
         `?platform=app&front_url=${encodeURIComponent(DEEP_LINK_BASE)}`;
 
-      const result = await WebBrowser.openAuthSessionAsync(
-        loginUrl,
-        DEEP_LINK_BASE,
-      );
+      const result = await WebBrowser.openAuthSessionAsync(loginUrl, DEEP_LINK_BASE);
 
       if (result.type !== 'success') return;
 
@@ -82,13 +80,12 @@ export default function SignUpScreen() {
         provider,
       });
 
-      // 백엔드에서 받은 이름 pre-fill
       if (nick_name && nick_name !== 'None') {
         setNickname(nick_name.slice(0, 10));
       }
 
       setStep('profile');
-    } catch (e) {
+    } catch {
       Alert.alert('오류', '로그인 중 문제가 발생했습니다. 다시 시도해 주세요.');
     } finally {
       setLoadingProvider(null);
@@ -112,15 +109,23 @@ export default function SignUpScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.content}>
-          <ScaleButton onPress={() => navigation.goBack()} style={styles.closeBtn}>
-            <Text style={styles.closeBtnText}>✕</Text>
-          </ScaleButton>
-
           <View style={styles.top}>
-            <Text style={styles.title}>오름달 가입</Text>
+            <LinearGradient
+              colors={[Colors.gradientStart, Colors.gradientMid, Colors.gradientEnd]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.logoBox}
+            >
+              <OremdalLogo size={34} />
+            </LinearGradient>
+            <Text style={styles.title}>매매하기 전,{'\n'}잠깐 들러보세요</Text>
             <Text style={styles.desc}>
-              가입하면 코칭 기록이 저장되고{'\n'}더 정확한 분석을 받을 수 있어요
+              오름달은 수익률이 아닌, 당신의 의사결정 습관을 다듬어주는 AI 심리 코치예요.
             </Text>
+            <View style={styles.tagRow}>
+              <Sparkle size={13} color={Colors.cta} />
+              <Text style={styles.tagText}>매매 충동을 느낄 때 가장 먼저 떠올리는 곳</Text>
+            </View>
           </View>
 
           <View style={styles.buttons}>
@@ -137,18 +142,6 @@ export default function SignUpScreen() {
             </ScaleButton>
 
             <ScaleButton
-              style={styles.googleBtn}
-              onPress={() => handleSocial('google')}
-              disabled={loadingProvider !== null}
-            >
-              {loadingProvider === 'google' ? (
-                <ActivityIndicator color={Colors.textPrimary} />
-              ) : (
-                <Text style={styles.googleBtnText}>Google로 계속하기</Text>
-              )}
-            </ScaleButton>
-
-            <ScaleButton
               style={styles.appleBtn}
               onPress={() => handleSocial('apple')}
               disabled={loadingProvider !== null}
@@ -160,9 +153,19 @@ export default function SignUpScreen() {
               )}
             </ScaleButton>
 
-            <Text style={styles.terms}>
-              시작하면 이용약관 및 개인정보처리방침에 동의하게 됩니다
-            </Text>
+            <ScaleButton
+              style={styles.googleBtn}
+              onPress={() => handleSocial('google')}
+              disabled={loadingProvider !== null}
+            >
+              {loadingProvider === 'google' ? (
+                <ActivityIndicator color={Colors.textPrimary} />
+              ) : (
+                <Text style={styles.googleBtnText}>Google로 계속하기</Text>
+              )}
+            </ScaleButton>
+
+            <Text style={styles.terms}>가입 시 이용약관과 개인정보 처리방침에 동의합니다</Text>
           </View>
         </View>
       </SafeAreaView>
@@ -180,8 +183,8 @@ export default function SignUpScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <ScaleButton onPress={() => setStep('social')} style={styles.closeBtn}>
-            <Text style={styles.closeBtnText}>←</Text>
+          <ScaleButton onPress={() => setStep('social')} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>←</Text>
           </ScaleButton>
 
           <Text style={styles.title}>닉네임을 정해봐요</Text>
@@ -201,10 +204,7 @@ export default function SignUpScreen() {
           </View>
 
           <View style={styles.consentSection}>
-            <ScaleButton
-              style={styles.checkRow}
-              onPress={() => setAgreeRequired(!agreeRequired)}
-            >
+            <ScaleButton style={styles.checkRow} onPress={() => setAgreeRequired(!agreeRequired)}>
               <View style={[styles.checkbox, agreeRequired && styles.checkboxActive]}>
                 {agreeRequired && <Text style={styles.checkmark}>✓</Text>}
               </View>
@@ -213,11 +213,7 @@ export default function SignUpScreen() {
                 이용약관 및 개인정보처리방침 동의
               </Text>
             </ScaleButton>
-
-            <ScaleButton
-              style={styles.checkRow}
-              onPress={() => setAgreeMarketing(!agreeMarketing)}
-            >
+            <ScaleButton style={styles.checkRow} onPress={() => setAgreeMarketing(!agreeMarketing)}>
               <View style={[styles.checkbox, agreeMarketing && styles.checkboxActive]}>
                 {agreeMarketing && <Text style={styles.checkmark}>✓</Text>}
               </View>
@@ -245,8 +241,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: {
     flex: 1,
-    padding: 24,
-    paddingBottom: 48,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
     justifyContent: 'space-between',
   },
   profileContent: {
@@ -254,42 +250,67 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
     gap: 24,
   },
-  closeBtn: {
-    width: 40,
-    height: 40,
+  top: { flex: 1, justifyContent: 'center', gap: 0 },
+  logoBox: {
+    width: 64,
+    height: 64,
+    borderRadius: 18,
+    alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 24,
+    shadowColor: Colors.cta,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
   },
-  closeBtnText: {
-    fontSize: 18,
-    color: Colors.textSecondary,
-  },
-  top: { gap: 14, flex: 1, justifyContent: 'center' },
   title: {
     fontSize: 26,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.textPrimary,
-    letterSpacing: -0.3,
+    lineHeight: 26 * 1.3,
   },
   desc: {
-    fontSize: 15,
+    fontSize: 14,
     color: Colors.textSecondary,
-    lineHeight: 15 * 1.7,
+    lineHeight: 14 * 1.7,
+    marginTop: 12,
   },
-  buttons: { gap: 10 },
+  tagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 20,
+  },
+  tagText: {
+    fontSize: 12,
+    color: Colors.cta,
+  },
+  buttons: { gap: 10, paddingBottom: 8 },
   kakaoBtn: {
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 17,
     alignItems: 'center',
     backgroundColor: '#FEE500',
   },
   kakaoBtnText: {
     fontSize: 15,
-    fontWeight: '500',
-    color: '#000000',
+    fontWeight: '600',
+    color: '#191600',
+  },
+  appleBtn: {
+    borderRadius: 16,
+    padding: 17,
+    alignItems: 'center',
+    backgroundColor: '#18181B',
+  },
+  appleBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   googleBtn: {
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 17,
     alignItems: 'center',
     backgroundColor: Colors.surface,
@@ -298,31 +319,22 @@ const styles = StyleSheet.create({
   },
   googleBtnText: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
     color: Colors.textPrimary,
   },
-  appleBtn: {
-    borderRadius: 10,
-    padding: 17,
-    alignItems: 'center',
-    backgroundColor: Colors.cta,
-  },
-  appleBtnText: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#FFF',
-  },
   terms: {
-    fontSize: 12,
+    fontSize: 11,
     color: Colors.textMuted,
     textAlign: 'center',
     marginTop: 4,
   },
+  backBtn: { width: 40, height: 40, justifyContent: 'center', marginBottom: 8 },
+  backBtnText: { fontSize: 18, color: Colors.textSecondary },
   inputWrap: { gap: 6 },
   textInput: {
     backgroundColor: Colors.surface,
-    borderRadius: 10,
-    paddingHorizontal: 14,
+    borderRadius: 16,
+    paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
     color: Colors.textPrimary,
@@ -335,11 +347,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   consentSection: { gap: 14 },
-  checkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  checkRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   checkbox: {
     width: 22,
     height: 22,
@@ -350,33 +358,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkboxActive: {
-    borderColor: Colors.cta,
-    backgroundColor: Colors.cta,
-  },
-  checkmark: {
-    fontSize: 12,
-    color: '#FFF',
-    fontWeight: '700',
-  },
-  checkLabel: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    flex: 1,
-  },
+  checkboxActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
+  checkmark: { fontSize: 12, color: '#FFF', fontWeight: '700' },
+  checkLabel: { fontSize: 14, color: Colors.textSecondary, flex: 1 },
   required: { color: Colors.cta, fontWeight: '600' },
   optional: { color: Colors.textMuted },
   completeBtn: {
     backgroundColor: Colors.cta,
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 17,
     alignItems: 'center',
     marginTop: 8,
   },
   completeBtnDisabled: { opacity: 0.35 },
-  completeBtnText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#FFF',
-  },
+  completeBtnText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
 });

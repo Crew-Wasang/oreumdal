@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { OnboardingStackParamList } from '../../types';
 import { Colors } from '../../constants/colors';
 import ScaleButton from '../../components/common/ScaleButton';
+import { Sparkle } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'PersonalityIntro'>;
 
@@ -21,7 +22,10 @@ export default function PersonalityIntroScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.content}>
         <View style={styles.top}>
-          <Text style={styles.tag}>투자 성향 테스트</Text>
+          <View style={styles.tagRow}>
+            <Sparkle size={13} color={Colors.cta} />
+            <Text style={styles.tag}>투자 성향 진단</Text>
+          </View>
           <Text style={styles.title}>내 투자 심리{'\n'}패턴을 먼저 파악해요</Text>
           <Text style={styles.desc}>
             매매 결정 순간, 나도 모르게 감정이 개입하고 있나요?{'\n'}
@@ -31,8 +35,8 @@ export default function PersonalityIntroScreen() {
         </View>
 
         <View style={styles.points}>
-          {POINTS.map((p) => (
-            <View key={p.label} style={styles.pointRow}>
+          {POINTS.map((p, i) => (
+            <View key={p.label} style={[styles.pointRow, i < POINTS.length - 1 && styles.pointRowBorder]}>
               <View style={styles.dot} />
               <View style={styles.pointText}>
                 <Text style={styles.pointLabel}>{p.label}</Text>
@@ -54,54 +58,63 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: {
     flex: 1,
-    padding: 28,
-    paddingBottom: 48,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+    paddingTop: 8,
     justifyContent: 'space-between',
   },
   top: { gap: 16, paddingTop: 24 },
+  tagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.ctaLight,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
   tag: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '500',
-    color: Colors.textMuted,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
+    color: Colors.cta,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
     color: Colors.textPrimary,
-    lineHeight: 28 * 1.4,
-    letterSpacing: -0.5,
+    lineHeight: 26 * 1.4,
   },
   desc: {
-    fontSize: 15,
+    fontSize: 14,
     color: Colors.textSecondary,
-    lineHeight: 15 * 1.7,
+    lineHeight: 14 * 1.7,
   },
   points: {
-    gap: 20,
     backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 24,
+    borderRadius: 20,
+    paddingVertical: 8,
     borderWidth: 0.5,
     borderColor: Colors.border,
   },
-  pointRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },
+  pointRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start', paddingHorizontal: 20, paddingVertical: 16 },
+  pointRowBorder: { borderBottomWidth: 0.5, borderBottomColor: Colors.border },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.accent,
-    marginTop: 5,
+    backgroundColor: Colors.cta,
+    marginTop: 6,
+    flexShrink: 0,
   },
   pointText: { gap: 2, flex: 1 },
   pointLabel: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   pointDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.6 },
   cta: {
     backgroundColor: Colors.cta,
-    borderRadius: 10,
-    padding: 18,
+    borderRadius: 16,
+    padding: 17,
     alignItems: 'center',
   },
-  ctaText: { fontSize: 16, fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
 });
