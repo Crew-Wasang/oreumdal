@@ -48,20 +48,19 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
   const bottomY = GRAPH_PADDING.top + PLOT_H;
   const areaPath = `${linePath} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
 
-  // 위험선 (50% 기준)
-  const dangerY = toY(50);
-
   return (
     <View style={styles.card}>
-      <Text style={styles.label}>충동도 변화</Text>
-      <Text style={styles.subLabel}>최근 {points.length}회 코칭</Text>
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardTitle}>회차별 충동도</Text>
+        <Text style={styles.cardHint}>탭하면 기록으로 이동</Text>
+      </View>
 
       <View style={styles.graphWrap}>
         <Svg width={GRAPH_W} height={GRAPH_H}>
           <Defs>
             <LinearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor={Colors.cta} stopOpacity="0.12" />
-              <Stop offset="100%" stopColor={Colors.cta} stopOpacity="0.01" />
+              <Stop offset="0%" stopColor={Colors.cta} stopOpacity="0.35" />
+              <Stop offset="100%" stopColor={Colors.cta} stopOpacity="0" />
             </LinearGradient>
           </Defs>
 
@@ -92,18 +91,6 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
             );
           })}
 
-          {/* 충동도 50% 위험선 */}
-          <Line
-            x1={GRAPH_PADDING.left}
-            y1={dangerY}
-            x2={GRAPH_PADDING.left + PLOT_W}
-            y2={dangerY}
-            stroke={Colors.reconsider}
-            strokeWidth={0.8}
-            strokeDasharray="4,3"
-            strokeOpacity={0.6}
-          />
-
           {/* 영역 채우기 */}
           <Path d={areaPath} fill="url(#areaGrad)" />
 
@@ -121,16 +108,13 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
           {points.map((p, i) => {
             const x = toX(i, points.length);
             const y = toY(p.score);
-            const isHigh = p.score >= 50;
             return (
               <Circle
                 key={p.sessionId}
                 cx={x}
                 cy={y}
-                r={5}
-                fill={isHigh ? Colors.reconsider : Colors.ok}
-                stroke={Colors.background}
-                strokeWidth={2}
+                r={3}
+                fill={Colors.cta}
               />
             );
           })}
@@ -178,21 +162,6 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
         })}
       </View>
 
-      {/* 범례 */}
-      <View style={styles.legend}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: Colors.reconsider }]} />
-          <Text style={styles.legendText}>50% 이상</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: Colors.ok }]} />
-          <Text style={styles.legendText}>50% 미만</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine]} />
-          <Text style={styles.legendText}>충동도 50% 기준선</Text>
-        </View>
-      </View>
     </View>
   );
 }
@@ -202,23 +171,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: 16, padding: CARD_PADDING,
     borderWidth: 0.5, borderColor: Colors.border, gap: 4,
   },
-  label: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  subLabel: { fontSize: 12, color: Colors.textMuted, marginBottom: 8 },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  cardTitle: { fontSize: 12, fontWeight: '600', color: Colors.textSubtle },
+  cardHint: { fontSize: 11, color: Colors.textMuted },
 
   graphWrap: { position: 'relative', height: GRAPH_H },
   pointHit: { position: 'absolute' },
-
-  legend: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 8,
-    paddingTop: 12, borderTopWidth: 0.5, borderTopColor: Colors.border,
-  },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendLine: {
-    width: 14, height: 1.5, backgroundColor: Colors.reconsider, opacity: 0.6,
-  },
-  legendText: { fontSize: 11, color: Colors.textMuted },
 });

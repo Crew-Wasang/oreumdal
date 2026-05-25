@@ -1,12 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { EmotionStat } from '../../lib/reportUtils';
+import { EmotionType } from '../../types';
 
-const SCREEN_W = Dimensions.get('window').width;
-const BAR_MAX_W = SCREEN_W - 48 - 40 - 72 - 48; // content padding, card padding, label col, percent col
-
-const EMOTION_COLORS = ['#0D2137', '#1A6FA8', '#8B95A1'];
+const EMOTION_COLORS: Record<EmotionType, string> = {
+  anxious:  '#FBBF24', // amber-400
+  excited:  '#FB7185', // rose-400
+  greedy:   '#FB7185', // rose-400
+  fearful:  '#38BDF8', // sky-400
+  calm:     '#818CF8', // indigo-400
+  confused: '#D4D4D8', // zinc-300
+};
 
 interface Props {
   stats: EmotionStat[];
@@ -18,7 +23,7 @@ export default function EmotionPatternCard({ stats, insight, loading }: Props) {
   if (!stats.length) {
     return (
       <View style={styles.card}>
-        <Text style={styles.sectionLabel}>나의 감정 패턴</Text>
+        <Text style={styles.title}>매매 직전 감정 분포</Text>
         <Text style={styles.empty}>코칭 기록이 쌓이면 자주 온 감정을 분석해드려요.</Text>
       </View>
     );
@@ -26,84 +31,60 @@ export default function EmotionPatternCard({ stats, insight, loading }: Props) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.sectionLabel}>나의 감정 패턴</Text>
-      <Text style={styles.subLabel}>자주 온 감정 Top {stats.length}</Text>
+      <Text style={styles.title}>매매 직전 감정 분포</Text>
 
-      <View style={styles.bars}>
-        {stats.map((stat, i) => (
-          <View key={stat.type} style={styles.barRow}>
-            {/* 순위 + 감정명 */}
-            <View style={styles.labelCol}>
-              <Text style={styles.rank}>{i + 1}</Text>
-              <Text style={styles.emotionLabel}>{stat.label}</Text>
+      <View style={styles.stackBar}>
+        {stats.map((e) => (
+          <View
+            key={e.type}
+            style={{ flex: e.percent, backgroundColor: EMOTION_COLORS[e.type] ?? '#D4D4D8' }}
+          />
+        ))}
+      </View>
+
+      <View style={styles.legend}>
+        {stats.map((e) => (
+          <View key={e.type} style={styles.legendRow}>
+            <View style={styles.legendLeft}>
+              <View style={[styles.legendDot, { backgroundColor: EMOTION_COLORS[e.type] ?? '#D4D4D8' }]} />
+              <Text style={styles.legendLabel}>{e.label}</Text>
             </View>
-
-            {/* 가로 막대 */}
-            <View style={styles.barTrack}>
-              <View
-                style={[
-                  styles.barFill,
-                  {
-                    width: (stat.percent / 100) * BAR_MAX_W,
-                    backgroundColor: EMOTION_COLORS[i],
-                  },
-                ]}
-              />
-            </View>
-
-            {/* 퍼센트 */}
-            <Text style={[styles.percent, { color: EMOTION_COLORS[i] }]}>
-              {stat.percent}%
-            </Text>
+            <Text style={styles.legendPct}>{e.percent}%</Text>
           </View>
         ))}
       </View>
 
-      <View style={styles.divider} />
-
-      {/* AI 인사이트 */}
-      <View style={styles.insightWrap}>
-        {loading ? (
-          <Text style={styles.insightLoading}>분석 중...</Text>
-        ) : insight ? (
-          <Text style={styles.insightText}>{insight}</Text>
-        ) : null}
-      </View>
+      {(insight || loading) && (
+        <View style={styles.insightWrap}>
+          <Text style={loading ? styles.insightLoading : styles.insightText}>
+            {loading ? '분석 중...' : insight}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
+    backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
     borderWidth: 0.5, borderColor: Colors.border, gap: 12,
   },
-  sectionLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  subLabel: { fontSize: 12, color: Colors.textMuted, marginTop: -4 },
+  title: { fontSize: 12, fontWeight: '600', color: Colors.textSubtle },
   empty: { fontSize: 14, color: Colors.textMuted, lineHeight: 14 * 1.6 },
 
-  bars: { gap: 14 },
-  barRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  labelCol: { width: 56, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  rank: { fontSize: 11, fontWeight: '600', color: Colors.textMuted, width: 14 },
-  emotionLabel: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary },
+  stackBar: { flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden' },
 
-  barTrack: {
-    flex: 1, height: 8, backgroundColor: Colors.border,
-    borderRadius: 4, overflow: 'hidden',
-  },
-  barFill: { height: '100%', borderRadius: 4 },
-  percent: { width: 36, fontSize: 12, fontWeight: '600', textAlign: 'right' },
+  legend: { gap: 6 },
+  legendRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  legendLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendLabel: { fontSize: 12, color: Colors.textSubtle },
+  legendPct: { fontSize: 12, color: Colors.textMuted },
 
-  divider: { height: 0.5, backgroundColor: Colors.border },
-
-  insightWrap: { minHeight: 20 },
+  insightWrap: { paddingTop: 12, borderTopWidth: 0.5, borderTopColor: Colors.border },
   insightText: {
-    fontSize: 13, color: Colors.accent, lineHeight: 13 * 1.7,
-    fontStyle: 'italic',
+    fontSize: 13, color: Colors.accent, lineHeight: 13 * 1.7, fontStyle: 'italic',
   },
   insightLoading: { fontSize: 13, color: Colors.textMuted },
 });

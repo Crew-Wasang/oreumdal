@@ -9,83 +9,44 @@ interface Props {
   loading: boolean;
 }
 
-function ImpulseBar({ value }: { value: number }) {
-  const color = value >= 50 ? Colors.reconsider : Colors.ok;
-  return (
-    <View style={styles.barWrap}>
-      <View style={styles.barBg}>
-        <View style={[styles.barFill, { width: `${value}%` as any, backgroundColor: color }]} />
-      </View>
-      <Text style={[styles.barLabel, { color }]}>{value}%</Text>
-    </View>
-  );
-}
-
 export default function OutcomeComparisonCard({ stats, insight, loading }: Props) {
   const { skippedCount, tradedCount, skippedAvgImpulse, tradedAvgImpulse } = stats;
   const total = skippedCount + tradedCount;
+  const heldPct = total > 0 ? Math.round((skippedCount / total) * 100) : 0;
 
   return (
     <View style={styles.card}>
-      <Text style={styles.sectionLabel}>참았을 때 vs 했을 때</Text>
+      <Text style={styles.title}>참은 횟수 vs 매매한 횟수</Text>
 
       {total === 0 ? (
         <Text style={styles.empty}>실제 매매 여부를 기록하면 여기서 비교해드려요.</Text>
       ) : (
         <>
-          {/* 테이블 헤더 */}
-          <View style={styles.tableRow}>
-            <View style={styles.colLabel} />
-            <View style={styles.colItem}>
-              <Text style={[styles.colHeader, { color: Colors.ok }]}>참았어요</Text>
+          <View style={styles.stackBar}>
+            <View style={{ flex: heldPct, backgroundColor: Colors.okMid }} />
+            <View style={{ flex: 100 - heldPct, backgroundColor: Colors.buy }} />
+          </View>
+
+          <View style={styles.colGrid}>
+            <View style={styles.heldCard}>
+              <Text style={styles.heldLabel}>참았어요</Text>
+              <Text style={styles.heldCount}>{skippedCount}회</Text>
+              <Text style={styles.heldSub}>평균 충동도 {skippedAvgImpulse}%</Text>
             </View>
-            <View style={styles.colItem}>
-              <Text style={[styles.colHeader, { color: Colors.reconsider }]}>했어요</Text>
+            <View style={styles.tradedCard}>
+              <Text style={styles.tradedLabel}>매매했어요</Text>
+              <Text style={styles.tradedCount}>{tradedCount}회</Text>
+              <Text style={styles.tradedSub}>평균 충동도 {tradedAvgImpulse}%</Text>
             </View>
           </View>
 
-          <View style={styles.divider} />
-
-          {/* 횟수 행 */}
-          <View style={styles.tableRow}>
-            <View style={styles.colLabel}>
-              <Text style={styles.rowLabel}>횟수</Text>
+          {(insight || loading) && (
+            <View style={styles.insightWrap}>
+              <Text style={loading ? styles.insightLoading : styles.insightText}>
+                {loading ? '분석 중...' : insight}
+              </Text>
             </View>
-            <View style={styles.colItem}>
-              <Text style={styles.cellValue}>{skippedCount}번</Text>
-            </View>
-            <View style={styles.colItem}>
-              <Text style={styles.cellValue}>{tradedCount}번</Text>
-            </View>
-          </View>
-
-          {/* 평균 충동도 행 */}
-          <View style={styles.tableRow}>
-            <View style={styles.colLabel}>
-              <Text style={styles.rowLabel}>평균 충동도</Text>
-            </View>
-            <View style={styles.colItem}>
-              {skippedCount > 0
-                ? <ImpulseBar value={skippedAvgImpulse} />
-                : <Text style={styles.naText}>-</Text>}
-            </View>
-            <View style={styles.colItem}>
-              {tradedCount > 0
-                ? <ImpulseBar value={tradedAvgImpulse} />
-                : <Text style={styles.naText}>-</Text>}
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          {/* AI 인사이트 */}
-          <View style={styles.insightWrap}>
-            {loading ? (
-              <Text style={styles.insightLoading}>분석 중...</Text>
-            ) : insight ? (
-              <Text style={styles.insightText}>{insight}</Text>
-            ) : null}
-          </View>
+          )}
         </>
       )}
     </View>
@@ -94,34 +55,37 @@ export default function OutcomeComparisonCard({ stats, insight, loading }: Props
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
+    backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
     borderWidth: 0.5, borderColor: Colors.border, gap: 12,
   },
-  sectionLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
+  title: { fontSize: 12, fontWeight: '600', color: Colors.textSubtle },
   empty: { fontSize: 14, color: Colors.textMuted, lineHeight: 14 * 1.6 },
 
-  tableRow: { flexDirection: 'row', alignItems: 'center' },
-  colLabel: { width: 72 },
-  colItem: { flex: 1 },
-  colHeader: { fontSize: 13, fontWeight: '600', textAlign: 'center' },
-  rowLabel: { fontSize: 12, color: Colors.textMuted },
-  cellValue: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
-  naText: { fontSize: 15, color: Colors.textMuted, textAlign: 'center' },
+  stackBar: {
+    flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden',
+  },
 
-  barWrap: { alignItems: 'center', gap: 4 },
-  barBg: { width: '80%', height: 4, backgroundColor: Colors.border, borderRadius: 4, overflow: 'hidden' },
-  barFill: { height: '100%', borderRadius: 4 },
-  barLabel: { fontSize: 12, fontWeight: '600' },
+  colGrid: { flexDirection: 'row', gap: 10 },
+  heldCard: {
+    flex: 1, padding: 12, borderRadius: 12,
+    backgroundColor: '#ECFDF5', borderWidth: 1, borderColor: '#A7F3D0',
+    gap: 2,
+  },
+  tradedCard: {
+    flex: 1, padding: 12, borderRadius: 12,
+    backgroundColor: '#FFF1F2', borderWidth: 1, borderColor: '#FECDD3',
+    gap: 2,
+  },
+  heldLabel: { fontSize: 11, color: '#047857' },
+  heldCount: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
+  heldSub: { fontSize: 11, color: Colors.textMuted },
+  tradedLabel: { fontSize: 11, color: '#BE123C' },
+  tradedCount: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
+  tradedSub: { fontSize: 11, color: Colors.textMuted },
 
-  divider: { height: 0.5, backgroundColor: Colors.border },
-
-  insightWrap: { minHeight: 20 },
+  insightWrap: { paddingTop: 12, borderTopWidth: 0.5, borderTopColor: Colors.border },
   insightText: {
-    fontSize: 13, color: Colors.accent, lineHeight: 13 * 1.7,
-    fontStyle: 'italic',
+    fontSize: 13, color: Colors.accent, lineHeight: 13 * 1.7, fontStyle: 'italic',
   },
   insightLoading: { fontSize: 13, color: Colors.textMuted },
 });

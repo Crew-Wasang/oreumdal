@@ -8,84 +8,78 @@ interface Props {
   totalAvgImpulse: number;
 }
 
+function MiniBar({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <View style={styles.miniBarWrap}>
+      <View style={styles.miniBarRow}>
+        <Text style={styles.miniBarLabel}>{label}</Text>
+        <Text style={styles.miniBarPct}>{value}%</Text>
+      </View>
+      <View style={styles.miniBarBg}>
+        <View style={[styles.miniBarFill, { width: `${value}%` as any, backgroundColor: color }]} />
+      </View>
+    </View>
+  );
+}
+
 export default function GrowthSummaryCard({ thisWeekAvg, lastWeekAvg, totalAvgImpulse }: Props) {
   const hasComparison = thisWeekAvg !== null && lastWeekAvg !== null;
   const diff = hasComparison ? thisWeekAvg! - lastWeekAvg! : 0;
-
   const improved = diff < 0;
-  const worsened = diff > 0;
-  const neutral = diff === 0;
-
-  const trendColor = improved ? Colors.ok : worsened ? Colors.reconsider : Colors.textSecondary;
-  const arrow = improved ? '↓' : worsened ? '↑' : '→';
+  const displayScore = thisWeekAvg ?? totalAvgImpulse;
 
   return (
     <View style={styles.card}>
-      <Text style={styles.label}>성장 요약</Text>
-
-      {hasComparison ? (
-        <View style={styles.body}>
-          <View style={styles.compRow}>
-            <View style={styles.weekBlock}>
-              <Text style={styles.weekLabel}>이번 주</Text>
-              <Text style={[styles.weekScore, { color: trendColor }]}>{thisWeekAvg}%</Text>
-            </View>
-            <Text style={[styles.arrow, { color: trendColor }]}>{arrow}</Text>
-            <View style={styles.weekBlock}>
-              <Text style={styles.weekLabel}>지난 주</Text>
-              <Text style={styles.weekScoreMuted}>{lastWeekAvg}%</Text>
-            </View>
-          </View>
-
-          <Text style={[styles.insight, { color: trendColor }]}>
-            {improved
-              ? `이번 주 평균 충동도 ${thisWeekAvg}%, 지난주 ${lastWeekAvg}%보다 낮아졌어요`
-              : worsened
-              ? `이번 주 평균 충동도 ${thisWeekAvg}%, 지난주 ${lastWeekAvg}%보다 높아졌어요`
-              : `이번 주와 지난주 충동도가 ${thisWeekAvg}%로 동일해요`}
+      <View style={styles.topRow}>
+        <Text style={styles.headerLabel}>이번 주 평균 충동도</Text>
+        {hasComparison && diff !== 0 && (
+          <Text style={[styles.trendText, improved ? styles.trendGood : styles.trendBad]}>
+            {improved ? '↓' : '↑'} {diff > 0 ? '+' : ''}{diff}%p
           </Text>
-        </View>
-      ) : (
-        <View style={styles.body}>
-          <Text style={styles.singleScore}>{totalAvgImpulse}%</Text>
-          <Text style={styles.singleLabel}>전체 평균 충동도</Text>
-          <Text style={styles.noCompDesc}>
-            {thisWeekAvg === null
-              ? '이번 주 코칭 기록이 없어요'
-              : '지난 주 기록이 쌓이면 변화를 비교해드려요'}
-          </Text>
+        )}
+      </View>
+
+      <View style={styles.scoreRow}>
+        <Text style={styles.score}>{displayScore}%</Text>
+        {hasComparison && lastWeekAvg !== null && (
+          <Text style={styles.lastWeekNote}>지난주 {lastWeekAvg}%</Text>
+        )}
+      </View>
+
+      {hasComparison && (
+        <View style={styles.miniBarGrid}>
+          <MiniBar label="이번 주" value={thisWeekAvg!} color={Colors.cta} />
+          <MiniBar label="지난 주" value={lastWeekAvg!} color="#D4D4D8" />
         </View>
       )}
+
+      <Text style={styles.footer}>누적 평균 {totalAvgImpulse}%</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 14,
+    backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
-  label: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  body: { gap: 10 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerLabel: { fontSize: 12, color: Colors.textMuted },
+  trendText: { fontSize: 11, fontWeight: '700' },
+  trendGood: { color: Colors.ok },
+  trendBad: { color: Colors.buy },
 
-  compRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 16,
-  },
-  weekBlock: { alignItems: 'center', gap: 4 },
-  weekLabel: { fontSize: 11, color: Colors.textMuted, fontWeight: '500' },
-  weekScore: { fontSize: 32, fontWeight: '700', letterSpacing: -1 },
-  weekScoreMuted: { fontSize: 32, fontWeight: '700', color: Colors.textMuted, letterSpacing: -1 },
-  arrow: { fontSize: 28, fontWeight: '600', marginTop: 12 },
+  scoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  score: { fontSize: 28, fontWeight: '700', color: Colors.textPrimary },
+  lastWeekNote: { fontSize: 12, color: Colors.textMuted },
 
-  insight: { fontSize: 14, lineHeight: 14 * 1.6, fontWeight: '500' },
+  miniBarGrid: { flexDirection: 'row', gap: 10 },
+  miniBarWrap: { flex: 1, gap: 4 },
+  miniBarRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  miniBarLabel: { fontSize: 11, color: Colors.textMuted },
+  miniBarPct: { fontSize: 11, color: Colors.textSubtle },
+  miniBarBg: { height: 8, backgroundColor: Colors.border, borderRadius: 4, overflow: 'hidden' },
+  miniBarFill: { height: '100%' as any, borderRadius: 4 },
 
-  singleScore: { fontSize: 40, fontWeight: '700', color: Colors.impulse, letterSpacing: -1 },
-  singleLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  noCompDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.6 },
+  footer: { fontSize: 11, color: Colors.textMuted },
 });
