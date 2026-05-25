@@ -5,11 +5,13 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import ScaleButton from '../../components/common/ScaleButton';
 import { useUserStore } from '../../store/userStore';
 import { useRecordStore } from '../../store/recordStore';
 import { RootStackParamList } from '../../types';
+import { Sparkle, ChevronRight } from '../../components/common/Icons';
 import {
   requestNotificationPermission,
   scheduleDailyReminder,
@@ -33,17 +35,49 @@ const PROVIDER_LABEL: Record<string, string> = {
   apple: 'Apple',
 };
 
+function PrincipleItem({
+  index, text, onDelete,
+}: { index: number; text: string; onDelete: () => void }) {
+  return (
+    <View style={styles.principleItem}>
+      <Text style={styles.principleIndex}>{String(index + 1).padStart(2, '0')}</Text>
+      <Text style={styles.principleText}>{text}</Text>
+      <ScaleButton onPress={onDelete} style={styles.principleDelete}>
+        <Text style={styles.principleDeleteText}>✕</Text>
+      </ScaleButton>
+    </View>
+  );
+}
+
 export default function MyPageScreen() {
   const navigation = useNavigation<Nav>();
-  const { principles, setPrinciples, personalityType, nickname, provider, logout, notifSettings, setNotifSettings } = useUserStore();
+  const {
+    principles, setPrinciples, personalityType,
+    nickname, provider, logout, notifSettings, setNotifSettings,
+  } = useUserStore();
   const clearRecords = useRecordStore((s) => s.clearRecords);
 
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(principles);
+  const [newPrinciple, setNewPrinciple] = useState('');
   const [showAccount, setShowAccount] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [editingNickname, setEditingNickname] = useState(false);
   const [nicknameDraft, setNicknameDraft] = useState(nickname);
+
+  const principleLines = principles
+    ? principles.split('\n').filter(l => l.trim().length > 0)
+    : [];
+
+  const addPrinciple = () => {
+    if (!newPrinciple.trim()) return;
+    const updated = [...principleLines, newPrinciple.trim()];
+    setPrinciples(updated.join('\n'));
+    setNewPrinciple('');
+  };
+
+  const deletePrinciple = (index: number) => {
+    const updated = principleLines.filter((_, i) => i !== index);
+    setPrinciples(updated.join('\n'));
+  };
 
   const handleNotifToggleDaily = async (val: boolean) => {
     if (val) {
@@ -66,7 +100,7 @@ export default function MyPageScreen() {
         Alert.alert('알림 권한 필요', '설정 > 오름달에서 알림을 허용해주세요.');
         return;
       }
-      await scheduleWeeklyReport(2, 9); // 2=월요일, 9시
+      await scheduleWeeklyReport(2, 9);
     } else {
       await cancelWeeklyReport();
     }
@@ -77,13 +111,8 @@ export default function MyPageScreen() {
     Alert.alert('로그아웃', '로그아웃 하시겠어요?', [
       { text: '취소', style: 'cancel' },
       {
-        text: '로그아웃',
-        style: 'destructive',
-        onPress: () => {
-          logout();
-          clearRecords();
-          navigation.replace('Main');
-        },
+        text: '로그아웃', style: 'destructive',
+        onPress: () => { logout(); clearRecords(); navigation.replace('Main'); },
       },
     ]);
   };
@@ -109,42 +138,73 @@ export default function MyPageScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <Text style={styles.pageTitle}>마이</Text>
 
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>투자 성향</Text>
-            <Text style={styles.personalityType}>
-              {personalityType ? PERSONALITY_LABEL[personalityType] ?? personalityType : '아직 테스트 전이에요'}
-            </Text>
+          {/* 프로필 카드 */}
+          <View style={styles.profileCard}>
+            <LinearGradient
+              colors={[Colors.accent, Colors.gradientEnd]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.profileAvatar}
+            >
+              <Text style={styles.profileAvatarText}>
+                {(nickname || '?')[0].toUpperCase()}
+              </Text>
+            </LinearGradient>
+            <View>
+              <Text style={styles.profileName}>{nickname || '이름 없음'}</Text>
+              <Text style={styles.profileSub}>
+                {personalityType ? PERSONALITY_LABEL[personalityType] ?? personalityType : '성향 미진단'}
+              </Text>
+            </View>
           </View>
 
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardLabel}>나의 투자 원칙</Text>
-              <ScaleButton onPress={() => {
-                if (editing) { setPrinciples(draft); setEditing(false); }
-                else { setDraft(principles); setEditing(true); }
-              }}>
-                <Text style={styles.editBtn}>{editing ? '저장' : '수정'}</Text>
+          {/* 투자 원칙 */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Sparkle size={13} color={Colors.cta} />
+              <Text style={styles.sectionTitle}>내 투자 원칙</Text>
+            </View>
+            <Text style={styles.sectionDesc}>여기에 적은 내용만 AI 코치가 참고해요</Text>
+
+            <View style={styles.principleList}>
+              {principleLines.map((p, i) => (
+                <PrincipleItem
+                  key={i}
+                  index={i}
+                  text={p}
+                  onDelete={() => deletePrinciple(i)}
+                />
+              ))}
+            </View>
+
+            <View style={styles.principleAddRow}>
+              <TextInput
+                style={styles.principleInput}
+                value={newPrinciple}
+                onChangeText={setNewPrinciple}
+                placeholder="새로운 원칙 추가하기"
+                placeholderTextColor={Colors.textMuted}
+                returnKeyType="done"
+                onSubmitEditing={addPrinciple}
+              />
+              <ScaleButton
+                style={[styles.addBtn, !newPrinciple.trim() && styles.addBtnDisabled]}
+                onPress={addPrinciple}
+                disabled={!newPrinciple.trim()}
+              >
+                <Text style={styles.addBtnText}>+</Text>
               </ScaleButton>
             </View>
-            {editing ? (
-              <TextInput
-                style={styles.principlesInput}
-                value={draft}
-                onChangeText={setDraft}
-                multiline
-                placeholder={'예) 손절 -10% 이상은 반드시 실행\n예) 모르는 종목은 절대 사지 않는다'}
-                placeholderTextColor={Colors.textMuted}
-              />
-            ) : (
-              <Text style={principles ? styles.principlesText : styles.principlesEmpty}>
-                {principles || 'AI 코칭의 기준이 되는 나만의 원칙을 적어봐요.\n원칙이 있으면 더 정확한 코칭을 받을 수 있어요.'}
-              </Text>
-            )}
           </View>
 
+          {/* 메뉴 */}
           <View style={styles.menuCard}>
             {menuItems.map((item, i) => (
               <ScaleButton
@@ -152,11 +212,15 @@ export default function MyPageScreen() {
                 style={[styles.menuItem, i < menuItems.length - 1 && styles.menuItemBorder]}
                 onPress={item.onPress}
               >
-                <Text style={[styles.menuLabel, item.danger && { color: Colors.reconsider }]}>{item.label}</Text>
-                <Text style={styles.menuArrow}>›</Text>
+                <Text style={[styles.menuLabel, item.danger && styles.menuLabelDanger]}>
+                  {item.label}
+                </Text>
+                <ChevronRight size={16} color={item.danger ? Colors.reconsider : Colors.textMuted} />
               </ScaleButton>
             ))}
           </View>
+
+          <View style={{ height: 40 }} />
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -170,13 +234,11 @@ export default function MyPageScreen() {
             </ScaleButton>
           </View>
           <ScrollView contentContainerStyle={styles.modalContent}>
-
-            {/* 매일 리마인더 */}
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
+            <View style={styles.notifCard}>
+              <View style={styles.notifCardHeader}>
                 <View style={{ gap: 4 }}>
-                  <Text style={styles.cardLabel}>매일 리마인더</Text>
-                  <Text style={styles.notifTime}>매일 오전 9시</Text>
+                  <Text style={styles.notifCardLabel}>매일 리마인더</Text>
+                  <Text style={styles.notifCardTime}>매일 오전 9시</Text>
                 </View>
                 <Switch
                   value={notifSettings.dailyEnabled}
@@ -185,15 +247,13 @@ export default function MyPageScreen() {
                   thumbColor="#FFF"
                 />
               </View>
-              <Text style={styles.principlesEmpty}>매매 전 체크를 잊지 않도록 매일 알려드려요</Text>
+              <Text style={styles.notifCardDesc}>매매 전 체크를 잊지 않도록 매일 알려드려요</Text>
             </View>
-
-            {/* 주간 리포트 */}
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
+            <View style={styles.notifCard}>
+              <View style={styles.notifCardHeader}>
                 <View style={{ gap: 4 }}>
-                  <Text style={styles.cardLabel}>주간 리포트</Text>
-                  <Text style={styles.notifTime}>매주 월요일 오전 9시</Text>
+                  <Text style={styles.notifCardLabel}>주간 리포트</Text>
+                  <Text style={styles.notifCardTime}>매주 월요일 오전 9시</Text>
                 </View>
                 <Switch
                   value={notifSettings.weeklyEnabled}
@@ -202,17 +262,14 @@ export default function MyPageScreen() {
                   thumbColor="#FFF"
                 />
               </View>
-              <Text style={styles.principlesEmpty}>지난주 나의 투자 심리 패턴을 알려드려요</Text>
+              <Text style={styles.notifCardDesc}>지난주 나의 투자 심리 패턴을 알려드려요</Text>
             </View>
-
-            {/* 코칭 후 결과 추적 */}
-            <View style={styles.card}>
-              <Text style={styles.cardLabel}>코칭 후 결과 추적</Text>
-              <Text style={styles.principlesEmpty}>
+            <View style={styles.notifCard}>
+              <Text style={styles.notifCardLabel}>코칭 후 결과 추적</Text>
+              <Text style={styles.notifCardDesc}>
                 코칭 화면에서 "나중에 알려주기"를 선택하면 8시간 후 자동으로 알림을 보내드려요
               </Text>
             </View>
-
           </ScrollView>
         </SafeAreaView>
       </Modal>
@@ -222,25 +279,27 @@ export default function MyPageScreen() {
         <SafeAreaView style={styles.modalSafe}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>계정 설정</Text>
-            <ScaleButton onPress={() => { setShowAccount(false); setEditingNickname(false); }} style={styles.modalClose}>
+            <ScaleButton
+              onPress={() => { setShowAccount(false); setEditingNickname(false); }}
+              style={styles.modalClose}
+            >
               <Text style={styles.modalCloseText}>✕</Text>
             </ScaleButton>
           </View>
-
           <ScrollView contentContainerStyle={styles.modalContent}>
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardLabel}>닉네임</Text>
+            <View style={styles.notifCard}>
+              <View style={styles.notifCardHeader}>
+                <Text style={styles.notifCardLabel}>닉네임</Text>
                 {!editingNickname && (
                   <ScaleButton onPress={() => setEditingNickname(true)}>
-                    <Text style={styles.editBtn}>수정</Text>
+                    <Text style={styles.editLink}>수정</Text>
                   </ScaleButton>
                 )}
               </View>
               {editingNickname ? (
                 <View style={{ gap: 10 }}>
                   <TextInput
-                    style={styles.principlesInput}
+                    style={styles.principleInput}
                     value={nicknameDraft}
                     onChangeText={(v) => setNicknameDraft(v.slice(0, 10))}
                     autoFocus
@@ -256,13 +315,12 @@ export default function MyPageScreen() {
                   </ScaleButton>
                 </View>
               ) : (
-                <Text style={styles.principlesText}>{nickname || '-'}</Text>
+                <Text style={styles.accountValue}>{nickname || '-'}</Text>
               )}
             </View>
-
-            <View style={styles.card}>
-              <Text style={styles.cardLabel}>소셜 로그인</Text>
-              <Text style={styles.principlesText}>{PROVIDER_LABEL[provider] || provider || '-'}</Text>
+            <View style={styles.notifCard}>
+              <Text style={styles.notifCardLabel}>소셜 로그인</Text>
+              <Text style={styles.accountValue}>{PROVIDER_LABEL[provider] || provider || '-'}</Text>
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -273,33 +331,88 @@ export default function MyPageScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: 24, gap: 20, paddingBottom: 48 },
-  pageTitle: { fontSize: 26, fontWeight: '600', color: Colors.textPrimary, paddingTop: 8, paddingBottom: 4 },
+  content: { padding: 20, gap: 20, paddingBottom: 48 },
+  pageTitle: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary, paddingTop: 4 },
 
-  card: { backgroundColor: Colors.surface, borderRadius: 16, padding: 22, gap: 14, borderWidth: 0.5, borderColor: Colors.border },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardLabel: { fontSize: 11, fontWeight: '500', color: Colors.textMuted, letterSpacing: 1.5, textTransform: 'uppercase' },
-  personalityType: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
-  editBtn: { fontSize: 13, color: Colors.accent, fontWeight: '500' },
-  principlesInput: { fontSize: 15, color: Colors.textPrimary, lineHeight: 15 * 1.7, minHeight: 80, textAlignVertical: 'top', borderWidth: 0.5, borderColor: Colors.border, borderRadius: 10, padding: 12, backgroundColor: Colors.background },
-  principlesText: { fontSize: 15, color: Colors.textPrimary, lineHeight: 15 * 1.7 },
-  principlesEmpty: { fontSize: 15, color: Colors.textMuted, lineHeight: 15 * 1.7 },
+  profileCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    padding: 16, borderRadius: 20,
+    backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
+  },
+  profileAvatar: {
+    width: 48, height: 48, borderRadius: 24,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  profileAvatarText: { fontSize: 18, fontWeight: '700', color: '#FFF' },
+  profileName: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  profileSub: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
 
-  menuCard: { backgroundColor: Colors.surface, borderRadius: 16, overflow: 'hidden', borderWidth: 0.5, borderColor: Colors.border },
-  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 },
+  section: { gap: 12 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  sectionTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  sectionDesc: { fontSize: 12, color: Colors.textMuted, marginTop: -4 },
+
+  principleList: { gap: 8 },
+  principleItem: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    padding: 14, borderRadius: 16,
+    backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
+  },
+  principleIndex: { fontSize: 12, fontWeight: '500', color: Colors.cta, marginTop: 1, minWidth: 20 },
+  principleText: { flex: 1, fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.5 },
+  principleDelete: { padding: 2 },
+  principleDeleteText: { fontSize: 13, color: Colors.textMuted },
+
+  principleAddRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    padding: 8, paddingLeft: 14, borderRadius: 16,
+    backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
+  },
+  principleInput: {
+    flex: 1, fontSize: 14, color: Colors.textPrimary, paddingVertical: 8,
+  },
+  addBtn: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: Colors.cta, alignItems: 'center', justifyContent: 'center',
+  },
+  addBtnDisabled: { backgroundColor: Colors.surfaceElevated },
+  addBtnText: { fontSize: 20, color: '#FFF', lineHeight: 22 },
+
+  menuCard: {
+    backgroundColor: Colors.surface, borderRadius: 16,
+    overflow: 'hidden', borderWidth: 0.5, borderColor: Colors.border,
+  },
+  menuItem: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    padding: 18,
+  },
   menuItemBorder: { borderBottomWidth: 0.5, borderBottomColor: Colors.border },
-  menuLabel: { fontSize: 15, color: Colors.textPrimary },
-  menuArrow: { fontSize: 18, color: Colors.textMuted },
+  menuLabel: { fontSize: 14, color: Colors.textPrimary },
+  menuLabelDanger: { color: Colors.reconsider },
 
   modalSafe: { flex: 1, backgroundColor: Colors.background },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24, paddingBottom: 16 },
+  modalHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    padding: 20, paddingBottom: 16,
+  },
   modalTitle: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
   modalClose: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
   modalCloseText: { fontSize: 18, color: Colors.textSecondary },
-  modalContent: { padding: 24, gap: 16 },
+  modalContent: { padding: 20, gap: 12 },
 
-  saveNicknameBtn: { backgroundColor: Colors.cta, borderRadius: 10, padding: 14, alignItems: 'center' },
-  saveNicknameBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+  notifCard: {
+    backgroundColor: Colors.surface, borderRadius: 16, padding: 18,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 10,
+  },
+  notifCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  notifCardLabel: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
+  notifCardTime: { fontSize: 12, color: Colors.textSecondary },
+  notifCardDesc: { fontSize: 13, color: Colors.textMuted, lineHeight: 13 * 1.6 },
 
-  notifTime: { fontSize: 13, color: Colors.textPrimary, fontWeight: '500' },
+  editLink: { fontSize: 13, color: Colors.accent, fontWeight: '500' },
+  accountValue: { fontSize: 14, color: Colors.textPrimary },
+  saveNicknameBtn: {
+    backgroundColor: Colors.cta, borderRadius: 12, padding: 13, alignItems: 'center',
+  },
+  saveNicknameBtnText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
 });

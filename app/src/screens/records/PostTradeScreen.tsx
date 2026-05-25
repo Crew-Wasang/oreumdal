@@ -15,12 +15,12 @@ import SignUpBottomSheet from '../../components/common/SignUpBottomSheet';
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
 const EMOTIONS: { type: EmotionType; label: string }[] = [
-  { type: 'excited', label: '흥분' },
-  { type: 'anxious', label: '불안' },
-  { type: 'greedy', label: '욕심' },
-  { type: 'fearful', label: '두려움' },
-  { type: 'calm', label: '차분' },
-  { type: 'confused', label: '혼란' },
+  { type: 'anxious', label: '불안했어요' },
+  { type: 'excited', label: '조급했어요' },
+  { type: 'greedy', label: '신났어요' },
+  { type: 'calm', label: '확신이 있었어요' },
+  { type: 'fearful', label: '두려웠어요' },
+  { type: 'confused', label: '후회돼요' },
 ];
 
 export default function PostTradeScreen() {
@@ -34,18 +34,15 @@ export default function PostTradeScreen() {
   const [memo, setMemo] = useState('');
   const [showSignUp, setShowSignUp] = useState(false);
 
-  const canSave = stockName.trim().length > 0 && direction !== null && emotions.length > 0;
+  const canSave = stockName.trim().length > 0 && direction !== null;
 
-  const toggleEmotion = (type: EmotionType) => {
-    setEmotions((prev) =>
-      prev.includes(type) ? prev.filter((e) => e !== type) : [...prev, type]
-    );
-  };
+  const toggleEmotion = (type: EmotionType) =>
+    setEmotions(prev => prev.includes(type) ? prev.filter(e => e !== type) : [...prev, type]);
 
   const handleSave = () => {
     if (!canSave || !direction) return;
     const emotionLabel = emotions
-      .map((e) => EMOTIONS.find((x) => x.type === e)?.label ?? e)
+      .map(e => EMOTIONS.find(x => x.type === e)?.label ?? e)
       .join(', ');
     addRecord({
       type: 'post',
@@ -67,26 +64,26 @@ export default function PostTradeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        {/* 헤더 */}
         <View style={styles.header}>
           <ScaleButton onPress={() => navigation.goBack()} style={styles.closeBtn}>
             <Text style={styles.closeBtnText}>✕</Text>
           </ScaleButton>
-          <Text style={styles.headerTitle}>매매 기록</Text>
+          <Text style={styles.headerTitle}>매매 기록 남기기</Text>
           <View style={{ width: 40 }} />
         </View>
+
+        <Text style={styles.subtitle}>이미 끝난 매매를 기록만 남겨요 · AI 코칭은 진행되지 않아요</Text>
 
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* 종목명 */}
           <View style={styles.field}>
             <Text style={styles.fieldLabel}>종목명</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="예: 삼성전자, TSLA"
+              placeholder="예: 삼성전자, AAPL"
               placeholderTextColor={Colors.textMuted}
               value={stockName}
               onChangeText={setStockName}
@@ -95,53 +92,54 @@ export default function PostTradeScreen() {
             />
           </View>
 
-          {/* 매수/매도 */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>매수 / 매도</Text>
+            <Text style={styles.fieldLabel}>방향</Text>
             <View style={styles.directionRow}>
-              {(['buy', 'sell'] as TradeDirection[]).map((d) => (
-                <ScaleButton
-                  key={d}
-                  style={[styles.dirBtn, direction === d && styles.dirBtnActive]}
-                  onPress={() => setDirection(d)}
-                >
-                  <Text style={[styles.dirBtnText, direction === d && styles.dirBtnTextActive]}>
-                    {d === 'buy' ? '매수' : '매도'}
-                  </Text>
-                </ScaleButton>
-              ))}
+              <ScaleButton
+                style={[styles.dirBtn, direction === 'buy' && styles.dirBtnBuy]}
+                onPress={() => setDirection('buy')}
+              >
+                <Text style={[styles.dirBtnText, direction === 'buy' && styles.dirBtnBuyText]}>매수</Text>
+              </ScaleButton>
+              <ScaleButton
+                style={[styles.dirBtn, direction === 'sell' && styles.dirBtnSell]}
+                onPress={() => setDirection('sell')}
+              >
+                <Text style={[styles.dirBtnText, direction === 'sell' && styles.dirBtnSellText]}>매도</Text>
+              </ScaleButton>
             </View>
           </View>
 
-          {/* 감정 상태 */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>매매 당시 감정</Text>
-            <View style={styles.emotionGrid}>
-              {EMOTIONS.map(({ type, label }) => (
-                <ScaleButton
-                  key={type}
-                  style={[styles.emotionChip, emotions.includes(type) && styles.emotionChipActive]}
-                  onPress={() => toggleEmotion(type)}
-                >
-                  <Text style={[styles.emotionChipText, emotions.includes(type) && styles.emotionChipTextActive]}>
-                    {label}
-                  </Text>
-                </ScaleButton>
-              ))}
+            <Text style={styles.fieldLabel}>당시 감정 (복수 선택, 선택)</Text>
+            <View style={styles.emotionWrap}>
+              {EMOTIONS.map(({ type, label }) => {
+                const active = emotions.includes(type);
+                return (
+                  <ScaleButton
+                    key={type}
+                    style={[styles.emotionPill, active && styles.emotionPillActive]}
+                    onPress={() => toggleEmotion(type)}
+                  >
+                    <Text style={[styles.emotionPillText, active && styles.emotionPillTextActive]}>
+                      {label}
+                    </Text>
+                  </ScaleButton>
+                );
+              })}
             </View>
           </View>
 
-          {/* 메모 */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>한 줄 메모 (선택)</Text>
+            <Text style={styles.fieldLabel}>메모 (선택)</Text>
             <TextInput
               style={[styles.textInput, styles.memoInput]}
-              placeholder="매매 이유나 느낌을 짧게 남겨봐요"
+              placeholder="매매하게 된 상황이나 이유를 짧게 남겨두면 리포트에 반영돼요"
               placeholderTextColor={Colors.textMuted}
               value={memo}
               onChangeText={setMemo}
               multiline
-              maxLength={100}
+              maxLength={200}
             />
           </View>
 
@@ -150,12 +148,13 @@ export default function PostTradeScreen() {
             onPress={handleSave}
             disabled={!canSave}
           >
-            <Text style={styles.saveBtnText}>저장하기</Text>
+            <Text style={styles.saveBtnText}>기록 저장하기</Text>
           </ScaleButton>
 
           <View style={{ height: 24 }} />
         </ScrollView>
       </KeyboardAvoidingView>
+
       <SignUpBottomSheet
         visible={showSignUp}
         trigger="save"
@@ -167,6 +166,7 @@ export default function PostTradeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingVertical: 14,
@@ -174,47 +174,53 @@ const styles = StyleSheet.create({
   },
   closeBtn: { width: 40, height: 40, justifyContent: 'center' },
   closeBtnText: { fontSize: 18, color: Colors.textSecondary },
-  headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  headerTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
 
-  content: { padding: 24, gap: 28 },
-
-  field: { gap: 12 },
-  fieldLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
+  subtitle: {
+    fontSize: 12, color: Colors.textSecondary,
+    paddingHorizontal: 20, paddingVertical: 10,
+    borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
+
+  content: { padding: 20, gap: 24 },
+
+  field: { gap: 10 },
+  fieldLabel: { fontSize: 12, color: Colors.textSecondary },
+
   textInput: {
-    backgroundColor: Colors.surface, borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 13,
-    fontSize: 15, color: Colors.textPrimary,
+    backgroundColor: Colors.surface, borderRadius: 16,
+    paddingHorizontal: 16, paddingVertical: 13,
+    fontSize: 14, color: Colors.textPrimary,
     borderWidth: 0.5, borderColor: Colors.border,
   },
   memoInput: { minHeight: 80, textAlignVertical: 'top' },
 
-  directionRow: { flexDirection: 'row', gap: 10 },
+  directionRow: { flexDirection: 'row', gap: 12 },
   dirBtn: {
-    flex: 1, paddingVertical: 13, borderRadius: 10,
-    backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border,
+    flex: 1, paddingVertical: 13, borderRadius: 16,
+    backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border,
     alignItems: 'center',
   },
-  dirBtnActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
-  dirBtnText: { fontSize: 15, color: Colors.textSecondary, fontWeight: '500' },
-  dirBtnTextActive: { color: '#FFF', fontWeight: '600' },
+  dirBtnBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buyBorder, borderWidth: 1.5 },
+  dirBtnSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sellBorder, borderWidth: 1.5 },
+  dirBtnText: { fontSize: 14, fontWeight: '600', color: Colors.textSecondary },
+  dirBtnBuyText: { color: Colors.buy },
+  dirBtnSellText: { color: Colors.sell },
 
-  emotionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  emotionChip: {
-    paddingVertical: 11, paddingHorizontal: 20,
+  emotionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  emotionPill: {
+    paddingVertical: 7, paddingHorizontal: 14,
     borderRadius: 20, backgroundColor: Colors.surface,
-    borderWidth: 1.5, borderColor: Colors.border,
+    borderWidth: 0.5, borderColor: Colors.border,
   },
-  emotionChipActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
-  emotionChipText: { fontSize: 14, color: Colors.textSecondary, fontWeight: '500' },
-  emotionChipTextActive: { color: '#FFF', fontWeight: '600' },
+  emotionPillActive: { backgroundColor: Colors.ctaLight, borderColor: Colors.cta, borderWidth: 1.5 },
+  emotionPillText: { fontSize: 13, color: Colors.textSecondary },
+  emotionPillTextActive: { color: Colors.ctaLightText, fontWeight: '500' },
 
   saveBtn: {
-    backgroundColor: Colors.cta, borderRadius: 10,
-    padding: 17, alignItems: 'center',
+    backgroundColor: Colors.cta, borderRadius: 16,
+    padding: 16, alignItems: 'center',
   },
-  saveBtnDisabled: { opacity: 0.35 },
+  saveBtnDisabled: { backgroundColor: Colors.surfaceElevated },
   saveBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
 });

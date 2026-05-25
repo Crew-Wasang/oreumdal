@@ -17,6 +17,7 @@ import GrowthSummaryCard from '../../components/report/GrowthSummaryCard';
 import ImpulseGraph from '../../components/report/ImpulseGraph';
 import OutcomeComparisonCard from '../../components/report/OutcomeComparisonCard';
 import EmotionPatternCard from '../../components/report/EmotionPatternCard';
+import { Sparkle } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
@@ -47,22 +48,27 @@ function LockedSection({
 
 // ── 데이터 부족 안내 ──────────────────────────────────────────────────────────
 function InsufficientCard({ count }: { count: number }) {
+  const pct = Math.min((count / 5) * 100, 100);
   return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>아직 데이터가 부족해요</Text>
-      <Text style={styles.cardDesc}>
-        코칭을 5번 이상 하면 나만의 패턴을 볼 수 있어요.
+    <View style={styles.insufficientCard}>
+      <View style={styles.insufficientHeader}>
+        <Sparkle size={13} color={Colors.impulse} />
+        <Text style={styles.insufficientTitle}>아직 데이터가 부족해요</Text>
+      </View>
+      <Text style={styles.insufficientDesc}>
+        코칭을 <Text style={{ fontWeight: '700' }}>5회 이상</Text> 받으면 나만의 패턴을 볼 수 있어요.
       </Text>
-      <View style={styles.progressBarWrap}>
-        <View style={styles.progressBarBg}>
-          <View
-            style={[
-              styles.progressBarFill,
-              { width: `${Math.min((count / 5) * 100, 100)}%` as any },
-            ]}
-          />
+      <View style={styles.insufficientBottom}>
+        <View>
+          <Text style={styles.insufficientCountLabel}>받은 코칭</Text>
+          <Text style={styles.insufficientCount}>
+            <Text style={styles.insufficientCountNum}>{count}</Text>
+            <Text style={styles.insufficientCountDen}> / 5회</Text>
+          </Text>
         </View>
-        <Text style={styles.progressLabel}>{count} / 5회</Text>
+        <View style={styles.progressBarBg}>
+          <View style={[styles.progressBarFill, { width: `${pct}%` as any }]} />
+        </View>
       </View>
     </View>
   );
@@ -338,12 +344,11 @@ export default function ReportScreen() {
 
         {/* 헤더 */}
         <View style={styles.header}>
-          <Text style={styles.title}>리포트</Text>
-          {tierBadgeLabel && (
-            <View style={styles.tierBadge}>
-              <Text style={styles.tierBadgeText}>{tierBadgeLabel}</Text>
-            </View>
-          )}
+          <View style={styles.headerSubRow}>
+            <Sparkle size={12} color={Colors.cta} />
+            <Text style={styles.headerSub}>AI 리포트 · 최근 30일</Text>
+          </View>
+          <Text style={styles.title}>나의 투자 심리 패턴</Text>
         </View>
 
         {/* 데이터 부족 안내 */}
@@ -491,19 +496,24 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { padding: 24, gap: 16 },
 
-  header: {
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'space-between', paddingTop: 8,
+  header: { paddingTop: 8, gap: 4 },
+  headerSubRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  headerSub: { fontSize: 12, color: Colors.cta },
+  title: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
+
+  // 데이터 부족 카드
+  insufficientCard: {
+    backgroundColor: '#FFFBEB', borderRadius: 20, padding: 20,
+    borderWidth: 1, borderColor: '#FCD34D', gap: 10,
   },
-  title: { fontSize: 26, fontWeight: '600', color: Colors.textPrimary },
-  tierBadge: {
-    backgroundColor: Colors.surface, borderRadius: 20,
-    paddingVertical: 5, paddingHorizontal: 12,
-    borderWidth: 0.5, borderColor: Colors.border,
-  },
-  tierBadgeText: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted, letterSpacing: 0.5,
-  },
+  insufficientHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  insufficientTitle: { fontSize: 14, fontWeight: '700', color: Colors.impulse },
+  insufficientDesc: { fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.6 },
+  insufficientBottom: { gap: 8 },
+  insufficientCountLabel: { fontSize: 11, color: Colors.textMuted },
+  insufficientCount: { marginTop: 2 },
+  insufficientCountNum: { fontSize: 28, fontWeight: '700', color: Colors.impulse },
+  insufficientCountDen: { fontSize: 13, color: Colors.textSecondary },
 
   // 공통 카드
   card: {
@@ -513,12 +523,10 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   cardDesc: { fontSize: 14, color: Colors.textSecondary, lineHeight: 14 * 1.6 },
 
-  progressBarWrap: { gap: 6 },
   progressBarBg: {
-    height: 4, backgroundColor: Colors.border, borderRadius: 4, overflow: 'hidden',
+    height: 6, backgroundColor: 'rgba(251,191,36,0.3)', borderRadius: 4, overflow: 'hidden',
   },
-  progressBarFill: { height: '100%' as any, backgroundColor: Colors.cta, borderRadius: 4 },
-  progressLabel: { fontSize: 12, color: Colors.textMuted, textAlign: 'right' },
+  progressBarFill: { height: '100%' as any, backgroundColor: Colors.impulseMid, borderRadius: 4 },
 
   statsRow: { flexDirection: 'row' },
   statItem: { flex: 1, alignItems: 'center', gap: 4 },
@@ -530,26 +538,26 @@ const styles = StyleSheet.create({
   },
 
   // 잠금
-  lockedWrap: { borderRadius: 16, overflow: 'hidden' },
+  lockedWrap: { borderRadius: 20, overflow: 'hidden' },
   lockedContent: { opacity: 0.45 },
   lockedOverlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     justifyContent: 'center', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(235,240,248,0.65)',
+    backgroundColor: 'rgba(250,250,250,0.7)',
+    borderRadius: 20,
   },
   lockBadge: {
-    backgroundColor: Colors.border, borderRadius: 12,
-    paddingHorizontal: 12, paddingVertical: 4,
+    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 5,
+    backgroundColor: 'rgba(24,24,27,0.85)',
   },
   lockBadgeText: {
-    fontSize: 10, fontWeight: '600', color: Colors.textMuted, letterSpacing: 0.8,
+    fontSize: 11, fontWeight: '600', color: '#FFF', letterSpacing: 0.5,
   },
-  lockedText: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary },
+  lockedText: { fontSize: 12, fontWeight: '600', color: Colors.textPrimary },
 
   // 섹션 헤더
   sectionHeader: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 4,
+    fontSize: 14, fontWeight: '600', color: Colors.textPrimary, marginTop: 4,
   },
 
   // AI 인사이트 카드

@@ -109,12 +109,12 @@ export default function HomeScreen() {
 
   const handleCheckPress = () => {
     if (isLoggedIn) setSheetVisible(true);
-    else navigation.navigate('SignUp');
+    else navigation.navigate('SignUp', { trigger: 'chk' });
   };
 
   const handlePostTradePress = () => {
     if (isLoggedIn) navigation.navigate('PostTrade');
-    else navigation.navigate('SignUp');
+    else navigation.navigate('SignUp', { trigger: 'save' });
   };
 
   const handleStart = ({
@@ -149,7 +149,7 @@ export default function HomeScreen() {
             </View>
           </View>
           <ScaleButton
-            onPress={() => navigation.navigate('SignUp')}
+            onPress={() => navigation.navigate('SignUp', { trigger: 'chk' })}
             style={styles.settingsBtn}
           >
             <SettingsIcon size={22} color={Colors.textSecondary} />
@@ -181,9 +181,7 @@ export default function HomeScreen() {
               </View>
               <ScaleButton
                 style={styles.ctaSecondaryPill}
-                onPress={(e) => {
-                  handlePostTradePress();
-                }}
+                onPress={handlePostTradePress}
               >
                 <Text style={styles.ctaSecondaryPillText}>이미 매매했어요 · 기록만 남기기</Text>
               </ScaleButton>

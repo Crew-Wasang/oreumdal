@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView,
-  TouchableOpacity, Alert,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,35 +8,23 @@ import { Colors } from '../../constants/colors';
 import { MainStackParamList, TradeOutcome } from '../../types';
 import { useRecordStore } from '../../store/recordStore';
 import ScaleButton from '../../components/common/ScaleButton';
+import { Sparkle } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 type Route = RouteProp<MainStackParamList, 'RecordDetail'>;
 
-const OUTCOME_OPTIONS: { value: TradeOutcome; label: string }[] = [
-  { value: 'traded', label: '매매했어요' },
-  { value: 'skipped', label: '참았어요' },
-];
-
 function formatDate(iso: string): string {
   const date = new Date(iso);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hour = date.getHours();
-  const min = String(date.getMinutes()).padStart(2, '0');
-  return `${month}월 ${day}일 ${hour}:${min}`;
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 · ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
 export default function RecordDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { sessionId } = route.params;
-
   const { records, updateTradeOutcome } = useRecordStore();
   const record = records.find((r) => r.id === sessionId);
-
-  const [localOutcome, setLocalOutcome] = useState<TradeOutcome>(
-    record?.trade_outcome ?? null
-  );
+  const [localOutcome, setLocalOutcome] = useState<TradeOutcome>(record?.trade_outcome ?? null);
 
   if (!record) {
     return (
@@ -49,7 +36,9 @@ export default function RecordDetailScreen() {
     );
   }
 
-  const directionText = record.direction === 'buy' ? '매수' : '매도';
+  const isBuy = record.direction === 'buy';
+  const isOk = record.verdict === 'ok';
+  const score = record.impulse_score ?? 0;
 
   const handleOutcomeSelect = (outcome: TradeOutcome) => {
     setLocalOutcome(outcome);
@@ -58,51 +47,46 @@ export default function RecordDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* 헤더 */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <ScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>‹ 뒤로</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{record.stock_name} · {directionText}</Text>
+        </ScaleButton>
+        <Text style={styles.headerTitle}>기록 상세</Text>
         <View style={{ width: 60 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* 메타 정보 */}
-        <View style={styles.metaRow}>
+        {/* 메타 */}
+        <View>
           <Text style={styles.metaDate}>{formatDate(record.created_at)}</Text>
-          <Text style={styles.metaEmotion}>{record.emotion_label}</Text>
+          <View style={styles.metaNameRow}>
+            <Text style={styles.metaStock}>{record.stock_name}</Text>
+            <View style={[styles.dirBadge, isBuy ? styles.dirBuyBadge : styles.dirSellBadge]}>
+              <Text style={[styles.dirBadgeText, isBuy ? styles.dirBuyText : styles.dirSellText]}>
+                {isBuy ? '매수' : '매도'}
+              </Text>
+            </View>
+          </View>
         </View>
 
-        {/* CHK 코칭 결과 카드 */}
+        {/* 코칭 결과 카드 */}
         {record.type === 'check' && record.verdict && (
-          <View style={styles.resultCard}>
-            <Text style={styles.sectionLabel}>코칭 결과</Text>
-            <Text style={[
-              styles.verdictText,
-              record.verdict === 'ok' ? styles.textOk : styles.textReconsider,
-            ]}>
-              {record.verdict === 'ok' ? '괜찮아요' : '다시 생각해봐요'}
-            </Text>
-            <View style={styles.gaugeSection}>
-              <View style={styles.gaugeHeader}>
-                <Text style={styles.gaugeLabel}>충동도</Text>
-                <Text style={[
-                  styles.gaugeScore,
-                  (record.impulse_score ?? 0) >= 55 ? styles.textReconsider : styles.textOk,
-                ]}>
-                  {record.impulse_score}
-                </Text>
-              </View>
-              <View style={styles.gaugeBg}>
-                <View style={[styles.gaugeFill, { width: `${record.impulse_score}%` as any }]} />
-              </View>
+          <View style={[styles.resultCard, isOk ? styles.resultCardOk : styles.resultCardAmber]}>
+            <View style={styles.resultCardHeader}>
+              <Text style={[styles.resultVerdict, isOk ? styles.verdictOkText : styles.verdictAmberText]}>
+                {isOk ? '지금 매매해도 괜찮아요' : '한 번 더 생각해봐요'}
+              </Text>
+              <Text style={[styles.resultScore, isOk ? styles.verdictOkText : styles.verdictAmberText]}>
+                충동도 {score}%
+              </Text>
             </View>
-            <Text style={styles.reason}>{record.reason}</Text>
+            {record.reason && (
+              <Text style={styles.resultReason}>{record.reason}</Text>
+            )}
           </View>
         )}
 
-        {/* POST 기록 메모 */}
+        {/* POST 메모 */}
         {record.type === 'post' && record.memo && (
           <View style={styles.memoCard}>
             <Text style={styles.sectionLabel}>메모</Text>
@@ -110,61 +94,55 @@ export default function RecordDetailScreen() {
           </View>
         )}
 
-        {/* 대화 내용 */}
+        {/* 코칭 대화 */}
         {record.type === 'check' && record.messages.length > 0 && (
           <View style={styles.chatSection}>
-            <Text style={styles.sectionLabel}>코칭 대화</Text>
+            <Text style={styles.sectionLabel}>당시 코칭 대화</Text>
             <View style={styles.chatBubbles}>
               {record.messages.map((msg, i) => (
-                <View
-                  key={i}
-                  style={msg.role === 'user' ? styles.bubbleWrapUser : styles.bubbleWrapAI}
-                >
-                  <View style={msg.role === 'user' ? styles.bubbleUser : styles.bubbleAI}>
-                    <Text style={msg.role === 'user' ? styles.textUser : styles.textAI}>
-                      {msg.content}
-                    </Text>
+                msg.role === 'assistant' ? (
+                  <View key={i} style={styles.bubbleWrapAI}>
+                    <View style={styles.bubbleAI}>
+                      <Text style={styles.textAI}>{msg.content}</Text>
+                    </View>
                   </View>
-                </View>
+                ) : (
+                  <View key={i} style={styles.bubbleWrapUser}>
+                    <View style={styles.bubbleUser}>
+                      <Text style={styles.textUser}>{msg.content}</Text>
+                    </View>
+                  </View>
+                )
               ))}
             </View>
           </View>
         )}
 
-        {/* 실제 매매 여부 */}
-        <View style={styles.outcomeSection}>
-          <Text style={styles.outcomeSectionTitle}>
-            {localOutcome === null ? '결국 어떻게 하셨어요?' : '실제 매매 여부'}
-          </Text>
-          {localOutcome === null && (
-            <Text style={styles.outcomeDesc}>
-              기록해두면 나중에 내 패턴을 분석하는데 도움이 돼요.
-            </Text>
-          )}
+        {/* 매매 결과 기록 */}
+        <View style={styles.outcomeCard}>
+          <Text style={styles.outcomeCardLabel}>매매 후 결과 (직접 기록)</Text>
           <View style={styles.outcomeButtons}>
-            {OUTCOME_OPTIONS.map(({ value, label }) => (
-              <TouchableOpacity
-                key={value}
-                style={[
-                  styles.outcomeBtn,
-                  localOutcome === value && styles.outcomeBtnActive,
-                ]}
-                onPress={() => handleOutcomeSelect(value)}
-              >
-                <Text style={[
-                  styles.outcomeBtnText,
-                  localOutcome === value && styles.outcomeBtnTextActive,
-                ]}>
-                  {label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            <ScaleButton
+              style={[styles.outcomeBtn, localOutcome === 'skipped' && styles.outcomeBtnOk]}
+              onPress={() => handleOutcomeSelect(localOutcome === 'skipped' ? null : 'skipped')}
+            >
+              <Text style={[styles.outcomeBtnText, localOutcome === 'skipped' && styles.outcomeBtnOkText]}>
+                매매 안 함
+              </Text>
+            </ScaleButton>
+            <ScaleButton
+              style={[styles.outcomeBtn, localOutcome === 'traded' && styles.outcomeBtnActive]}
+              onPress={() => handleOutcomeSelect(localOutcome === 'traded' ? null : 'traded')}
+            >
+              <Text style={[styles.outcomeBtnText, localOutcome === 'traded' && styles.outcomeBtnActiveText]}>
+                그대로 매매
+              </Text>
+            </ScaleButton>
           </View>
-          {localOutcome !== null && (
-            <TouchableOpacity onPress={() => handleOutcomeSelect(null)}>
-              <Text style={styles.clearOutcome}>입력 취소</Text>
-            </TouchableOpacity>
-          )}
+          <View style={styles.outcomeNote}>
+            <Sparkle size={11} color={Colors.cta} />
+            <Text style={styles.outcomeNoteText}>결과를 남기면 AI 리포트의 정확도가 올라가요</Text>
+          </View>
         </View>
 
         <View style={{ height: 40 }} />
@@ -187,73 +165,78 @@ const styles = StyleSheet.create({
   backText: { fontSize: 16, color: Colors.accent, fontWeight: '500' },
   headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
 
-  content: { padding: 20, gap: 20 },
+  content: { padding: 20, gap: 16 },
 
-  metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  metaDate: { fontSize: 13, color: Colors.textMuted },
-  metaEmotion: { fontSize: 13, color: Colors.textSecondary },
-
-  sectionLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8,
-  },
+  metaDate: { fontSize: 12, color: Colors.textMuted },
+  metaNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
+  metaStock: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
+  dirBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
+  dirBuyBadge: { backgroundColor: Colors.buyBg },
+  dirSellBadge: { backgroundColor: Colors.sellBg },
+  dirBadgeText: { fontSize: 11, fontWeight: '500' },
+  dirBuyText: { color: Colors.buy },
+  dirSellText: { color: Colors.sell },
 
   resultCard: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
+    borderRadius: 20, padding: 16, borderWidth: 1, gap: 8,
   },
-  verdictText: { fontSize: 20, fontWeight: '600', letterSpacing: -0.3 },
-  textOk: { color: Colors.ok },
-  textReconsider: { color: Colors.reconsider },
-  gaugeSection: { gap: 8 },
-  gaugeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  gaugeLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
+  resultCardAmber: { backgroundColor: '#FFFBEB', borderColor: '#FCD34D' },
+  resultCardOk: { backgroundColor: '#F0FDF4', borderColor: '#6EE7B7' },
+  resultCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  resultVerdict: { fontSize: 14, fontWeight: '600' },
+  verdictAmberText: { color: Colors.impulse },
+  verdictOkText: { color: Colors.ok },
+  resultScore: { fontSize: 14, fontWeight: '700' },
+  resultReason: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
+
+  sectionLabel: {
+    fontSize: 13, fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
   },
-  gaugeScore: { fontSize: 20, fontWeight: '600' },
-  gaugeBg: { height: 4, backgroundColor: Colors.impulseBar, borderRadius: 4, overflow: 'hidden' },
-  gaugeFill: { height: '100%', backgroundColor: Colors.impulse, borderRadius: 4 },
-  reason: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7 },
 
   memoCard: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
+    backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
     borderWidth: 0.5, borderColor: Colors.border,
   },
-  memoText: { fontSize: 15, color: Colors.textPrimary, lineHeight: 15 * 1.7 },
+  memoText: { fontSize: 14, color: Colors.textPrimary, lineHeight: 14 * 1.7 },
 
-  chatSection: { gap: 4 },
-  chatBubbles: { gap: 10 },
-  bubbleWrapAI: { alignSelf: 'flex-start', maxWidth: '85%' },
-  bubbleWrapUser: { alignSelf: 'flex-end', maxWidth: '85%' },
+  chatSection: { gap: 0 },
+  chatBubbles: { gap: 8 },
+  bubbleWrapAI: { alignSelf: 'flex-start', maxWidth: '82%' },
+  bubbleWrapUser: { alignSelf: 'flex-end', maxWidth: '82%' },
   bubbleAI: {
     backgroundColor: Colors.surface,
-    borderTopRightRadius: 12, borderBottomRightRadius: 12, borderBottomLeftRadius: 12,
-    padding: 14, borderWidth: 0.5, borderColor: Colors.border,
+    borderTopRightRadius: 16, borderBottomRightRadius: 16, borderTopLeftRadius: 16,
+    padding: 12, borderWidth: 0.5, borderColor: Colors.border,
   },
   bubbleUser: {
-    backgroundColor: Colors.cta,
-    borderTopLeftRadius: 12, borderBottomLeftRadius: 12, borderTopRightRadius: 12,
-    padding: 14,
+    backgroundColor: `${Colors.cta}E6`,
+    borderTopLeftRadius: 16, borderBottomLeftRadius: 16, borderTopRightRadius: 16,
+    padding: 12,
   },
-  textAI: { fontSize: 14, color: Colors.textPrimary, lineHeight: 14 * 1.7 },
-  textUser: { fontSize: 14, color: '#FFF', lineHeight: 14 * 1.7 },
+  textAI: { fontSize: 13, color: Colors.textPrimary, lineHeight: 13 * 1.75 },
+  textUser: { fontSize: 13, color: '#FFF', lineHeight: 13 * 1.75 },
 
-  outcomeSection: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
+  outcomeCard: {
+    backgroundColor: Colors.surface, borderRadius: 20, padding: 16,
     borderWidth: 0.5, borderColor: Colors.border, gap: 12,
   },
-  outcomeSectionTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  outcomeDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7, marginTop: -4 },
+  outcomeCardLabel: { fontSize: 12, color: Colors.textSecondary },
   outcomeButtons: { flexDirection: 'row', gap: 10 },
   outcomeBtn: {
-    flex: 1, paddingVertical: 12, borderRadius: 10,
-    backgroundColor: Colors.background,
-    borderWidth: 0.5, borderColor: Colors.border,
+    flex: 1, paddingVertical: 10, borderRadius: 14,
+    backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
     alignItems: 'center',
   },
-  outcomeBtnActive: { borderColor: Colors.cta, borderWidth: 1.5 },
-  outcomeBtnText: { fontSize: 14, color: Colors.textSecondary, fontWeight: '500' },
-  outcomeBtnTextActive: { color: Colors.cta, fontWeight: '600' },
-  clearOutcome: { fontSize: 13, color: Colors.textMuted, textAlign: 'center' },
+  outcomeBtnOk: {
+    backgroundColor: '#F0FDF4', borderColor: Colors.okMid, borderWidth: 1,
+  },
+  outcomeBtnActive: {
+    backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border,
+  },
+  outcomeBtnText: { fontSize: 13, color: Colors.textSubtle, fontWeight: '500' },
+  outcomeBtnOkText: { color: Colors.ok },
+  outcomeBtnActiveText: { color: Colors.textSecondary },
+
+  outcomeNote: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  outcomeNoteText: { fontSize: 11, color: Colors.textMuted },
 });

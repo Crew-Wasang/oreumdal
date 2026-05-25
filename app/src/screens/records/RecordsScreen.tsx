@@ -1,28 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, SafeAreaView, ScrollView,
-  TextInput,
+  View, Text, StyleSheet, SafeAreaView, ScrollView, TextInput,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
-import { MainStackParamList, SessionRecord, TradeOutcome } from '../../types';
+import { MainStackParamList, SessionRecord } from '../../types';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
 import ScaleButton from '../../components/common/ScaleButton';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
+type Tab = 'all' | 'followed' | 'skipped';
 
-type Filter = 'all' | 'buy' | 'sell' | 'ok' | 'reconsider' | 'traded' | 'skipped';
-
-const FILTER_PILLS: { value: Filter; label: string }[] = [
-  { value: 'all',        label: '전체' },
-  { value: 'buy',        label: '매수' },
-  { value: 'sell',       label: '매도' },
-  { value: 'ok',         label: '괜찮아요' },
-  { value: 'reconsider', label: '다시 생각해봐요' },
-  { value: 'traded',     label: '매매함' },
-  { value: 'skipped',    label: '참았어요' },
+const TABS: { value: Tab; label: string }[] = [
+  { value: 'all', label: '전체' },
+  { value: 'followed', label: '조언 따름' },
+  { value: 'skipped', label: '그대로 매매' },
 ];
 
 function formatDate(iso: string): string {
@@ -37,44 +31,43 @@ function formatDate(iso: string): string {
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
-// 코칭 결과 — 텍스트 색상만 (배경 없음)
-const VERDICT_STYLE: Record<'ok' | 'reconsider', { label: string; color: string }> = {
-  ok:         { label: '괜찮아요',      color: Colors.ok },
-  reconsider: { label: '다시 생각해봐요', color: Colors.reconsider },
-};
+function RecordCard({ record, onPress }: { record: SessionRecord; onPress: () => void }) {
+  const isBuy = record.direction === 'buy';
+  const isOk = record.verdict === 'ok';
+  const score = record.impulse_score;
+  const isReconsider = record.verdict === 'reconsider';
 
-// 실제 매매 여부 — 배경 + 텍스트 색상
-const OUTCOME_STYLE: Record<string, { label: string; bg: string; color: string }> = {
-  traded:  { label: '매매함',   bg: '#FFF4E6', color: '#C97A3A' },
-  skipped: { label: '참았어요', bg: '#EBF4FF', color: '#1A6FA8' },
-  null:    { label: '미입력',   bg: '#F2F4F6', color: '#8B95A1' },
-};
-
-function OutcomeBadge({ outcome }: { outcome: TradeOutcome }) {
-  const key = outcome ?? 'null';
-  const cfg = OUTCOME_STYLE[key] ?? OUTCOME_STYLE['null'];
   return (
-    <View style={[styles.badge, { backgroundColor: cfg.bg }]}>
-      <Text style={[styles.badgeText, { color: cfg.color }]}>{cfg.label}</Text>
-    </View>
-  );
-}
-
-function applyFilters(records: SessionRecord[], filters: Filter[]): SessionRecord[] {
-  const active = filters.filter((f) => f !== 'all');
-  if (active.length === 0) return records;
-  return records.filter((r) =>
-    active.every((f) => {
-      switch (f) {
-        case 'buy':        return r.direction === 'buy';
-        case 'sell':       return r.direction === 'sell';
-        case 'ok':         return r.type === 'check' && r.verdict === 'ok';
-        case 'reconsider': return r.type === 'check' && r.verdict === 'reconsider';
-        case 'traded':     return r.trade_outcome === 'traded';
-        case 'skipped':    return r.trade_outcome === 'skipped';
-        default:           return true;
-      }
-    })
+    <ScaleButton style={styles.card} onPress={onPress}>
+      <View style={styles.cardTop}>
+        <View style={styles.cardLeft}>
+          <Text style={styles.cardStock}>{record.stock_name}</Text>
+          <View style={[styles.actionBadge, isBuy ? styles.buyBadge : styles.sellBadge]}>
+            <Text style={[styles.actionBadgeText, isBuy ? styles.buyText : styles.sellText]}>
+              {isBuy ? '매수' : '매도'}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.cardDate}>{formatDate(record.created_at)}</Text>
+      </View>
+      <View style={styles.cardBottom}>
+        <Text style={styles.cardVerdict}>
+          {record.verdict === 'ok' ? '지금 매매해도 괜찮아요' :
+           record.verdict === 'reconsider' ? '한 번 더 생각해봐요' : '직접 기록'}
+        </Text>
+        {score !== undefined && (
+          <View style={[styles.scoreBadge,
+            isOk ? styles.scoreBadgeOk : isReconsider ? styles.scoreBadgeAmber : styles.scoreBadgeNeutral,
+          ]}>
+            <Text style={[styles.scoreBadgeText,
+              isOk ? styles.scoreBadgeOkText : isReconsider ? styles.scoreBadgeAmberText : styles.scoreBadgeNeutralText,
+            ]}>
+              충동도 {score}%
+            </Text>
+          </View>
+        )}
+      </View>
+    </ScaleButton>
   );
 }
 
@@ -83,34 +76,27 @@ export default function RecordsScreen() {
   const records = useRecordStore((s) => s.records);
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
 
+  const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
-  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
-
-  const toggleFilter = (f: Filter) => {
-    if (f === 'all') { setActiveFilters([]); return; }
-    setActiveFilters((prev) =>
-      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]
-    );
-  };
 
   const filtered = useMemo(() => {
-    let result = applyFilters(records, activeFilters);
-    if (search.trim()) {
-      result = result.filter((r) => r.stock_name.includes(search.trim()));
-    }
+    let result = records;
+    if (tab === 'followed') result = result.filter(r => r.trade_outcome === 'skipped');
+    if (tab === 'skipped') result = result.filter(r => r.trade_outcome === 'traded');
+    if (search.trim()) result = result.filter(r => r.stock_name.includes(search.trim()));
     return result;
-  }, [records, activeFilters, search]);
+  }, [records, tab, search]);
 
   if (!isLoggedIn) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.header}>
-          <Text style={styles.title}>기록</Text>
+          <Text style={styles.title}>매매 기록</Text>
         </View>
         <View style={styles.lockedWrap}>
           <Text style={styles.lockedTitle}>로그인하면 기록을 볼 수 있어요</Text>
           <Text style={styles.lockedDesc}>코칭 기록과 매매 내역이 저장됩니다</Text>
-          <ScaleButton style={styles.lockedBtn} onPress={() => navigation.navigate('SignUp')}>
+          <ScaleButton style={styles.lockedBtn} onPress={() => navigation.navigate('SignUp', { trigger: 'save' })}>
             <Text style={styles.lockedBtnText}>로그인하기</Text>
           </ScaleButton>
         </View>
@@ -121,10 +107,10 @@ export default function RecordsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={styles.title}>기록</Text>
+        <Text style={styles.title}>매매 기록</Text>
+        <Text style={styles.subtitle}>총 {records.length}회의 코칭 기록</Text>
       </View>
 
-      {/* 검색 */}
       <View style={styles.searchWrap}>
         <TextInput
           style={styles.searchInput}
@@ -136,73 +122,32 @@ export default function RecordsScreen() {
         />
       </View>
 
-      {/* 필터 — 가로 스크롤 한 줄 */}
-      <View style={styles.filterWrap}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterRow}
-        >
-          {FILTER_PILLS.map(({ value, label }) => {
-            const active = value === 'all' ? activeFilters.length === 0 : activeFilters.includes(value);
-            return (
-              <ScaleButton
-                key={value}
-                style={[styles.pill, active && styles.pillActive]}
-                onPress={() => toggleFilter(value)}
-              >
-                <Text style={[styles.pillText, active && styles.pillTextActive]}>
-                  {label}
-                </Text>
-              </ScaleButton>
-            );
-          })}
-        </ScrollView>
+      <View style={styles.tabRow}>
+        {TABS.map(({ value, label }) => (
+          <ScaleButton
+            key={value}
+            style={[styles.tabPill, tab === value && styles.tabPillActive]}
+            onPress={() => setTab(value)}
+          >
+            <Text style={[styles.tabPillText, tab === value && styles.tabPillTextActive]}>
+              {label}
+            </Text>
+          </ScaleButton>
+        ))}
       </View>
 
-      {/* 목록 */}
-      <ScrollView
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {filtered.length === 0 ? (
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyText}>조건에 맞는 기록이 없어요.</Text>
+            <Text style={styles.emptyText}>조건에 맞는 기록이 없어요</Text>
           </View>
         ) : (
           filtered.map((record) => (
-            <ScaleButton
+            <RecordCard
               key={record.id}
-              style={styles.card}
+              record={record}
               onPress={() => navigation.navigate('RecordDetail', { sessionId: record.id })}
-            >
-              <View style={styles.cardTop}>
-                <View style={styles.cardLeft}>
-                  <Text style={styles.cardStock}>{record.stock_name}</Text>
-                  <Text style={styles.cardMeta}>
-                    {record.direction === 'buy' ? '매수' : '매도'} · {formatDate(record.created_at)}
-                    {record.type === 'post' ? ' · 직접 기록' : ''}
-                  </Text>
-                </View>
-                <View style={styles.cardRight}>
-                  {record.verdict && (
-                    <Text style={[
-                      styles.verdictText,
-                      { color: VERDICT_STYLE[record.verdict].color },
-                    ]}>
-                      {VERDICT_STYLE[record.verdict].label}
-                    </Text>
-                  )}
-                  {record.impulse_score !== undefined && (
-                    <Text style={styles.scoreText}>충동도 {record.impulse_score}%</Text>
-                  )}
-                  <OutcomeBadge outcome={record.trade_outcome} />
-                </View>
-              </View>
-              {record.memo ? (
-                <Text style={styles.cardMemo} numberOfLines={1}>{record.memo}</Text>
-              ) : null}
-            </ScaleButton>
+            />
           ))
         )}
         <View style={{ height: 24 }} />
@@ -213,72 +158,66 @@ export default function RecordsScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  header: { paddingHorizontal: 24, paddingTop: 24, paddingBottom: 8 },
-  title: { fontSize: 26, fontWeight: '600', color: Colors.textPrimary },
 
-  searchWrap: { paddingHorizontal: 16, paddingBottom: 8 },
+  header: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 4 },
+  title: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
+  subtitle: { fontSize: 12, color: Colors.textMuted, marginTop: 2 },
+
+  searchWrap: { paddingHorizontal: 20, paddingVertical: 10 },
   searchInput: {
-    backgroundColor: Colors.surface, borderRadius: 10,
+    backgroundColor: Colors.surface, borderRadius: 16,
     paddingHorizontal: 14, paddingVertical: 10,
     fontSize: 14, color: Colors.textPrimary,
     borderWidth: 0.5, borderColor: Colors.border,
   },
 
-  // 가로 스크롤 필터
-  filterWrap: { height: 40, marginBottom: 8 },
-  filterRow: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 2,
-    alignItems: 'center',
+  tabRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingBottom: 12 },
+  tabPill: {
+    paddingVertical: 6, paddingHorizontal: 14,
+    borderRadius: 20, backgroundColor: Colors.surface,
+    borderWidth: 0.5, borderColor: Colors.border,
   },
-  pill: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
+  tabPillActive: { backgroundColor: Colors.textPrimary, borderColor: Colors.textPrimary },
+  tabPillText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
+  tabPillTextActive: { color: '#FFF' },
+
+  list: { paddingHorizontal: 20, gap: 12 },
+  emptyWrap: { paddingTop: 60, alignItems: 'center' },
+  emptyText: { fontSize: 15, color: Colors.textMuted },
+
+  card: {
+    padding: 16, borderRadius: 20,
+    backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
-  pillActive: {
-    backgroundColor: Colors.cta,
-    borderColor: Colors.cta,
-  },
-  pillText: { fontSize: 13, color: Colors.textSecondary, fontWeight: '500' },
-  pillTextActive: { color: '#FFF' },
+  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  cardStock: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  cardDate: { fontSize: 11, color: Colors.textMuted },
+  cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardVerdict: { fontSize: 13, color: Colors.textSubtle },
+
+  actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
+  buyBadge: { backgroundColor: Colors.buyBg },
+  sellBadge: { backgroundColor: Colors.sellBg },
+  actionBadgeText: { fontSize: 10, fontWeight: '500' },
+  buyText: { color: Colors.buy },
+  sellText: { color: Colors.sell },
+
+  scoreBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
+  scoreBadgeAmber: { backgroundColor: Colors.impulseBg },
+  scoreBadgeOk: { backgroundColor: Colors.okBg },
+  scoreBadgeNeutral: { backgroundColor: Colors.surface },
+  scoreBadgeText: { fontSize: 11 },
+  scoreBadgeAmberText: { color: Colors.impulse },
+  scoreBadgeOkText: { color: Colors.ok },
+  scoreBadgeNeutralText: { color: Colors.textMuted },
 
   lockedWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
   lockedTitle: { fontSize: 17, fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
   lockedDesc: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   lockedBtn: {
-    marginTop: 8, backgroundColor: Colors.cta, borderRadius: 10,
+    marginTop: 8, backgroundColor: Colors.cta, borderRadius: 16,
     paddingVertical: 14, paddingHorizontal: 32,
   },
   lockedBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
-
-  // 목록
-  list: { paddingHorizontal: 16, gap: 12 },
-  emptyWrap: { paddingTop: 60, alignItems: 'center' },
-  emptyText: { fontSize: 15, color: Colors.textMuted },
-
-  card: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 10,
-  },
-  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  cardLeft: { gap: 3, flex: 1, marginRight: 12 },
-  cardStock: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary },
-  cardMeta: { fontSize: 13, color: Colors.textMuted },
-  cardRight: { alignItems: 'flex-end', gap: 4 },
-  verdictText: { fontSize: 13, fontWeight: '500' },
-  scoreText: { fontSize: 12, color: Colors.textMuted },
-  cardMemo: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.5 },
-
-  badge: {
-    borderRadius: 6,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-  },
-  badgeText: { fontSize: 11, fontWeight: '600' },
 });
