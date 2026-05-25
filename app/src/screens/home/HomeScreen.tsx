@@ -2,12 +2,16 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { MainStackParamList, EmotionType, TradeDirection, SessionRecord } from '../../types';
 import ScaleButton from '../../components/common/ScaleButton';
 import CheckBottomSheet from '../../components/check/CheckBottomSheet';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
+import {
+  Sparkle, MoodIcon, GreetSun, SettingsIcon, ChevronRight,
+} from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
@@ -18,256 +22,100 @@ const EMOTION_LABEL: Record<EmotionType, string> = {
 
 const DAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
 
-// ── 날짜 유틸 ────────────────────────────────────────────────────────────────
+const MOODS: { kind: 'calm' | 'ok' | 'neutral' | 'anxious' | 'tense'; label: string }[] = [
+  { kind: 'calm', label: '편안' },
+  { kind: 'ok', label: '괜찮' },
+  { kind: 'neutral', label: '보통' },
+  { kind: 'anxious', label: '불안' },
+  { kind: 'tense', label: '초조' },
+];
 
-function startOfDay(d: Date): Date {
-  const r = new Date(d);
-  r.setHours(0, 0, 0, 0);
-  return r;
+function getTodayLabel() {
+  const d = new Date();
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_KR[d.getDay()]}요일`;
 }
 
-function isSameDay(a: Date, b: Date) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-// 이번 주 월요일 00:00
-function getThisMonday(today: Date): Date {
-  const d = startOfDay(new Date(today));
-  const dow = d.getDay(); // 0=일, 1=월, ..., 6=토
-  d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
-  return d;
-}
-
-// 이번 주 월~일 7일 전체
-function getThisWeekDays(today: Date): Date[] {
-  const monday = getThisMonday(today);
-  const days: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    days.push(d);
-  }
-  return days;
-}
-
-// 지난 주 월~일 범위
-function getLastWeekRange(today: Date): { start: Date; end: Date } {
-  const monday = getThisMonday(today);
-  const start = new Date(monday);
-  start.setDate(monday.getDate() - 7);
-  const end = new Date(monday);
-  end.setDate(monday.getDate() - 1);
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
-}
-
-function inRange(date: Date, start: Date, end: Date) {
-  return date >= start && date <= end;
-}
-
-function avgImpulse(records: SessionRecord[]): number | null {
-  const scored = records.filter((r) => r.impulse_score !== undefined);
-  if (scored.length === 0) return null;
-  return Math.round(scored.reduce((s, r) => s + r.impulse_score!, 0) / scored.length);
-}
-
-// ── 요약 데이터 계산 ──────────────────────────────────────────────────────────
-
-function computeSummary(records: SessionRecord[]) {
-  const today = new Date();
-  const thisMonday = getThisMonday(today);
-  const { start: lastStart, end: lastEnd } = getLastWeekRange(today);
-
-  const checkRecords = records.filter((r) => r.type === 'check');
-
-  const thisWeek = checkRecords.filter((r) => new Date(r.created_at) >= thisMonday);
-  const lastWeek = checkRecords.filter((r) => inRange(new Date(r.created_at), lastStart, lastEnd));
-
-  const thisWeekAvg = avgImpulse(thisWeek);
-  const lastWeekAvg = avgImpulse(lastWeek);
-
-  const skippedCount = thisWeek.filter((r) => r.trade_outcome === 'skipped').length;
-
-  // 이번 주 감정 빈도 (3회 이상인 경우만)
-  let topEmotion: EmotionType | null = null;
-  if (thisWeek.length >= 3) {
-    const freq: Partial<Record<EmotionType, number>> = {};
-    thisWeek.forEach((r) => {
-      r.emotions.forEach((e) => {
-        freq[e] = (freq[e] ?? 0) + 1;
-      });
-    });
-    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-    if (sorted.length > 0) topEmotion = sorted[0][0] as EmotionType;
-  }
-
-  return {
-    today,
-    thisWeek,
-    thisWeekCount: thisWeek.length,
-    thisWeekAvg,
-    lastWeekAvg,
-    skippedCount,
-    topEmotion,
-    hasAnyRecord: checkRecords.length > 0,
-  };
-}
-
-// ── 빈 상태 카드 ─────────────────────────────────────────────────────────────
-
-function EmptyCard({ onPress }: { onPress: () => void }) {
-  return (
-    <View style={styles.summaryCard}>
-      <Text style={styles.emptyCardTitle}>첫 코칭을 시작하면{'\n'}나의 패턴이 보여요</Text>
-      <ScaleButton style={styles.emptyCardBtn} onPress={onPress}>
-        <Text style={styles.emptyCardBtnText}>매매 전 체크하기</Text>
-      </ScaleButton>
-    </View>
-  );
-}
-
-// ── 요약 카드 ─────────────────────────────────────────────────────────────────
-
-function SummaryCard({ records, onStartCheck }: { records: SessionRecord[]; onStartCheck: () => void }) {
-  const summary = useMemo(() => computeSummary(records), [records]);
-  const {
-    today, thisWeek, thisWeekCount, thisWeekAvg, lastWeekAvg,
-    skippedCount, topEmotion, hasAnyRecord,
-  } = summary;
-
-  if (!hasAnyRecord) {
-    return <EmptyCard onPress={onStartCheck} />;
-  }
-
-  const weekDays = getThisWeekDays(today);
-
-  // 충동도 변화
-  let impulseChange: { diff: number; better: boolean } | null = null;
-  if (thisWeekAvg !== null && lastWeekAvg !== null && thisWeekAvg !== lastWeekAvg) {
-    const diff = Math.abs(thisWeekAvg - lastWeekAvg);
-    impulseChange = { diff, better: thisWeekAvg < lastWeekAvg };
-  }
-
-  return (
-    <View style={styles.summaryCard}>
-      {/* 섹션 1 — 주간 코칭 현황 */}
-      <View style={styles.section1}>
-        <View style={styles.dotsRow}>
-          {weekDays.map((day, i) => {
-            const coached = thisWeek.some((r) => isSameDay(new Date(r.created_at), day));
-            const isToday = isSameDay(day, today);
-            const isFuture = day > today && !isToday;
-            return (
-              <View key={i} style={styles.dotWrap}>
-                <View style={[
-                  styles.dot,
-                  coached ? styles.dotFilled : styles.dotEmpty,
-                  isToday && styles.dotToday,
-                  isFuture && styles.dotFuture,
-                ]} />
-                <Text style={[styles.dotLabel, isToday && styles.dotLabelToday, isFuture && styles.dotLabelFuture]}>
-                  {DAY_KR[day.getDay()]}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-        <Text style={styles.weekSummaryText}>
-          이번 주{' '}
-          <Text style={styles.weekSummaryBold}>{thisWeekCount}번</Text>{' '}
-          코칭했어요
-        </Text>
-      </View>
-
-      {/* 구분선 */}
-      <View style={styles.divider} />
-
-      {/* 섹션 2 — 핵심 수치 */}
-      <View style={styles.section2}>
-
-        {/* Row: 충동도 + 참은 횟수 */}
-        <View style={styles.metricsRow}>
-          {/* 충동도 */}
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>이번 주 평균 충동도</Text>
-            <Text style={styles.metricValue}>
-              {thisWeekAvg !== null ? `${thisWeekAvg}%` : '-'}
-            </Text>
-            {impulseChange ? (
-              <Text style={[
-                styles.metricSub,
-                { color: impulseChange.better ? Colors.ok : Colors.impulse },
-              ]}>
-                {`지난주보다 ${impulseChange.diff}% ${impulseChange.better ? '낮아졌어요 ↓' : '높아졌어요 ↑'}`}
-              </Text>
-            ) : (
-              <Text style={styles.metricSub}>
-                {lastWeekAvg === null ? '지난주 데이터 없음' : '지난주와 동일해요'}
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.metricDivider} />
-
-          {/* 참은 횟수 */}
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>이번 주 참은 횟수</Text>
-            <Text style={styles.metricValue}>
-              {skippedCount > 0 ? `${skippedCount}번` : '-'}
-            </Text>
-            <Text style={styles.metricSub}>
-              {thisWeekCount > 0
-                ? `총 ${thisWeekCount}번 중 ${skippedCount}번`
-                : '기록 없음'}
-            </Text>
-          </View>
-        </View>
-
-        {/* 감정 (3회 이상일 때만) */}
-        {topEmotion && (
-          <>
-            <View style={styles.divider} />
-            <View style={styles.emotionRow}>
-              <Text style={styles.metricLabel}>이번 주 주요 감정</Text>
-              <Text style={styles.emotionText}>
-                <Text style={styles.emotionBold}>{EMOTION_LABEL[topEmotion]}</Text>이 가장 많이 왔어요
-              </Text>
-            </View>
-          </>
-        )}
-      </View>
-    </View>
-  );
-}
-
-// ── 홈 ───────────────────────────────────────────────────────────────────────
-
-function formatDate(iso: string): string {
+function formatTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const h = Math.floor(diff / 3600000);
   const d = Math.floor(h / 24);
-  if (h < 24) return '오늘';
+  if (h < 1) return '방금 전';
+  if (h < 24) return `${h}시간 전`;
   if (d === 1) return '어제';
   if (d < 7) return `${d}일 전`;
   const date = new Date(iso);
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
-function getTodayLabel() {
-  const d = new Date();
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+// ── 최근 코칭 카드 ────────────────────────────────────────────────────────────
+
+function RecentCard({
+  record,
+  onPress,
+}: {
+  record: SessionRecord;
+  onPress: () => void;
+}) {
+  const isOk = record.verdict === 'ok';
+  const isBuy = record.direction === 'buy';
+  const score = record.impulse_score;
+
+  const verdictLabel = isOk ? '지금 매매해도 괜찮아요' : '한 번 더 생각해봐요';
+  const scoreColor = isOk ? styles.scoreBadgeOk : styles.scoreBadgeAmber;
+  const scoreTextColor = isOk ? styles.scoreBadgeOkText : styles.scoreBadgeAmberText;
+  const actionStyle = isBuy ? styles.actionBuy : styles.actionSell;
+  const actionTextStyle = isBuy ? styles.actionBuyText : styles.actionSellText;
+
+  return (
+    <ScaleButton style={styles.recentCard} onPress={onPress}>
+      <View style={styles.recentCardTop}>
+        <View style={styles.recentCardLeft}>
+          <Text style={styles.recentCardStock}>{record.stock_name}</Text>
+          <View style={[styles.actionBadge, actionStyle]}>
+            <Text style={[styles.actionBadgeText, actionTextStyle]}>
+              {isBuy ? '매수' : '매도'}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.recentCardTime}>{formatTime(record.created_at)}</Text>
+      </View>
+      <View style={styles.recentCardBottom}>
+        <Text style={styles.recentCardVerdict}>{verdictLabel}</Text>
+        {score !== undefined && (
+          <View style={[styles.scoreBadge, scoreColor]}>
+            <Text style={[styles.scoreBadgeText, scoreTextColor]}>충동도 {score}%</Text>
+          </View>
+        )}
+      </View>
+    </ScaleButton>
+  );
 }
+
+// ── 홈 ───────────────────────────────────────────────────────────────────────
 
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
   const [sheetVisible, setSheetVisible] = useState(false);
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+
   const records = useRecordStore((s) => s.records);
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
-  const recentSessions = records.filter((r) => r.type === 'check').slice(0, 2);
+  const nickname = useUserStore((s) => s.nickname);
+
+  const recentSessions = useMemo(
+    () => records.filter((r) => r.type === 'check').slice(0, 2),
+    [records],
+  );
+
+  const handleCheckPress = () => {
+    if (isLoggedIn) setSheetVisible(true);
+    else navigation.navigate('SignUp');
+  };
+
+  const handlePostTradePress = () => {
+    if (isLoggedIn) navigation.navigate('PostTrade');
+    else navigation.navigate('SignUp');
+  };
 
   const handleStart = ({
     stockName, direction, emotions,
@@ -277,7 +125,9 @@ export default function HomeScreen() {
     setSheetVisible(false);
     setTimeout(() => {
       navigation.navigate('CheckChat', {
-        stockName, direction, emotions,
+        stockName,
+        direction,
+        emotions,
         emotionLabel: emotions.map((e) => EMOTION_LABEL[e]).join(', '),
       });
     }, 300);
@@ -289,64 +139,110 @@ export default function HomeScreen() {
 
         {/* 헤더 */}
         <View style={styles.header}>
-          <Text style={styles.logo}>오름달</Text>
-          <Text style={styles.date}>{getTodayLabel()}</Text>
+          <View>
+            <Text style={styles.headerDate}>{getTodayLabel()}</Text>
+            <View style={styles.headerGreetRow}>
+              <Text style={styles.headerGreet}>
+                안녕하세요, {nickname || '반가워요'}님
+              </Text>
+              <GreetSun size={18} color="#F59E0B" />
+            </View>
+          </View>
+          <ScaleButton
+            onPress={() => navigation.navigate('SignUp')}
+            style={styles.settingsBtn}
+          >
+            <SettingsIcon size={22} color={Colors.textSecondary} />
+          </ScaleButton>
         </View>
 
-        {/* 요약 카드 */}
-        <SummaryCard records={records} onStartCheck={() => isLoggedIn ? setSheetVisible(true) : navigation.navigate('SignUp')} />
+        {/* 메인 CTA 그라디언트 카드 */}
+        <ScaleButton onPress={handleCheckPress} style={styles.ctaCardWrap}>
+          <LinearGradient
+            colors={[Colors.gradientStart, Colors.gradientMid, Colors.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.ctaCard}
+          >
+            {/* 배경 글로우 서클 */}
+            <View style={styles.ctaGlow} />
 
-        {/* 최근 코칭 */}
-        {recentSessions.length > 0 && (
-          <View style={styles.recentSection}>
-            <Text style={styles.sectionLabel}>최근 코칭</Text>
-            {recentSessions.map((s) => (
+            <View style={styles.ctaAiTag}>
+              <Sparkle size={12} color="rgba(255,255,255,0.85)" />
+              <Text style={styles.ctaAiTagText}>AI 심리 코치</Text>
+            </View>
+            <Text style={styles.ctaTitle}>지금 매매하고{'\n'}싶어요?</Text>
+            <Text style={styles.ctaSubtitle}>결정 전, 1분만 같이 점검해봐요</Text>
+
+            <View style={styles.ctaBtnRow}>
+              <View style={styles.ctaPrimaryPill}>
+                <Text style={styles.ctaPrimaryPillText}>충동 체크 시작하기</Text>
+                <ChevronRight size={14} color={Colors.cta} />
+              </View>
               <ScaleButton
-                key={s.id}
-                style={styles.sessionCard}
-                onPress={() => navigation.navigate('RecordDetail', { sessionId: s.id })}
+                style={styles.ctaSecondaryPill}
+                onPress={(e) => {
+                  handlePostTradePress();
+                }}
               >
-                <View>
-                  <Text style={styles.sessionStock}>{s.stock_name}</Text>
-                  <Text style={styles.sessionMeta}>
-                    {s.direction === 'buy' ? '매수' : '매도'} · {formatDate(s.created_at)}
-                  </Text>
-                </View>
-                <View style={styles.sessionRight}>
-                  {s.verdict && (
-                    <Text style={[
-                      styles.verdictText,
-                      s.verdict === 'ok' ? styles.textOk : styles.textReconsider,
-                    ]}>
-                      {s.verdict === 'ok' ? '괜찮아요' : '다시 생각해봐요'}
-                    </Text>
-                  )}
-                  {s.impulse_score !== undefined && (
-                    <Text style={styles.scoreText}>충동도 {s.impulse_score}%</Text>
-                  )}
-                </View>
+                <Text style={styles.ctaSecondaryPillText}>이미 매매했어요 · 기록만 남기기</Text>
+              </ScaleButton>
+            </View>
+          </LinearGradient>
+        </ScaleButton>
+
+        {/* 오늘의 감정 체크인 */}
+        <View>
+          <Text style={styles.sectionTitle}>오늘의 감정 체크인</Text>
+          <View style={styles.moodRow}>
+            {MOODS.map((m) => (
+              <ScaleButton
+                key={m.kind}
+                style={[styles.moodBtn, selectedMood === m.kind && styles.moodBtnActive]}
+                onPress={() => setSelectedMood(selectedMood === m.kind ? null : m.kind)}
+              >
+                <MoodIcon
+                  kind={m.kind}
+                  size={24}
+                  color={selectedMood === m.kind ? Colors.cta : Colors.textSubtle}
+                />
+                <Text style={[styles.moodLabel, selectedMood === m.kind && styles.moodLabelActive]}>
+                  {m.label}
+                </Text>
               </ScaleButton>
             ))}
           </View>
-        )}
+        </View>
 
+        {/* 최근 코칭 */}
+        <View>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>최근 코칭</Text>
+            <ScaleButton onPress={() => navigation.navigate('Tabs', { screen: 'Records' } as any)}>
+              <Text style={styles.sectionMore}>전체보기</Text>
+            </ScaleButton>
+          </View>
+
+          {recentSessions.length > 0 ? (
+            <View style={styles.recentList}>
+              {recentSessions.map((s) => (
+                <RecentCard
+                  key={s.id}
+                  record={s}
+                  onPress={() => navigation.navigate('RecordDetail', { sessionId: s.id })}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyRecent}>
+              <Text style={styles.emptyRecentText}>아직 코칭 기록이 없어요</Text>
+              <Text style={styles.emptyRecentSub}>첫 충동 체크를 시작해봐요</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.bottomPad} />
       </ScrollView>
-
-      {/* 하단 CTA */}
-      <View style={styles.bottomBar}>
-        <ScaleButton
-          style={styles.primaryBtn}
-          onPress={() => isLoggedIn ? setSheetVisible(true) : navigation.navigate('SignUp')}
-        >
-          <Text style={styles.primaryBtnText}>매매 전 체크하기</Text>
-        </ScaleButton>
-        <ScaleButton
-          style={styles.secondaryBtn}
-          onPress={() => isLoggedIn ? navigation.navigate('PostTrade') : navigation.navigate('SignUp')}
-        >
-          <Text style={styles.secondaryBtnText}>매매 기록하기</Text>
-        </ScaleButton>
-      </View>
 
       <CheckBottomSheet
         visible={sheetVisible}
@@ -361,154 +257,155 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: 24, paddingBottom: 24, gap: 28 },
+  content: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24, gap: 28 },
 
+  // 헤더
   header: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', paddingTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingTop: 4,
   },
-  logo: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
-  date: { fontSize: 13, color: Colors.textMuted },
+  headerDate: { fontSize: 12, color: Colors.textMuted },
+  headerGreetRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  headerGreet: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
+  settingsBtn: { padding: 4, marginTop: 4 },
 
-  // ── 요약 카드 공통
-  summaryCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
+  // CTA 카드
+  ctaCardWrap: { borderRadius: 28, overflow: 'hidden' },
+  ctaCard: {
+    borderRadius: 28,
     padding: 24,
+    overflow: 'hidden',
+    shadowColor: Colors.cta,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.35,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  ctaGlow: {
+    position: 'absolute',
+    right: -24,
+    top: -24,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  ctaAiTag: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  ctaAiTagText: { fontSize: 11, color: 'rgba(255,255,255,0.8)' },
+  ctaTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#FFF',
+    lineHeight: 26 * 1.3,
+    marginTop: 12,
+  },
+  ctaSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.75)',
+    marginTop: 6,
+  },
+  ctaBtnRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  ctaPrimaryPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  ctaPrimaryPillText: { fontSize: 13, fontWeight: '600', color: Colors.cta },
+  ctaSecondaryPill: {
+    borderRadius: 24,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  ctaSecondaryPillText: { fontSize: 12, fontWeight: '500', color: '#FFF' },
+
+  // 감정 체크인
+  sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
+  moodRow: { flexDirection: 'row', gap: 8 },
+  moodBtn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
     borderWidth: 0.5,
     borderColor: Colors.border,
-    gap: 20,
   },
-  divider: {
-    height: 0.5,
-    backgroundColor: Colors.border,
-    marginHorizontal: -24,
-    marginVertical: 0,
+  moodBtnActive: {
+    backgroundColor: Colors.ctaLight,
+    borderColor: Colors.ctaBorder,
+    borderWidth: 1,
   },
+  moodLabel: { fontSize: 10, color: Colors.textSecondary },
+  moodLabelActive: { color: Colors.cta, fontWeight: '500' },
 
-  // ── 섹션 1
-  section1: { gap: 12 },
-  dotsRow: {
+  // 최근 코칭
+  sectionHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionMore: { fontSize: 12, color: Colors.textMuted },
+  recentList: { gap: 10 },
+
+  // 최근 코칭 카드
+  recentCard: {
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderWidth: 0.5,
+    borderColor: Colors.border,
     gap: 12,
   },
-  dotWrap: { alignItems: 'center', gap: 5 },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  dotFilled: { backgroundColor: Colors.cta },
-  dotEmpty: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-  },
-  dotToday: {
-    borderWidth: 2,
-    borderColor: Colors.cta,
-  },
-  dotFuture: { opacity: 0.25 },
-  dotLabel: { fontSize: 10, color: Colors.textMuted },
-  dotLabelToday: { color: Colors.cta, fontWeight: '600' },
-  dotLabelFuture: { opacity: 0.35 },
-  weekSummaryText: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-  },
-  weekSummaryBold: {
-    fontWeight: '600',
-    color: Colors.textPrimary,
-  },
+  recentCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  recentCardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  recentCardStock: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  recentCardTime: { fontSize: 11, color: Colors.textMuted },
+  recentCardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  recentCardVerdict: { fontSize: 13, color: Colors.textSubtle },
 
-  // ── 섹션 2
-  section2: { gap: 20 },
-  metricsRow: {
-    flexDirection: 'row',
-    gap: 0,
-  },
-  metricItem: {
-    flex: 1,
+  actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
+  actionBuy: { backgroundColor: Colors.buyBg },
+  actionSell: { backgroundColor: Colors.sellBg },
+  actionBadgeText: { fontSize: 10, fontWeight: '500' },
+  actionBuyText: { color: Colors.buy },
+  actionSellText: { color: Colors.sell },
+
+  scoreBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
+  scoreBadgeAmber: { backgroundColor: Colors.impulseBg },
+  scoreBadgeOk: { backgroundColor: Colors.okBg },
+  scoreBadgeText: { fontSize: 11 },
+  scoreBadgeAmberText: { color: Colors.impulse },
+  scoreBadgeOkText: { color: Colors.ok },
+
+  // 빈 상태
+  emptyRecent: {
+    padding: 24,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderWidth: 0.5,
+    borderColor: Colors.border,
+    alignItems: 'center',
     gap: 4,
   },
-  metricDivider: {
-    width: 0.5,
-    backgroundColor: Colors.border,
-    marginHorizontal: 16,
-  },
-  metricLabel: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    fontWeight: '500',
-    letterSpacing: 0.3,
-  },
-  metricValue: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  metricSub: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    lineHeight: 12 * 1.5,
-  },
-  emotionRow: { gap: 6 },
-  emotionText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-  },
-  emotionBold: {
-    fontWeight: '600',
-    color: Colors.textPrimary,
-  },
+  emptyRecentText: { fontSize: 14, color: Colors.textSecondary },
+  emptyRecentSub: { fontSize: 12, color: Colors.textMuted },
 
-  // ── 빈 상태 카드
-  emptyCardTitle: {
-    fontSize: 15,
-    color: Colors.textSecondary,
-    lineHeight: 15 * 1.7,
-  },
-  emptyCardBtn: {
-    backgroundColor: Colors.cta,
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  emptyCardBtnText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFF',
-  },
-
-  // ── 최근 코칭
-  recentSection: { gap: 12 },
-  sectionLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  sessionCard: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 18,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    borderWidth: 0.5, borderColor: Colors.border,
-  },
-  sessionStock: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary },
-  sessionMeta: { fontSize: 13, color: Colors.textMuted, marginTop: 2 },
-  sessionRight: { alignItems: 'flex-end', gap: 3 },
-  verdictText: { fontSize: 13, fontWeight: '500' },
-  textOk: { color: Colors.ok },
-  textReconsider: { color: Colors.reconsider },
-  scoreText: { fontSize: 12, color: Colors.textMuted },
-
-  // ── 하단 CTA
-  bottomBar: {
-    padding: 20, paddingBottom: 32, gap: 12,
-    borderTopWidth: 0.5, borderTopColor: Colors.border,
-    backgroundColor: Colors.background,
-  },
-  primaryBtn: {
-    backgroundColor: Colors.cta, borderRadius: 12, padding: 18, alignItems: 'center',
-  },
-  primaryBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
-  secondaryBtn: {
-    backgroundColor: Colors.surface, borderRadius: 12, padding: 18, alignItems: 'center',
-  },
-  secondaryBtnText: { color: Colors.textPrimary, fontSize: 15, fontWeight: '500' },
+  bottomPad: { height: 8 },
 });

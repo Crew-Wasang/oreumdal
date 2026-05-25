@@ -53,4 +53,8 @@ export const Colors = {
   // 탭바
   tabActive: '#6366F1',     // indigo-500
   tabInactive: '#A1A1AA',   // zinc-400
+
+  // 하위 호환 alias
+  reconsider: '#B45309',    // = impulse (amber-700)
+  inputBorder: '#E4E4E7',   // = border (zinc-200)
 };
