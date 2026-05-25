@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator,
 } from 'react-native';
+import Svg, { Path, Circle, Defs, LinearGradient as SvgGrad, Stop as SvgStop } from 'react-native-svg';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
@@ -235,6 +236,97 @@ function FearGreedCard() {
   );
 }
 
+// ── 히트맵 ───────────────────────────────────────────────────────────────────
+
+const HEAT_DAYS  = ['월', '화', '수', '목', '금', '토', '일'];
+const HEAT_SLOTS = ['09–10', '10–12', '12–14', '14–16', '장외'];
+
+function heatCellColor(v: number): string {
+  if (v === 0) return Colors.surfaceElevated;
+  if (v >= 75) return '#F43F5E';
+  if (v >= 55) return '#FB923C';
+  if (v >= 35) return Colors.impulseMid;
+  return Colors.okMid;
+}
+
+function Heatmap7Day({ data, hasData }: { data: number[][]; hasData: boolean }) {
+  return (
+    <View style={styles.card}>
+      <Text style={styles.deepCardTitle}>7일 충동 히트맵</Text>
+
+      <View style={styles.heatDayRow}>
+        <View style={styles.heatSlotSpacer} />
+        {HEAT_DAYS.map((d) => (
+          <Text key={d} style={styles.heatDayLabel}>{d}</Text>
+        ))}
+      </View>
+
+      {HEAT_SLOTS.map((slot, si) => (
+        <View key={slot} style={styles.heatSlotRow}>
+          <Text style={styles.heatSlotLabel}>{slot}</Text>
+          {HEAT_DAYS.map((_, di) => (
+            <View
+              key={di}
+              style={[
+                styles.heatCell,
+                { backgroundColor: hasData ? heatCellColor(data[di][si]) : Colors.surfaceElevated },
+              ]}
+            />
+          ))}
+        </View>
+      ))}
+
+      <View style={styles.heatLegend}>
+        <Text style={styles.heatLegendText}>낮음</Text>
+        {[Colors.okMid, Colors.impulseMid, '#FB923C', '#F43F5E'].map((c, i) => (
+          <View key={i} style={[styles.heatLegendCell, { backgroundColor: c }]} />
+        ))}
+        <Text style={styles.heatLegendText}>높음</Text>
+      </View>
+    </View>
+  );
+}
+
+// ── 종목 추이 ─────────────────────────────────────────────────────────────────
+
+function TickerTrendCard({ ticker, trend, count }: { ticker: string; trend: number[]; count: number }) {
+  const W = 280, H = 56, PAD = 6;
+  const xs = (i: number) => PAD + (i / Math.max(trend.length - 1, 1)) * (W - PAD * 2);
+  const ys = (v: number) => PAD + (1 - v / 100) * (H - PAD * 2);
+  const linePath = trend.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xs(i)} ${ys(v)}`).join(' ');
+  const areaPath = `${linePath} L ${xs(trend.length - 1)} ${H - PAD} L ${xs(0)} ${H - PAD} Z`;
+  const last = trend[trend.length - 1];
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.deepCardTopRow}>
+        <Text style={styles.deepCardTitle}>동일 종목 반복 매매</Text>
+        <Text style={styles.deepCardMeta}>{ticker} · {count}회</Text>
+      </View>
+
+      <Svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: H }}>
+        <Defs>
+          <SvgGrad id="tt-grad" x1="0" y1="0" x2="0" y2="1">
+            <SvgStop offset="0" stopColor={Colors.buy} stopOpacity="0.3" />
+            <SvgStop offset="1" stopColor={Colors.buy} stopOpacity="0" />
+          </SvgGrad>
+        </Defs>
+        <Path d={areaPath} fill="url(#tt-grad)" />
+        <Path d={linePath} fill="none" stroke={Colors.buy} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+        {trend.map((v, i) => (
+          <Circle key={i} cx={xs(i)} cy={ys(v)} r={2.5} fill={Colors.buy} />
+        ))}
+      </Svg>
+
+      <View style={styles.tickerScoreRow}>
+        <Text style={styles.tickerScore}>{last}%</Text>
+        <Text style={styles.tickerScoreSub}>최근 충동도 · 상승 추세</Text>
+      </View>
+      <Text style={styles.cardDesc}>{ticker}에 감정이 누적되고 있어요. 잠시 관심종목에서 빼두는 걸 권해요.</Text>
+    </View>
+  );
+}
+
 // ── 메인 ─────────────────────────────────────────────────────────────────────
 export default function ReportScreen() {
   const navigation = useNavigation<Nav>();
@@ -251,9 +343,11 @@ export default function ReportScreen() {
   } = report;
 
   const { complianceRate, complianceOkCount, complianceTotal,
-    emotionImpulse, vulnerableStock, q1Impulse } = advanced;
+    emotionImpulse, vulnerableStock, q1Impulse,
+    heatmapData, heatmapHasData, vulnerableStockTrend } = advanced;
 
   const remaining5  = Math.max(5  - checkCount, 0);
+  const remaining7  = Math.max(7  - checkCount, 0);
   const remaining10 = Math.max(10 - checkCount, 0);
 
   // ── 회원가입 프롬프트 ─────────────────────────────────────────────────────
@@ -475,6 +569,21 @@ export default function ReportScreen() {
           commentLoading={advLoading && !q1Impulse && checkCount >= 10}
         />
 
+        {/* ── 심화 인사이트 ── */}
+        <Text style={styles.sectionHeader}>심화 인사이트</Text>
+
+        <LockedSection locked={checkCount < 7} lockMessage={`코칭 ${remaining7}번 더 하면 열려요`}>
+          <Heatmap7Day data={heatmapData} hasData={heatmapHasData} />
+        </LockedSection>
+
+        {vulnerableStock && vulnerableStockTrend.length >= 2 && (
+          <TickerTrendCard
+            ticker={vulnerableStock.name}
+            trend={vulnerableStockTrend}
+            count={vulnerableStock.count}
+          />
+        )}
+
         {/* 시장 맥락 */}
         <Text style={styles.sectionHeader}>시장 맥락</Text>
         <FearGreedCard />
@@ -579,6 +688,25 @@ const styles = StyleSheet.create({
   aiCommentText: {
     fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7,
   },
+
+  // 히트맵
+  heatDayRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  heatSlotSpacer: { width: 42 },
+  heatDayLabel: { flex: 1, fontSize: 10, color: Colors.textMuted, textAlign: 'center' },
+  heatSlotRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  heatSlotLabel: { width: 42, fontSize: 9, color: Colors.textMuted },
+  heatCell: { flex: 1, height: 20, borderRadius: 3, marginHorizontal: 1 },
+  heatLegend: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  heatLegendText: { fontSize: 10, color: Colors.textMuted },
+  heatLegendCell: { width: 14, height: 8, borderRadius: 2 },
+
+  // 종목 추이
+  deepCardTitle: { fontSize: 12, fontWeight: '600', color: Colors.textSubtle },
+  deepCardTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  deepCardMeta: { fontSize: 11, color: Colors.textMuted },
+  tickerScoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 4 },
+  tickerScore: { fontSize: 18, fontWeight: '700', color: Colors.buy },
+  tickerScoreSub: { fontSize: 11, color: Colors.textMuted },
 
   // Fear & Greed
   fgRow: {

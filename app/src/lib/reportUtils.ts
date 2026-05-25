@@ -162,6 +162,14 @@ export interface AdvancedInsights {
 
   // 인사이트 4: 매매이유-충동도 (checkCount >= 10)
   q1Impulse: { reason: string; avgImpulse: number } | null;
+
+  // 심화 인사이트: 7일 히트맵 (checkCount >= 7)
+  // heatmapData[dayIdx (Mon=0..Sun=6)][slotIdx (0=09-10, 1=10-12, 2=12-14, 3=14-16, 4=장외)]
+  heatmapData: number[][];
+  heatmapHasData: boolean;
+
+  // 취약 종목 충동도 추이 (최근 7회)
+  vulnerableStockTrend: number[];
 }
 
 export function computeAdvancedInsights(records: SessionRecord[]): AdvancedInsights {
@@ -229,6 +237,31 @@ export function computeAdvancedInsights(records: SessionRecord[]): AdvancedInsig
     if (sorted.length > 0) q1Impulse = sorted[0];
   }
 
+  // ── 히트맵 ────────────────────────────────────────────────────────────────
+  const heatBuckets: number[][][] = Array.from({ length: 7 }, () =>
+    Array.from({ length: 5 }, () => [] as number[]),
+  );
+  checks.forEach((r) => {
+    const d = new Date(r.created_at);
+    const js = d.getDay();
+    const di = js === 0 ? 6 : js - 1; // Sun=0 → 6, Mon=1 → 0
+    const h = d.getHours();
+    const si = h === 9 ? 0 : h >= 10 && h < 12 ? 1 : h >= 12 && h < 14 ? 2 : h >= 14 && h < 16 ? 3 : 4;
+    heatBuckets[di][si].push(r.impulse_score!);
+  });
+  const heatmapData = heatBuckets.map((day) =>
+    day.map((scores) => (scores.length ? avg(scores) : 0)),
+  );
+  const heatmapHasData = checks.length >= 7;
+
+  // ── 취약 종목 추이 ────────────────────────────────────────────────────────
+  const vulnerableStockTrend = vulnerableStock
+    ? checks
+        .filter((r) => r.stock_name === vulnerableStock.name)
+        .slice(-7)
+        .map((r) => r.impulse_score!)
+    : [];
+
   return {
     complianceRate,
     complianceOkCount: okCount,
@@ -236,5 +269,8 @@ export function computeAdvancedInsights(records: SessionRecord[]): AdvancedInsig
     emotionImpulse,
     vulnerableStock,
     q1Impulse,
+    heatmapData,
+    heatmapHasData,
+    vulnerableStockTrend,
   };
 }
