@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { MainStackParamList, ChatMessage } from '../../types';
 import ScaleButton from '../../components/common/ScaleButton';
@@ -15,6 +16,7 @@ import { sendCoachingMessage, generateConclusion } from '../../lib/ai';
 import { buildRecordSummary } from '../../lib/ai/recordSummary';
 import { fetchMarketContext } from '../../lib/ai/marketContext';
 import { requestNotificationPermission, scheduleFollowUp } from '../../lib/notifications';
+import { Sparkle, SendIcon, LightbulbIcon, ChevronRight } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList, 'CheckChat'>;
 type Route = RouteProp<MainStackParamList, 'CheckChat'>;
@@ -22,12 +24,7 @@ type Route = RouteProp<MainStackParamList, 'CheckChat'>;
 type InputMode = 'q1' | 'q2' | 'q3' | 'done';
 type TradeOutcome = 'pending' | 'done' | 'cancelled' | null;
 
-const INPUT_PLACEHOLDERS: Record<InputMode, string> = {
-  q1: '예) 감이 좋아서요, 뉴스 봤어요',
-  q2: '예) 왠지 불안해서요, 다들 하는 것 같아서요',
-  q3: '예) 원칙이랑 맞아요, 잘 모르겠어요',
-  done: '',
-};
+const PLACEHOLDER = '솔직하게 답해보세요…';
 
 interface ResultData {
   score: number;
@@ -35,11 +32,24 @@ interface ResultData {
   reason: string;
 }
 
+function AIAvatar() {
+  return (
+    <LinearGradient
+      colors={[Colors.accent, Colors.gradientEnd]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.aiAvatar}
+    >
+      <Sparkle size={13} color="#FFF" />
+    </LinearGradient>
+  );
+}
+
 function TypingBubble() {
   const dots = [
-    useRef(new Animated.Value(0)).current,
-    useRef(new Animated.Value(0)).current,
-    useRef(new Animated.Value(0)).current,
+    useRef(new Animated.Value(0.2)).current,
+    useRef(new Animated.Value(0.2)).current,
+    useRef(new Animated.Value(0.2)).current,
   ];
   useEffect(() => {
     const anims = dots.map((dot, i) =>
@@ -54,10 +64,24 @@ function TypingBubble() {
     return () => anims.forEach(a => a.stop());
   }, []);
   return (
-    <View style={styles.bubbleAI}>
-      <View style={styles.typingRow}>
-        {dots.map((dot, i) => <Animated.View key={i} style={[styles.typingDot, { opacity: dot }]} />)}
+    <View style={styles.msgRowAI}>
+      <AIAvatar />
+      <View style={styles.bubbleAI}>
+        <View style={styles.typingRow}>
+          {dots.map((dot, i) => (
+            <Animated.View key={i} style={[styles.typingDot, { opacity: dot }]} />
+          ))}
+        </View>
       </View>
+    </View>
+  );
+}
+
+function BasisRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.basisRow}>
+      <Text style={styles.basisLabel}>{label}</Text>
+      <Text style={styles.basisValue}>{value}</Text>
     </View>
   );
 }
@@ -72,12 +96,11 @@ export default function CheckChatScreen() {
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
   const principles = useUserStore((s) => s.principles);
 
-  // 세션 시작 시 한 번만 수집하는 컨텍스트 (ref로 관리, 리렌더 불필요)
   const sessionCtx = useRef({ recordSummary: '', marketContext: '' });
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [inputMode, setInputMode] = useState<InputMode>('done'); // 'done' until Q1 arrives
+  const [inputMode, setInputMode] = useState<InputMode>('done');
   const [customText, setCustomText] = useState('');
   const [result, setResult] = useState<ResultData | null>(null);
   const [tradeOutcome, setTradeOutcome] = useState<TradeOutcome>(null);
@@ -85,6 +108,8 @@ export default function CheckChatScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const outcomeFadeAnim = useRef(new Animated.Value(0)).current;
+
+  const userTurn = messages.filter(m => m.role === 'user').length;
 
   const scrollToBottom = () =>
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
@@ -94,10 +119,7 @@ export default function CheckChatScreen() {
     scrollToBottom();
     try {
       const reply = await sendCoachingMessage({
-        stockName,
-        direction,
-        emotions,
-        emotionLabel,
+        stockName, direction, emotions, emotionLabel,
         investmentPrinciples: principles || undefined,
         recordSummary: sessionCtx.current.recordSummary || undefined,
         marketContext: sessionCtx.current.marketContext || undefined,
@@ -124,10 +146,7 @@ export default function CheckChatScreen() {
     scrollToBottom();
     try {
       const res = await generateConclusion({
-        stockName,
-        direction,
-        emotions,
-        emotionLabel,
+        stockName, direction, emotions, emotionLabel,
         investmentPrinciples: principles || undefined,
         recordSummary: sessionCtx.current.recordSummary || undefined,
         marketContext: sessionCtx.current.marketContext || undefined,
@@ -156,7 +175,6 @@ export default function CheckChatScreen() {
     setCustomText('');
     setInputMode('done');
     scrollToBottom();
-
     const userCount = nextMessages.filter(m => m.role === 'user').length;
     if (userCount < 3) {
       callAIQuestion(nextMessages);
@@ -203,6 +221,8 @@ export default function CheckChatScreen() {
     }
   };
 
+  const handleSkipSave = () => navigation.goBack();
+
   const handleLaterOutcomeNotify = async () => {
     const granted = await requestNotificationPermission();
     if (!granted) {
@@ -219,29 +239,7 @@ export default function CheckChatScreen() {
     scrollToBottom();
   };
 
-  const renderInputArea = (mode: InputMode) => (
-    <View style={styles.inputArea}>
-      <View style={styles.customRow}>
-        <TextInput
-          style={styles.customInput}
-          placeholder={INPUT_PLACEHOLDERS[mode]}
-          placeholderTextColor={Colors.textMuted}
-          value={customText}
-          onChangeText={setCustomText}
-          returnKeyType="send"
-          autoFocus
-          onSubmitEditing={() => handleUserChoice(customText.trim())}
-        />
-        <ScaleButton
-          style={[styles.sendBtn, !customText.trim() && styles.sendBtnDisabled]}
-          onPress={() => handleUserChoice(customText.trim())}
-          disabled={!customText.trim()}
-        >
-          <Text style={styles.sendBtnText}>→</Text>
-        </ScaleButton>
-      </View>
-    </View>
-  );
+  const isOk = result?.verdict === '괜찮아요';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -250,8 +248,8 @@ export default function CheckChatScreen() {
           <ScaleButton onPress={() => navigation.goBack()} style={styles.closeBtn}>
             <Text style={styles.closeBtnText}>✕</Text>
           </ScaleButton>
-          <Text style={styles.headerTitle}>{stockName} · {directionText}</Text>
-          <View style={{ width: 40 }} />
+          <Text style={styles.headerTitle}>AI 코칭</Text>
+          <Text style={styles.turnCounter}>{Math.min(userTurn + 1, 3)}/3</Text>
         </View>
 
         <ScrollView
@@ -260,76 +258,171 @@ export default function CheckChatScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {messages.map((msg, i) => (
-            <View key={i} style={msg.role === 'user' ? styles.bubbleWrapUser : styles.bubbleWrapAI}>
-              <View style={msg.role === 'user' ? styles.bubbleUser : styles.bubbleAI}>
-                <Text style={msg.role === 'user' ? styles.textUser : styles.textAI}>{msg.content}</Text>
+          {messages.map((msg, i) =>
+            msg.role === 'assistant' ? (
+              <View key={i} style={styles.msgRowAI}>
+                <AIAvatar />
+                <View style={styles.bubbleAI}>
+                  <Text style={styles.textAI}>{msg.content}</Text>
+                </View>
               </View>
-            </View>
-          ))}
-          {isTyping && <View style={styles.bubbleWrapAI}><TypingBubble /></View>}
+            ) : (
+              <View key={i} style={styles.msgRowUser}>
+                <View style={styles.bubbleUser}>
+                  <Text style={styles.textUser}>{msg.content}</Text>
+                </View>
+              </View>
+            )
+          )}
+
+          {isTyping && <TypingBubble />}
 
           {result && (
-            <Animated.View style={[styles.resultCard, { opacity: fadeAnim }]}>
-              <Text style={styles.resultLabel}>코칭 결과</Text>
-              <Text style={[styles.resultVerdict, result.verdict === '괜찮아요' ? styles.verdictOk : styles.verdictReconsider]}>
-                {result.verdict}
-              </Text>
+            <Animated.View style={[styles.resultWrap, { opacity: fadeAnim }]}>
+              {/* 판정 카드 */}
+              <LinearGradient
+                colors={isOk ? ['#D1FAE5', '#ECFDF5'] : ['#FEF3C7', '#FFF7ED']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.verdictCard, { borderColor: isOk ? '#6EE7B7' : '#FCD34D' }]}
+              >
+                <View style={[styles.verdictGlow, { backgroundColor: isOk ? 'rgba(52,211,153,0.3)' : 'rgba(251,191,36,0.3)' }]} />
+                <View style={[styles.verdictTag, { backgroundColor: isOk ? '#A7F3D0' : '#FDE68A' }]}>
+                  <Sparkle size={11} color={isOk ? Colors.ok : Colors.impulse} />
+                  <Text style={[styles.verdictTagText, { color: isOk ? Colors.ok : Colors.impulse }]}>AI 코치 의견</Text>
+                </View>
+                <Text style={[styles.verdictText, { color: isOk ? Colors.ok : Colors.textPrimary }]}>
+                  {isOk ? '지금\n매매해도 괜찮아요' : '한 번 더\n생각해봐요'}
+                </Text>
+                <Text style={styles.verdictReason}>{result.reason}</Text>
+              </LinearGradient>
 
-              <View style={styles.gaugeSection}>
-                <View style={styles.gaugeHeader}>
-                  <Text style={styles.gaugeLabel}>충동도</Text>
-                  <Text style={[styles.gaugeScore, result.score >= 55 ? styles.verdictReconsider : styles.verdictOk]}>
-                    {result.score}
+              {/* 충동도 카드 */}
+              <View style={styles.scoreCard}>
+                <View style={styles.scoreHeader}>
+                  <Text style={styles.scoreLabel}>충동도</Text>
+                  <Text style={[styles.scoreValue, { color: result.score >= 55 ? Colors.impulse : Colors.ok }]}>
+                    {result.score}%
                   </Text>
                 </View>
-                <View style={styles.gaugeBg}>
-                  <View style={[styles.gaugeFill, { width: `${result.score}%` as any }]} />
+                <View style={styles.barBg}>
+                  <LinearGradient
+                    colors={[Colors.impulseGradientLow, Colors.impulseGradientMid, Colors.impulseGradientHigh]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.barFill, { width: `${result.score}%` as any }]}
+                  />
+                </View>
+                <View style={styles.barLabels}>
+                  <Text style={styles.barLabelText}>차분</Text>
+                  <Text style={styles.barLabelText}>주의</Text>
+                  <Text style={styles.barLabelText}>충동</Text>
+                </View>
+                <View style={styles.basisList}>
+                  <BasisRow label="감정 상태" value={emotionLabel} />
+                  <BasisRow label="매매 방향" value={`${stockName} ${directionText}`} />
+                  <BasisRow
+                    label="충동 위험도"
+                    value={result.score >= 70 ? '높음' : result.score >= 45 ? '보통' : '낮음'}
+                  />
                 </View>
               </View>
 
-              <Text style={styles.resultReason}>{result.reason}</Text>
-
-              <View style={styles.outcomeSectionDivider} />
-              <Text style={styles.outcomeSectionLabel}>결국 어떻게 하셨어요?</Text>
-
-              {tradeOutcome === null ? (
-                <View style={styles.outcomeButtons}>
-                  {(['아직 안 했어요', '했어요', '안 하기로 했어요', '나중에 알려주기'] as const).map((label, i) => (
-                    <ScaleButton
-                      key={label}
-                      style={styles.outcomeBtn}
-                      onPress={() => {
-                        if (i === 3) { handleLaterOutcomeNotify(); return; }
-                        handleTradeOutcome(i === 0 ? 'pending' : i === 1 ? 'done' : 'cancelled');
-                      }}
-                    >
-                      <Text style={styles.outcomeBtnText}>{label}</Text>
+              {/* 결국 어떻게? */}
+              <View style={styles.outcomeCard}>
+                <Text style={styles.outcomeSectionLabel}>결국 어떻게 하셨어요?</Text>
+                {tradeOutcome === null ? (
+                  <View style={styles.outcomeButtons}>
+                    {[
+                      { label: '아직 안 했어요', value: 'pending' as TradeOutcome },
+                      { label: '했어요', value: 'done' as TradeOutcome },
+                      { label: '안 하기로 했어요', value: 'cancelled' as TradeOutcome },
+                    ].map((item) => (
+                      <ScaleButton
+                        key={item.label}
+                        style={styles.outcomeBtn}
+                        onPress={() => handleTradeOutcome(item.value)}
+                      >
+                        <Text style={styles.outcomeBtnText}>{item.label}</Text>
+                      </ScaleButton>
+                    ))}
+                    <ScaleButton style={styles.outcomeBtn} onPress={handleLaterOutcomeNotify}>
+                      <Text style={styles.outcomeBtnText}>나중에 알려주기</Text>
                     </ScaleButton>
-                  ))}
-                </View>
-              ) : (
-                <Animated.View style={{ opacity: outcomeFadeAnim }}>
-                  <Text style={styles.outcomeConfirm}>
-                    {tradeOutcome === 'pending' ? '아직 결정하지 않으셨군요. 충분히 생각해보세요.'
-                      : tradeOutcome === 'done' ? '기록해두었어요. 결과는 나중에 돌아봐도 좋아요.'
-                      : '잘 하셨어요. 원칙을 지킨 선택이에요.'}
-                  </Text>
-                </Animated.View>
-              )}
-
-              <View style={styles.resultActions}>
-                <ScaleButton style={styles.saveBtn} onPress={handleSaveAndClose}>
-                  <Text style={styles.saveBtnText}>기록 저장하고 닫기</Text>
-                </ScaleButton>
+                  </View>
+                ) : (
+                  <Animated.View style={{ opacity: outcomeFadeAnim }}>
+                    <Text style={styles.outcomeConfirm}>
+                      {tradeOutcome === 'pending'
+                        ? '아직 결정하지 않으셨군요. 충분히 생각해보세요.'
+                        : tradeOutcome === 'done'
+                        ? '기록해두었어요. 결과는 나중에 돌아봐도 좋아요.'
+                        : '잘 하셨어요. 원칙을 지킨 선택이에요.'}
+                    </Text>
+                  </Animated.View>
+                )}
               </View>
+
+              {/* 저장 */}
+              <View style={styles.saveCard}>
+                <Text style={styles.saveSectionLabel}>이 코칭을 기록으로 저장할까요?</Text>
+                <View style={styles.saveButtons}>
+                  <ScaleButton style={styles.savePrimary} onPress={handleSaveAndClose}>
+                    <Text style={styles.savePrimaryText}>저장</Text>
+                  </ScaleButton>
+                  <ScaleButton style={styles.saveSecondary} onPress={handleSkipSave}>
+                    <Text style={styles.saveSecondaryText}>저장 안 함</Text>
+                  </ScaleButton>
+                </View>
+              </View>
+
+              {/* 투자 원칙 유도 */}
+              {!principles && (
+                <ScaleButton
+                  style={styles.principlesCard}
+                  onPress={() => navigation.navigate('Tabs', { screen: 'My' } as any)}
+                >
+                  <View style={styles.principlesLeft}>
+                    <View style={styles.principlesIconBox}>
+                      <LightbulbIcon size={18} color={Colors.cta} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.principlesTag}>더 정확한 코칭을 받고 싶다면</Text>
+                      <Text style={styles.principlesText}>투자 원칙을 설정해보세요</Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={18} color={Colors.cta} />
+                </ScaleButton>
+              )}
             </Animated.View>
           )}
+
           <View style={{ height: 20 }} />
         </ScrollView>
 
-        {!result && inputMode !== 'done' && renderInputArea(inputMode)}
+        {!result && inputMode !== 'done' && (
+          <View style={styles.inputArea}>
+            <TextInput
+              style={styles.customInput}
+              placeholder={PLACEHOLDER}
+              placeholderTextColor={Colors.textMuted}
+              value={customText}
+              onChangeText={setCustomText}
+              returnKeyType="send"
+              autoFocus
+              onSubmitEditing={() => handleUserChoice(customText.trim())}
+            />
+            <ScaleButton
+              style={[styles.sendBtn, !customText.trim() && styles.sendBtnDisabled]}
+              onPress={() => handleUserChoice(customText.trim())}
+              disabled={!customText.trim()}
+            >
+              <SendIcon size={18} color="#FFF" />
+            </ScaleButton>
+          </View>
+        )}
       </KeyboardAvoidingView>
+
       <SignUpBottomSheet
         visible={showSignUp}
         trigger="chk"
@@ -341,6 +434,7 @@ export default function CheckChatScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingVertical: 14,
@@ -349,87 +443,136 @@ const styles = StyleSheet.create({
   closeBtn: { width: 40, height: 40, justifyContent: 'center' },
   closeBtnText: { fontSize: 18, color: Colors.textSecondary },
   headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  turnCounter: { fontSize: 13, fontWeight: '600', color: Colors.cta, width: 40, textAlign: 'right' },
 
-  chatContent: { padding: 20, gap: 16, paddingBottom: 8 },
-  bubbleWrapAI: { alignSelf: 'flex-start', maxWidth: '82%' },
-  bubbleWrapUser: { alignSelf: 'flex-end', maxWidth: '82%' },
+  chatContent: { padding: 20, gap: 14, paddingBottom: 8 },
+
+  msgRowAI: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, maxWidth: '85%' },
+  msgRowUser: { alignSelf: 'flex-end', maxWidth: '82%' },
+
+  aiAvatar: {
+    width: 32, height: 32, borderRadius: 16,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+
   bubbleAI: {
+    flex: 1,
     backgroundColor: Colors.surface,
-    borderTopRightRadius: 12, borderBottomRightRadius: 12, borderBottomLeftRadius: 12,
-    padding: 14, borderWidth: 0.5, borderColor: Colors.border,
+    borderTopRightRadius: 16, borderBottomRightRadius: 16, borderTopLeftRadius: 16,
+    padding: 14,
+    borderWidth: 0.5, borderColor: Colors.border,
   },
   bubbleUser: {
     backgroundColor: Colors.cta,
-    borderTopLeftRadius: 12, borderBottomLeftRadius: 12, borderTopRightRadius: 12,
+    borderTopLeftRadius: 16, borderBottomLeftRadius: 16, borderTopRightRadius: 16,
     padding: 14,
   },
-  textAI: { fontSize: 15, color: Colors.textPrimary, lineHeight: 15 * 1.7 },
-  textUser: { fontSize: 15, color: '#FFF', lineHeight: 15 * 1.7 },
-  typingRow: { flexDirection: 'row', gap: 4, padding: 4 },
+  textAI: { fontSize: 14, color: Colors.textPrimary, lineHeight: 14 * 1.75 },
+  textUser: { fontSize: 14, color: '#FFF', lineHeight: 14 * 1.75 },
+
+  typingRow: { flexDirection: 'row', gap: 5, paddingVertical: 2 },
   typingDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.textMuted },
 
-  // 결과 카드
-  resultCard: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 24, gap: 14,
-    borderWidth: 0.5, borderColor: Colors.border, marginTop: 8,
-  },
-  resultLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  resultVerdict: { fontSize: 24, fontWeight: '600', letterSpacing: -0.3 },
-  verdictOk: { color: Colors.ok },
-  verdictReconsider: { color: Colors.reconsider },
-  gaugeSection: { gap: 8 },
-  gaugeHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  gaugeLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
-    letterSpacing: 1.5, textTransform: 'uppercase',
-  },
-  gaugeScore: { fontSize: 22, fontWeight: '600' },
-  gaugeBg: { height: 4, backgroundColor: Colors.impulseBar, borderRadius: 4, overflow: 'hidden' },
-  gaugeFill: { height: '100%', backgroundColor: Colors.impulse, borderRadius: 4 },
-  resultReason: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7 },
+  // 결과 영역
+  resultWrap: { gap: 12, marginTop: 4 },
 
-  // 결국 어떻게 하셨어요?
-  outcomeSectionDivider: { height: 0.5, backgroundColor: Colors.border, marginVertical: 2 },
+  verdictCard: {
+    borderRadius: 24, padding: 20, borderWidth: 1, overflow: 'hidden', gap: 12,
+  },
+  verdictGlow: {
+    position: 'absolute', right: -40, top: -40,
+    width: 160, height: 160, borderRadius: 80,
+  },
+  verdictTag: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: 20,
+  },
+  verdictTagText: { fontSize: 11, fontWeight: '500' },
+  verdictText: { fontSize: 26, fontWeight: '700', lineHeight: 26 * 1.3 },
+  verdictReason: { fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.7 },
+
+  scoreCard: {
+    backgroundColor: Colors.surface, borderRadius: 24, padding: 20,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
+  },
+  scoreHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  scoreLabel: { fontSize: 13, color: Colors.textSecondary },
+  scoreValue: { fontSize: 22, fontWeight: '700' },
+  barBg: { height: 8, backgroundColor: Colors.impulseBar, borderRadius: 4, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: 4 },
+  barLabels: { flexDirection: 'row', justifyContent: 'space-between' },
+  barLabelText: { fontSize: 10, color: Colors.textMuted },
+  basisList: { gap: 8 },
+  basisRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 12, paddingVertical: 10,
+    backgroundColor: Colors.background, borderRadius: 12,
+    borderWidth: 0.5, borderColor: Colors.border,
+  },
+  basisLabel: { fontSize: 12, color: Colors.textSecondary },
+  basisValue: { fontSize: 13, color: Colors.textPrimary },
+
+  outcomeCard: {
+    backgroundColor: Colors.surface, borderRadius: 20, padding: 20,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
+  },
   outcomeSectionLabel: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary },
   outcomeButtons: { gap: 8 },
   outcomeBtn: {
-    paddingVertical: 11, paddingHorizontal: 16, borderRadius: 10,
+    paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12,
     backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
     alignItems: 'center',
   },
   outcomeBtnText: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
-  outcomeConfirm: {
-    fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7,
-    fontStyle: 'italic',
-  },
+  outcomeConfirm: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7, fontStyle: 'italic' },
 
-  // 액션 버튼
-  resultActions: { gap: 8, marginTop: 4 },
-  saveBtn: {
-    backgroundColor: Colors.cta, borderRadius: 10,
-    padding: 15, alignItems: 'center',
+  saveCard: {
+    backgroundColor: Colors.surface, borderRadius: 20, padding: 20,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
   },
-  saveBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+  saveSectionLabel: { fontSize: 13, color: Colors.textSubtle },
+  saveButtons: { flexDirection: 'row', gap: 10 },
+  savePrimary: {
+    flex: 1, paddingVertical: 12, borderRadius: 14,
+    backgroundColor: Colors.cta, alignItems: 'center',
+  },
+  savePrimaryText: { fontSize: 14, fontWeight: '600', color: '#FFF' },
+  saveSecondary: {
+    flex: 1, paddingVertical: 12, borderRadius: 14,
+    backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  saveSecondaryText: { fontSize: 14, color: Colors.textLight },
 
-  // 입력 영역
+  principlesCard: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    padding: 16, borderRadius: 20,
+    backgroundColor: Colors.ctaLight, borderWidth: 0.5, borderColor: Colors.ctaBorder,
+  },
+  principlesLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  principlesIconBox: {
+    width: 36, height: 36, borderRadius: 10,
+    backgroundColor: 'rgba(99,102,241,0.12)', alignItems: 'center', justifyContent: 'center',
+  },
+  principlesTag: { fontSize: 11, color: Colors.cta },
+  principlesText: { fontSize: 13, fontWeight: '500', color: Colors.textPrimary, marginTop: 2 },
+
   inputArea: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
     borderTopWidth: 0.5, borderTopColor: Colors.border,
-    padding: 20, gap: 12, backgroundColor: Colors.background,
+    paddingHorizontal: 16, paddingVertical: 12,
+    backgroundColor: Colors.background,
   },
-  customRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   customInput: {
-    flex: 1, backgroundColor: Colors.surface, borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 10,
+    flex: 1, backgroundColor: Colors.surface, borderRadius: 24,
+    paddingHorizontal: 18, paddingVertical: 12,
     fontSize: 14, color: Colors.textPrimary,
     borderWidth: 0.5, borderColor: Colors.border,
   },
   sendBtn: {
-    backgroundColor: Colors.cta, borderRadius: 10,
-    paddingHorizontal: 16, paddingVertical: 11,
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: Colors.cta, alignItems: 'center', justifyContent: 'center',
   },
   sendBtnDisabled: { opacity: 0.35 },
-  sendBtnText: { color: '#FFF', fontWeight: '600', fontSize: 16 },
 });
