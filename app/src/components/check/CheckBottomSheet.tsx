@@ -49,8 +49,14 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
     }
   }, [visible]);
 
+  const MAX_EMOTIONS = 2;
+
   const toggleEmotion = (type: EmotionType) =>
-    setEmotions(prev => prev.includes(type) ? prev.filter(e => e !== type) : [...prev, type]);
+    setEmotions(prev =>
+      prev.includes(type)
+        ? prev.filter(e => e !== type)
+        : prev.length >= MAX_EMOTIONS ? prev : [...prev, type]
+    );
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
@@ -104,15 +110,17 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
 
             {/* 감정 */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>지금 감정 (복수 선택)</Text>
+              <Text style={styles.sectionLabel}>지금 감정 (최대 2개)</Text>
               <View style={styles.emotionWrap}>
                 {EMOTIONS.map((e) => {
                   const active = emotions.includes(e.type);
+                  const disabled = !active && emotions.length >= MAX_EMOTIONS;
                   return (
                     <ScaleButton
                       key={e.type}
-                      style={[styles.emotionPill, active && styles.emotionPillActive]}
+                      style={[styles.emotionPill, active && styles.emotionPillActive, disabled && styles.emotionPillDisabled]}
                       onPress={() => toggleEmotion(e.type)}
+                      disabled={disabled}
                     >
                       <Text style={[styles.emotionPillText, active && styles.emotionPillTextActive]}>
                         {e.label}
@@ -186,6 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.ctaLight,
     borderColor: Colors.cta, borderWidth: 1.5,
   },
+  emotionPillDisabled: { opacity: 0.35 },
   emotionPillText: { fontSize: 13, color: Colors.textLight },
   emotionPillTextActive: { color: Colors.ctaLightText, fontWeight: '500' },
 
