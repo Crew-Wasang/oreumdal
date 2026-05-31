@@ -136,6 +136,10 @@ export default function CheckChatScreen() {
       else if (userCount === 1) setInputMode('q2');
       else setInputMode('q3');
     } catch {
+      const userCount = currentMessages.filter(m => m.role === 'user').length;
+      if (userCount === 0) setInputMode('q1');
+      else if (userCount === 1) setInputMode('q2');
+      else setInputMode('q3');
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: '잠시 연결이 불안정해요. 다시 시도해주세요.',
