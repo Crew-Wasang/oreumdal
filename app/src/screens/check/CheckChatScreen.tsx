@@ -24,7 +24,11 @@ type Route = RouteProp<MainStackParamList, 'CheckChat'>;
 type InputMode = 'q1' | 'q2' | 'q3' | 'done';
 type TradeOutcome = 'pending' | 'done' | 'cancelled' | null;
 
-const PLACEHOLDER = '솔직하게 답해보세요…';
+const PLACEHOLDERS: Record<string, string> = {
+  q1: '정보에서인지, 감정에서인지 솔직하게…',
+  q2: '구체적인 상황이나 근거를 말해보세요…',
+  q3: '지금 이 순간 솔직하게 돌아보면…',
+};
 
 interface ResultData {
   score: number;
@@ -425,7 +429,7 @@ export default function CheckChatScreen() {
           <View style={styles.inputArea}>
             <TextInput
               style={styles.customInput}
-              placeholder={PLACEHOLDER}
+              placeholder={PLACEHOLDERS[inputMode] ?? '솔직하게 답해보세요…'}
               placeholderTextColor={Colors.textMuted}
               value={customText}
               onChangeText={setCustomText}
