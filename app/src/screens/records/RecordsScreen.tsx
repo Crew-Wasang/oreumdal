@@ -84,23 +84,20 @@ export default function RecordsScreen() {
 
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
-  const [selectedDirections, setSelectedDirections] = useState<Set<Direction>>(new Set());
+  const [selectedDirections, setSelectedDirections] = useState<Direction[]>([]);
 
   const toggleDirection = (dir: Direction) => {
-    setSelectedDirections(prev => {
-      const next = new Set(prev);
-      if (next.has(dir)) next.delete(dir);
-      else next.add(dir);
-      return next;
-    });
+    setSelectedDirections(prev =>
+      prev.includes(dir) ? prev.filter(d => d !== dir) : [...prev, dir]
+    );
   };
 
   const filtered = useMemo(() => {
     let result = records;
     if (tab === 'followed') result = result.filter(r => r.trade_outcome === 'skipped');
     if (tab === 'skipped') result = result.filter(r => r.trade_outcome === 'traded');
-    if (selectedDirections.size > 0) {
-      result = result.filter(r => selectedDirections.has(r.direction as Direction));
+    if (selectedDirections.length > 0) {
+      result = result.filter(r => selectedDirections.includes(r.direction as Direction));
     }
     if (search.trim()) result = result.filter(r => r.stock_name.includes(search.trim()));
     return result;
@@ -157,7 +154,7 @@ export default function RecordsScreen() {
 
       <View style={styles.directionRow}>
         {DIRECTIONS.map(({ value, label }) => {
-          const active = selectedDirections.has(value);
+          const active = selectedDirections.includes(value);
           const isBuy = value === 'buy';
           return (
             <ScaleButton
