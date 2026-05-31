@@ -7,6 +7,7 @@ import {
 import { Colors } from '../../constants/colors';
 import { EmotionType, TradeDirection } from '../../types';
 import ScaleButton from '../common/ScaleButton';
+import { searchStocks, Stock } from '../../data/stocks';
 
 const SHEET_HEIGHT = Dimensions.get('window').height * 0.76;
 
@@ -29,6 +30,7 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
   const slideAnim = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [stockName, setStockName] = useState('');
+  const [suggestions, setSuggestions] = useState<Stock[]>([]);
   const [direction, setDirection] = useState<TradeDirection | null>(null);
   const [emotions, setEmotions] = useState<EmotionType[]>([]);
 
@@ -45,7 +47,7 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
         Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
         Animated.timing(slideAnim, { toValue: SHEET_HEIGHT, duration: 220, useNativeDriver: true }),
       ]).start();
-      setStockName(''); setDirection(null); setEmotions([]);
+      setStockName(''); setSuggestions([]); setDirection(null); setEmotions([]);
     }
   }, [visible]);
 
@@ -84,9 +86,27 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
                 placeholder="예: 삼성전자, AAPL"
                 placeholderTextColor={Colors.textMuted}
                 value={stockName}
-                onChangeText={setStockName}
+                onChangeText={(v) => {
+                  setStockName(v);
+                  setSuggestions(searchStocks(v));
+                }}
                 returnKeyType="done"
+                onSubmitEditing={() => setSuggestions([])}
               />
+              {suggestions.length > 0 && (
+                <View style={styles.suggestionBox}>
+                  {suggestions.map((s) => (
+                    <ScaleButton
+                      key={s.code}
+                      style={styles.suggestionItem}
+                      onPress={() => { setStockName(s.name); setSuggestions([]); }}
+                    >
+                      <Text style={styles.suggestionName}>{s.name}</Text>
+                      <Text style={styles.suggestionCode}>{s.code}</Text>
+                    </ScaleButton>
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* 방향 */}
@@ -171,6 +191,26 @@ const styles = StyleSheet.create({
     fontSize: 15, color: Colors.textPrimary,
     borderWidth: 0.5, borderColor: Colors.border,
   },
+
+  suggestionBox: {
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.background,
+    overflow: 'hidden',
+    marginTop: 4,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.border,
+  },
+  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
+  suggestionCode: { fontSize: 12, color: Colors.textMuted },
 
   dirRow: { flexDirection: 'row', gap: 12 },
   dirBtn: {
