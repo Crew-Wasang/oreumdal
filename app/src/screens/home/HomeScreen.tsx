@@ -10,7 +10,7 @@ import CheckBottomSheet from '../../components/check/CheckBottomSheet';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
 import {
-  Sparkle, MoodIcon, GreetSun, SettingsIcon, ChevronRight,
+  Sparkle, GreetSun, SettingsIcon, ChevronRight,
 } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
@@ -22,13 +22,6 @@ const EMOTION_LABEL: Record<EmotionType, string> = {
 
 const DAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
 
-const MOODS: { kind: 'calm' | 'ok' | 'neutral' | 'anxious' | 'tense'; label: string }[] = [
-  { kind: 'calm', label: '편안' },
-  { kind: 'ok', label: '괜찮' },
-  { kind: 'neutral', label: '보통' },
-  { kind: 'anxious', label: '불안' },
-  { kind: 'tense', label: '초조' },
-];
 
 function getTodayLabel() {
   const d = new Date();
@@ -96,7 +89,6 @@ function RecentCard({
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
   const [sheetVisible, setSheetVisible] = useState(false);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
   const records = useRecordStore((s) => s.records);
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
@@ -188,29 +180,6 @@ export default function HomeScreen() {
             </View>
           </LinearGradient>
         </ScaleButton>
-
-        {/* 오늘의 감정 체크인 */}
-        <View>
-          <Text style={styles.sectionTitle}>오늘의 감정 체크인</Text>
-          <View style={styles.moodRow}>
-            {MOODS.map((m) => (
-              <ScaleButton
-                key={m.kind}
-                style={[styles.moodBtn, selectedMood === m.kind && styles.moodBtnActive]}
-                onPress={() => setSelectedMood(selectedMood === m.kind ? null : m.kind)}
-              >
-                <MoodIcon
-                  kind={m.kind}
-                  size={24}
-                  color={selectedMood === m.kind ? Colors.cta : Colors.textSubtle}
-                />
-                <Text style={[styles.moodLabel, selectedMood === m.kind && styles.moodLabelActive]}>
-                  {m.label}
-                </Text>
-              </ScaleButton>
-            ))}
-          </View>
-        </View>
 
         {/* 최근 코칭 */}
         <View>
@@ -331,26 +300,7 @@ const styles = StyleSheet.create({
   },
   ctaSecondaryPillText: { fontSize: 12, fontWeight: '500', color: '#FFF' },
 
-  // 감정 체크인
   sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
-  moodRow: { flexDirection: 'row', gap: 8 },
-  moodBtn: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 16,
-    backgroundColor: Colors.surface,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
-  moodBtnActive: {
-    backgroundColor: Colors.ctaLight,
-    borderColor: Colors.ctaBorder,
-    borderWidth: 1,
-  },
-  moodLabel: { fontSize: 10, color: Colors.textSecondary },
-  moodLabelActive: { color: Colors.cta, fontWeight: '500' },
 
   // 최근 코칭
   sectionHeader: {
