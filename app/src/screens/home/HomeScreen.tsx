@@ -10,7 +10,7 @@ import CheckBottomSheet from '../../components/check/CheckBottomSheet';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
 import {
-  Sparkle, GreetSun, SettingsIcon, ChevronRight,
+  Sparkle, GreetSun, BellIcon, ChevronRight,
 } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
@@ -141,10 +141,10 @@ export default function HomeScreen() {
             </View>
           </View>
           <ScaleButton
-            onPress={() => navigation.navigate('SignUp', { trigger: 'chk' })}
+            onPress={() => navigation.navigate('Tabs', { screen: 'My' } as any)}
             style={styles.settingsBtn}
           >
-            <SettingsIcon size={22} color={Colors.textSecondary} />
+            <BellIcon size={22} color={Colors.textSecondary} />
           </ScaleButton>
         </View>
 
