@@ -1,5 +1,5 @@
 import { AIProvider, CoachingInput, CoachingResult } from './types';
-import { buildSystemWithContext, CONCLUSION_PROMPT } from './systemPrompt';
+import { buildSystemWithContext, CONCLUSION_PROMPT, safeParseConclusion } from './systemPrompt';
 import { AI_CONFIG } from './config';
 
 const { model, maxTokens, maxTokensConclusion } = AI_CONFIG.claude;
@@ -49,7 +49,7 @@ export const claudeProvider: AIProvider = {
       system,
       messages,
     });
-    const text = data.content?.[0]?.text ?? '{}';
-    return JSON.parse(text) as CoachingResult;
+    const text = data.content?.[0]?.text ?? '';
+    return safeParseConclusion(text);
   },
 };

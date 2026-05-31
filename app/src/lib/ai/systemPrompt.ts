@@ -1,4 +1,21 @@
-import { CoachingInput } from './types';
+import { CoachingInput, CoachingResult } from './types';
+
+export function safeParseConclusion(text: string): CoachingResult {
+  try {
+    const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    const obj = JSON.parse(cleaned || '{}');
+    return {
+      conclusion: obj.conclusion === 'ok' ? 'ok' : 'reconsider',
+      impulseScore:
+        typeof obj.impulseScore === 'number' ? obj.impulseScore
+        : typeof obj.impulse_score === 'number' ? obj.impulse_score
+        : 55,
+      reason: typeof obj.reason === 'string' && obj.reason ? obj.reason : '심리적 요인을 고려해보세요',
+    };
+  } catch {
+    return { conclusion: 'reconsider', impulseScore: 55, reason: '심리적 요인을 고려해보세요' };
+  }
+}
 
 export const SYSTEM_PROMPT = `당신은 오름달의 AI 투자 심리 코치입니다.
 

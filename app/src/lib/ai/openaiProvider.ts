@@ -1,5 +1,5 @@
 import { AIProvider, CoachingInput, CoachingResult } from './types';
-import { buildSystemWithContext, CONCLUSION_PROMPT } from './systemPrompt';
+import { buildSystemWithContext, CONCLUSION_PROMPT, safeParseConclusion } from './systemPrompt';
 import { AI_CONFIG } from './config';
 
 const { model, maxTokens, maxTokensConclusion, temperature } = AI_CONFIG.openai;
@@ -52,6 +52,6 @@ export const openaiProvider: AIProvider = {
         { role: 'user', content: CONCLUSION_PROMPT },
       ],
     });
-    return JSON.parse(text) as CoachingResult;
+    return safeParseConclusion(text);
   },
 };
