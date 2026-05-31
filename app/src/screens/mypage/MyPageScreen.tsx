@@ -53,7 +53,7 @@ export default function MyPageScreen() {
   const navigation = useNavigation<Nav>();
   const {
     principles, setPrinciples, personalityType,
-    nickname, provider, logout, notifSettings, setNotifSettings,
+    nickname, provider, logout, notifSettings, setNotifSettings, setNickname,
   } = useUserStore();
   const clearRecords = useRecordStore((s) => s.clearRecords);
 
@@ -143,13 +143,7 @@ export default function MyPageScreen() {
 
   const handleSaveNickname = () => {
     if (!nicknameDraft.trim()) return;
-    useUserStore.getState().login({
-      nickname: nicknameDraft.trim(),
-      userId: useUserStore.getState().userId,
-      accessToken: useUserStore.getState().accessToken,
-      refreshToken: useUserStore.getState().refreshToken,
-      provider: useUserStore.getState().provider,
-    });
+    setNickname(nicknameDraft.trim());
     setEditingNickname(false);
   };
 

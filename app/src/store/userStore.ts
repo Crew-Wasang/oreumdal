@@ -46,6 +46,7 @@ interface UserStore {
 
   setPrinciples: (v: string) => void;
   setPersonalityType: (v: string) => void;
+  setNickname: (v: string) => void;
   completeOnboarding: () => void;
   login: (params: LoginParams) => void;
   logout: () => void;
@@ -73,6 +74,11 @@ export const useUserStore = create<UserStore>((set) => ({
   setPersonalityType: (v) => {
     set({ personalityType: v });
     AsyncStorage.setItem(KEYS.personality, v);
+  },
+
+  setNickname: (v) => {
+    set({ nickname: v });
+    AsyncStorage.setItem(KEYS.nickname, v);
   },
 
   completeOnboarding: () => {
