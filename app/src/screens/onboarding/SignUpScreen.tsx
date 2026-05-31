@@ -108,6 +108,9 @@ export default function SignUpScreen() {
   if (step === 'social') {
     return (
       <SafeAreaView style={styles.safe}>
+        <ScaleButton style={styles.closeBtn} onPress={() => navigation.goBack()}>
+          <Text style={styles.closeBtnText}>✕</Text>
+        </ScaleButton>
         <View style={styles.content}>
           <View style={styles.top}>
             <LinearGradient
@@ -239,6 +242,8 @@ export default function SignUpScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+  closeBtn: { position: 'absolute', top: 56, right: 24, zIndex: 10, width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { fontSize: 18, color: Colors.textMuted },
   content: {
     flex: 1,
     paddingHorizontal: 24,
