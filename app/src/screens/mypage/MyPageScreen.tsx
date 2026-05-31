@@ -58,6 +58,7 @@ export default function MyPageScreen() {
   const clearRecords = useRecordStore((s) => s.clearRecords);
 
   const [newPrinciple, setNewPrinciple] = useState('');
+  const [principleError, setPrincipleError] = useState('');
   const [showAccount, setShowAccount] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [editingNickname, setEditingNickname] = useState(false);
@@ -67,11 +68,28 @@ export default function MyPageScreen() {
     ? principles.split('\n').filter(l => l.trim().length > 0)
     : [];
 
+  const PRINCIPLE_ALLOWED = /^[가-힣a-zA-Z0-9\s\-\.%,]+$/;
+
   const addPrinciple = () => {
-    if (!newPrinciple.trim()) return;
-    const updated = [...principleLines, newPrinciple.trim()];
+    const trimmed = newPrinciple.trim();
+    if (!trimmed) return;
+    if (trimmed.length < 5) {
+      setPrincipleError('최소 5자 이상 입력해주세요');
+      return;
+    }
+    if (!PRINCIPLE_ALLOWED.test(trimmed)) {
+      setPrincipleError('한글, 영어, 숫자, -, ., %, ,만 입력 가능해요');
+      return;
+    }
+    const updated = [...principleLines, trimmed];
     setPrinciples(updated.join('\n'));
     setNewPrinciple('');
+    setPrincipleError('');
+  };
+
+  const handlePrincipleChange = (text: string) => {
+    if (text.length <= 60) setNewPrinciple(text);
+    if (principleError) setPrincipleError('');
   };
 
   const deletePrinciple = (index: number) => {
@@ -186,13 +204,14 @@ export default function MyPageScreen() {
 
             <View style={styles.principleAddRow}>
               <TextInput
-                style={styles.principleInput}
+                style={[styles.principleInput, !!principleError && styles.principleInputError]}
                 value={newPrinciple}
-                onChangeText={setNewPrinciple}
+                onChangeText={handlePrincipleChange}
                 placeholder="새로운 원칙 추가하기"
                 placeholderTextColor={Colors.textMuted}
                 returnKeyType="done"
                 onSubmitEditing={addPrinciple}
+                maxLength={60}
               />
               <ScaleButton
                 style={[styles.addBtn, !newPrinciple.trim() && styles.addBtnDisabled]}
@@ -201,6 +220,13 @@ export default function MyPageScreen() {
               >
                 <Text style={styles.addBtnText}>+</Text>
               </ScaleButton>
+            </View>
+            <View style={styles.principleFooter}>
+              {principleError
+                ? <Text style={styles.principleErrorText}>{principleError}</Text>
+                : <View />
+              }
+              <Text style={styles.principleCount}>{newPrinciple.length}/60</Text>
             </View>
           </View>
 
@@ -371,6 +397,10 @@ const styles = StyleSheet.create({
   principleInput: {
     flex: 1, fontSize: 14, color: Colors.textPrimary, paddingVertical: 8,
   },
+  principleInputError: { borderBottomWidth: 1, borderBottomColor: Colors.reconsider },
+  principleFooter: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
+  principleErrorText: { fontSize: 12, color: Colors.reconsider },
+  principleCount: { fontSize: 12, color: Colors.textMuted },
   addBtn: {
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: Colors.cta, alignItems: 'center', justifyContent: 'center',
