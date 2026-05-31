@@ -104,6 +104,7 @@ export default function CheckChatScreen() {
   const [customText, setCustomText] = useState('');
   const [result, setResult] = useState<ResultData | null>(null);
   const [tradeOutcome, setTradeOutcome] = useState<TradeOutcome>(null);
+  const [saved, setSaved] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -214,6 +215,7 @@ export default function CheckChatScreen() {
 
   const handleSaveAndClose = () => {
     doSave();
+    setSaved(true);
     if (!isLoggedIn) {
       setShowSignUp(true);
     } else {
@@ -223,6 +225,22 @@ export default function CheckChatScreen() {
 
   const handleSkipSave = () => navigation.goBack();
 
+  const handleClose = () => {
+    if (result && !saved) {
+      Alert.alert(
+        '코칭 기록을 저장할까요?',
+        '저장하지 않으면 이 코칭 내용이 사라져요.',
+        [
+          { text: '저장하고 닫기', onPress: handleSaveAndClose },
+          { text: '그냥 닫기', style: 'destructive', onPress: () => navigation.goBack() },
+          { text: '취소', style: 'cancel' },
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+  };
+
   const handleLaterOutcomeNotify = async () => {
     const granted = await requestNotificationPermission();
     if (!granted) {
@@ -231,6 +249,7 @@ export default function CheckChatScreen() {
     }
     await scheduleFollowUp(stockName, direction);
     Alert.alert('알림 예약', `8시간 후에 "${stockName} ${directionText}, 결국 어떻게 하셨나요?" 알림을 보내드릴게요.`);
+    handleTradeOutcome('pending');
   };
 
   const handleTradeOutcome = (outcome: TradeOutcome) => {
@@ -245,7 +264,7 @@ export default function CheckChatScreen() {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={styles.header}>
-          <ScaleButton onPress={() => navigation.goBack()} style={styles.closeBtn}>
+          <ScaleButton onPress={handleClose} style={styles.closeBtn}>
             <Text style={styles.closeBtnText}>✕</Text>
           </ScaleButton>
           <Text style={styles.headerTitle}>AI 코칭</Text>
@@ -363,18 +382,20 @@ export default function CheckChatScreen() {
                 )}
               </View>
 
-              {/* 저장 */}
-              <View style={styles.saveCard}>
-                <Text style={styles.saveSectionLabel}>이 코칭을 기록으로 저장할까요?</Text>
-                <View style={styles.saveButtons}>
-                  <ScaleButton style={styles.savePrimary} onPress={handleSaveAndClose}>
-                    <Text style={styles.savePrimaryText}>저장</Text>
-                  </ScaleButton>
-                  <ScaleButton style={styles.saveSecondary} onPress={handleSkipSave}>
-                    <Text style={styles.saveSecondaryText}>저장 안 함</Text>
-                  </ScaleButton>
+              {/* 저장 — outcome 선택 후에만 노출 */}
+              {tradeOutcome !== null && !saved && (
+                <View style={styles.saveCard}>
+                  <Text style={styles.saveSectionLabel}>이 코칭을 기록으로 저장할까요?</Text>
+                  <View style={styles.saveButtons}>
+                    <ScaleButton style={styles.savePrimary} onPress={handleSaveAndClose}>
+                      <Text style={styles.savePrimaryText}>기록 저장하고 닫기</Text>
+                    </ScaleButton>
+                    <ScaleButton style={styles.saveSecondary} onPress={handleSkipSave}>
+                      <Text style={styles.saveSecondaryText}>저장 안 함</Text>
+                    </ScaleButton>
+                  </View>
                 </View>
-              </View>
+              )}
 
               {/* 투자 원칙 유도 */}
               {!principles && (
