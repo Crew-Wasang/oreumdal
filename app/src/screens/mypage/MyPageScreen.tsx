@@ -70,9 +70,15 @@ export default function MyPageScreen() {
 
   const PRINCIPLE_ALLOWED = /^[가-힣a-zA-Z0-9\s\-\.%,]+$/;
 
+  const MAX_PRINCIPLES = 10;
+
   const addPrinciple = () => {
     const trimmed = newPrinciple.trim();
     if (!trimmed) return;
+    if (principleLines.length >= MAX_PRINCIPLES) {
+      setPrincipleError(`최대 ${MAX_PRINCIPLES}개까지 추가할 수 있어요`);
+      return;
+    }
     if (trimmed.length < 5) {
       setPrincipleError('최소 5자 이상 입력해주세요');
       return;
