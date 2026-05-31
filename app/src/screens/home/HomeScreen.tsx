@@ -12,6 +12,7 @@ import { useUserStore } from '../../store/userStore';
 import {
   Sparkle, GreetSun, BellIcon, ChevronRight,
 } from '../../components/common/Icons';
+import { triggerNotifOpen } from '../../lib/notifModalTrigger';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
@@ -141,7 +142,7 @@ export default function HomeScreen() {
             </View>
           </View>
           <ScaleButton
-            onPress={() => navigation.navigate('Tabs', { screen: 'My' } as any)}
+            onPress={() => { triggerNotifOpen(); navigation.navigate('Tabs', { screen: 'My' } as any); }}
             style={styles.settingsBtn}
           >
             <BellIcon size={22} color={Colors.textSecondary} />

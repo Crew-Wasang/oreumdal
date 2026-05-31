@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TextInput, ScrollView,
   KeyboardAvoidingView, Platform, Alert, Modal, Switch,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
@@ -12,6 +12,7 @@ import { useUserStore } from '../../store/userStore';
 import { useRecordStore } from '../../store/recordStore';
 import { RootStackParamList } from '../../types';
 import { Sparkle, ChevronRight } from '../../components/common/Icons';
+import { consumeNotifTrigger } from '../../lib/notifModalTrigger';
 import {
   requestNotificationPermission,
   scheduleDailyReminder,
@@ -61,6 +62,10 @@ export default function MyPageScreen() {
   const [principleError, setPrincipleError] = useState('');
   const [showAccount, setShowAccount] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+
+  useFocusEffect(useCallback(() => {
+    if (consumeNotifTrigger()) setShowNotif(true);
+  }, []));
   const [editingNickname, setEditingNickname] = useState(false);
   const [nicknameDraft, setNicknameDraft] = useState(nickname);
 
