@@ -12,11 +12,17 @@ import ScaleButton from '../../components/common/ScaleButton';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 type Tab = 'all' | 'followed' | 'skipped';
+type Direction = 'buy' | 'sell';
 
 const TABS: { value: Tab; label: string }[] = [
   { value: 'all', label: '전체' },
   { value: 'followed', label: '조언 따름' },
   { value: 'skipped', label: '그대로 매매' },
+];
+
+const DIRECTIONS: { value: Direction; label: string }[] = [
+  { value: 'buy', label: '매수' },
+  { value: 'sell', label: '매도' },
 ];
 
 function formatDate(iso: string): string {
@@ -78,14 +84,27 @@ export default function RecordsScreen() {
 
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
+  const [selectedDirections, setSelectedDirections] = useState<Set<Direction>>(new Set());
+
+  const toggleDirection = (dir: Direction) => {
+    setSelectedDirections(prev => {
+      const next = new Set(prev);
+      if (next.has(dir)) next.delete(dir);
+      else next.add(dir);
+      return next;
+    });
+  };
 
   const filtered = useMemo(() => {
     let result = records;
     if (tab === 'followed') result = result.filter(r => r.trade_outcome === 'skipped');
     if (tab === 'skipped') result = result.filter(r => r.trade_outcome === 'traded');
+    if (selectedDirections.size > 0) {
+      result = result.filter(r => selectedDirections.has(r.direction as Direction));
+    }
     if (search.trim()) result = result.filter(r => r.stock_name.includes(search.trim()));
     return result;
-  }, [records, tab, search]);
+  }, [records, tab, search, selectedDirections]);
 
   if (!isLoggedIn) {
     return (
@@ -136,6 +155,30 @@ export default function RecordsScreen() {
         ))}
       </View>
 
+      <View style={styles.directionRow}>
+        {DIRECTIONS.map(({ value, label }) => {
+          const active = selectedDirections.has(value);
+          const isBuy = value === 'buy';
+          return (
+            <ScaleButton
+              key={value}
+              style={[
+                styles.directionPill,
+                active && (isBuy ? styles.directionPillBuy : styles.directionPillSell),
+              ]}
+              onPress={() => toggleDirection(value)}
+            >
+              <Text style={[
+                styles.directionPillText,
+                active && (isBuy ? styles.directionPillBuyText : styles.directionPillSellText),
+              ]}>
+                {label}
+              </Text>
+            </ScaleButton>
+          );
+        })}
+      </View>
+
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {filtered.length === 0 ? (
           <View style={styles.emptyWrap}>
@@ -171,7 +214,19 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border,
   },
 
-  tabRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingBottom: 12 },
+  tabRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingBottom: 8 },
+
+  directionRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingBottom: 12 },
+  directionPill: {
+    paddingVertical: 5, paddingHorizontal: 12,
+    borderRadius: 20, backgroundColor: Colors.surface,
+    borderWidth: 0.5, borderColor: Colors.border,
+  },
+  directionPillBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buy },
+  directionPillSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sell },
+  directionPillText: { fontSize: 12, fontWeight: '500', color: Colors.textSecondary },
+  directionPillBuyText: { color: Colors.buy },
+  directionPillSellText: { color: Colors.sell },
   tabPill: {
     paddingVertical: 6, paddingHorizontal: 14,
     borderRadius: 20, backgroundColor: Colors.surface,
