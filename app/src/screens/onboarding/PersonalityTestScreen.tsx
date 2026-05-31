@@ -76,7 +76,7 @@ function calcPersonality(answers: string[]): string {
 export default function PersonalityTestScreen() {
   const navigation = useNavigation<Nav>();
   const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<number[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
   const question = QUESTIONS[current];
@@ -86,9 +86,10 @@ export default function PersonalityTestScreen() {
   const handleSelect = (type: string, idx: number) => {
     setSelectedIdx(idx);
     setTimeout(() => {
-      const newAnswers = [...answers, type];
+      const newAnswers = [...answers, idx];
       if (isLast) {
-        navigation.navigate('PersonalityResult', { personalityType: calcPersonality(newAnswers) });
+        const types = newAnswers.map((optIdx, qIdx) => QUESTIONS[qIdx].options[optIdx].type);
+        navigation.navigate('PersonalityResult', { personalityType: calcPersonality(types) });
       } else {
         setAnswers(newAnswers);
         setCurrent(prev => prev + 1);
@@ -101,9 +102,10 @@ export default function PersonalityTestScreen() {
     if (current === 0) {
       navigation.goBack();
     } else {
+      const prevIdx = answers[current - 1];
       setAnswers(prev => prev.slice(0, -1));
       setCurrent(prev => prev - 1);
-      setSelectedIdx(null);
+      setSelectedIdx(prevIdx ?? null);
     }
   };
 
