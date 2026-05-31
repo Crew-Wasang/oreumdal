@@ -34,7 +34,9 @@ export default function InvestmentPrinciplesScreen() {
 
   const totalCount = selected.length + (customEnabled ? 1 : 0);
   const canAddMore = totalCount < MAX_SELECT;
-  const hasAny = totalCount > 0;
+  const customFilled = customEnabled && customText.trim().length > 0;
+  const hasAny = selected.length > 0 || customFilled;
+  const canSave = !customEnabled || customFilled;
 
   const togglePreset = (item: string) => {
     if (selected.includes(item)) {
@@ -135,8 +137,9 @@ export default function InvestmentPrinciplesScreen() {
           )}
 
           <ScaleButton
-            style={[styles.cta, !hasAny && styles.ctaSecondary]}
+            style={[styles.cta, !hasAny && styles.ctaSecondary, !canSave && styles.ctaDisabled]}
             onPress={handleSave}
+            disabled={!canSave}
           >
             <Text style={[styles.ctaText, !hasAny && styles.ctaTextSecondary]}>
               {hasAny ? '저장하고 시작하기' : '원칙 없이 시작하기'}
@@ -233,6 +236,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: Colors.border,
   },
+  ctaDisabled: { opacity: 0.4 },
   ctaText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
   ctaTextSecondary: { color: Colors.textLight },
 });
