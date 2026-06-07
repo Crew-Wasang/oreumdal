@@ -10,7 +10,7 @@ import CheckBottomSheet from '../../components/check/CheckBottomSheet';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
 import {
-  Sparkle, GreetSun, BellIcon, ChevronRight,
+  Sparkle, BellIcon, ChevronRight,
 } from '../../components/common/Icons';
 import { triggerNotifOpen } from '../../lib/notifModalTrigger';
 
@@ -164,12 +164,9 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.headerDate}>{getTodayLabel()}</Text>
-            <View style={styles.headerGreetRow}>
-              <Text style={styles.headerGreet}>
-                안녕하세요, {nickname || '반가워요'}님
-              </Text>
-              <GreetSun size={18} color="#F59E0B" />
-            </View>
+            <Text style={styles.headerGreet}>
+              안녕하세요, {nickname || '반가워요'}님
+            </Text>
           </View>
           <ScaleButton
             onPress={() => { triggerNotifOpen(); navigation.navigate('Tabs', { screen: 'My' } as any); }}
@@ -207,6 +204,7 @@ export default function HomeScreen() {
                 onPress={handlePostTradePress}
               >
                 <Text style={styles.ctaSecondaryPillText}>이미 매매했어요 · 기록만 남기기</Text>
+                <ChevronRight size={12} color="rgba(255,255,255,0.75)" />
               </ScaleButton>
             </View>
           </LinearGradient>
@@ -265,8 +263,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   headerDate: { fontSize: 12, color: Colors.textMuted },
-  headerGreetRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  headerGreet: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
+  headerGreet: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary, marginTop: 4 },
   settingsBtn: { padding: 4, marginTop: 4 },
 
   // CTA 카드
@@ -322,6 +319,9 @@ const styles = StyleSheet.create({
   },
   ctaPrimaryPillText: { fontSize: 13, fontWeight: '600', color: Colors.cta },
   ctaSecondaryPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     borderRadius: 24,
     paddingHorizontal: 14,
     paddingVertical: 8,

@@ -231,11 +231,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0FDF4', borderColor: Colors.okMid, borderWidth: 1,
   },
   outcomeBtnActive: {
-    backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: '#FFF1F2', borderWidth: 1, borderColor: '#FECDD3',
   },
   outcomeBtnText: { fontSize: 13, color: Colors.textSubtle, fontWeight: '500' },
   outcomeBtnOkText: { color: Colors.ok },
-  outcomeBtnActiveText: { color: Colors.textSecondary },
+  outcomeBtnActiveText: { color: '#BE123C' },
 
   outcomeNote: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   outcomeNoteText: { fontSize: 11, color: Colors.textMuted },
