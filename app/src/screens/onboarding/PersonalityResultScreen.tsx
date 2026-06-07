@@ -7,7 +7,7 @@ import { OnboardingStackParamList } from '../../types';
 import { Colors } from '../../constants/colors';
 import ScaleButton from '../../components/common/ScaleButton';
 import { useUserStore } from '../../store/userStore';
-import { Sparkle, ChevronRight } from '../../components/common/Icons';
+import { Sparkle, ThumbsUp, AlertTriangle } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList>;
 type Route = RouteProp<OnboardingStackParamList, 'PersonalityResult'>;
@@ -95,67 +95,62 @@ export default function PersonalityResultScreen() {
             </View>
           </View>
           <Text style={styles.mainCardSummary}>{data.summary}</Text>
+          <View style={styles.tipRow}>
+            <Sparkle size={13} color={Colors.cta} />
+            <Text style={styles.tipText}>
+              <Text style={styles.tipBold}>코치의 조언 · </Text>
+              {data.tip}
+            </Text>
+          </View>
         </LinearGradient>
 
         {/* 강점 / 주의할 점 */}
         <View style={styles.cardRow}>
           <View style={[styles.halfCard, styles.strengthCard]}>
-            <View style={styles.halfCardHeader}>
-              <View style={styles.strengthDot} />
-              <Text style={styles.strengthLabel}>강점</Text>
-            </View>
+            <ThumbsUp size={18} color="#059669" />
             <Text style={styles.halfCardBody}>{data.strength}</Text>
           </View>
           <View style={[styles.halfCard, styles.weaknessCard]}>
-            <View style={styles.halfCardHeader}>
-              <View style={styles.weaknessDot} />
-              <Text style={styles.weaknessLabel}>주의할 점</Text>
-            </View>
+            <AlertTriangle size={18} color="#E11D48" />
             <Text style={styles.halfCardBody}>{data.weakness}</Text>
           </View>
         </View>
 
-        {/* 코치 조언 */}
-        <View style={styles.tipCard}>
-          <Sparkle size={14} color={Colors.cta} />
-          <Text style={styles.tipText}>
-            <Text style={styles.tipBold}>코치의 조언 · </Text>
-            {data.tip}
-          </Text>
-        </View>
-
         {/* 모든 유형 보기 */}
-        <ScaleButton
-          style={styles.showAllBtn}
-          onPress={() => setShowAll(v => !v)}
-        >
-          <Text style={styles.showAllText}>모든 투자 유형 보기</Text>
-          <Text style={styles.showAllChevron}>{showAll ? '∧' : '∨'}</Text>
-        </ScaleButton>
+        <View style={styles.showAllContainer}>
+          <ScaleButton
+            style={styles.showAllBtn}
+            onPress={() => setShowAll(v => !v)}
+          >
+            <Text style={styles.showAllText}>모든 투자 유형 보기</Text>
+            <Text style={styles.showAllChevron}>{showAll ? '∧' : '∨'}</Text>
+          </ScaleButton>
 
-        {showAll && (
-          <View style={styles.allList}>
-            {TYPE_ORDER.map((key) => {
-              const t = PERSONALITY_DATA[key];
-              const isMe = key === myType;
-              return (
-                <View key={key} style={[styles.typeRow, isMe && styles.typeRowMe]}>
-                  <View style={styles.typeRowHeader}>
-                    <Text style={[styles.typeRowLabel, isMe && styles.typeRowLabelMe]}>
-                      {t.label}
-                    </Text>
-                    {isMe && (
-                      <View style={styles.meBadge}>
-                        <Text style={styles.meBadgeText}>나의 유형</Text>
-                      </View>
-                    )}
+          {showAll && (
+            <View style={styles.allList}>
+              {TYPE_ORDER.map((key, idx) => {
+                const t = PERSONALITY_DATA[key];
+                const isMe = key === myType;
+                return (
+                  <View key={key} style={[styles.typeRow, idx > 0 && styles.typeRowDivider]}>
+                    <View style={styles.typeRowHeader}>
+                      <Text style={[styles.typeRowLabel, isMe && styles.typeRowLabelMe]}>
+                        {t.label}
+                      </Text>
+                      {isMe && (
+                        <View style={styles.meBadge}>
+                          <Text style={styles.meBadgeText}>나</Text>
+                        </View>
+                      )}
+                      <Text style={styles.typeRowRisk}>위험 {t.risk}</Text>
+                    </View>
+                    <Text style={styles.typeRowSummary}>{t.summary}</Text>
                   </View>
-                  <Text style={styles.typeRowSummary}>{t.summary}</Text>
-                </View>
-              );
-            })}
-          </View>
-        )}
+                );
+              })}
+            </View>
+          )}
+        </View>
 
         <ScaleButton style={styles.cta} onPress={handleNext}>
           <Text style={styles.ctaText}>오름달 시작하기</Text>
@@ -209,6 +204,16 @@ const styles = StyleSheet.create({
   mainCardLabel: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary },
   mainCardRisk: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   mainCardSummary: { fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.7 },
+  tipRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'flex-start',
+    paddingTop: 14,
+    borderTopWidth: 0.5,
+    borderTopColor: `${Colors.ctaBorder}99`,
+  },
+  tipText: { flex: 1, fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
+  tipBold: { fontWeight: '700', color: Colors.cta },
 
   cardRow: { flexDirection: 'row', gap: 10 },
   halfCard: {
@@ -220,61 +225,36 @@ const styles = StyleSheet.create({
   },
   strengthCard: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
   weaknessCard: { backgroundColor: '#FFF1F2', borderColor: '#FECDD3' },
-  halfCardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  strengthDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#22C55E', alignItems: 'center', justifyContent: 'center' },
-  strengthLabel: { fontSize: 14, fontWeight: '700', color: '#15803D' },
-  weaknessDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#EF4444', alignItems: 'center', justifyContent: 'center' },
-  weaknessLabel: { fontSize: 14, fontWeight: '700', color: '#B91C1C' },
   halfCardBody: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
 
-  tipCard: {
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'flex-start',
-    backgroundColor: Colors.ctaLight,
+  showAllContainer: {
+    backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 14,
     borderWidth: 0.5,
-    borderColor: Colors.ctaBorder,
+    borderColor: Colors.border,
+    overflow: 'hidden',
   },
-  tipText: { flex: 1, fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.7 },
-  tipBold: { fontWeight: '700', color: Colors.cta },
-
   showAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
   },
   showAllText: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
   showAllChevron: { fontSize: 12, color: Colors.textMuted },
 
-  allList: { gap: 8 },
-  typeRow: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 14,
-    gap: 6,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
-  typeRowMe: {
-    backgroundColor: Colors.ctaLight,
-    borderColor: Colors.ctaBorder,
-    borderWidth: 1,
-  },
-  typeRowHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  allList: { paddingHorizontal: 16, paddingBottom: 12 },
+  typeRow: { paddingVertical: 12, gap: 4 },
+  typeRowDivider: { borderTopWidth: 0.5, borderTopColor: Colors.border },
+  typeRowHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   typeRowLabel: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
   typeRowLabelMe: { color: Colors.cta },
+  typeRowRisk: { fontSize: 11, color: Colors.textMuted, marginLeft: 'auto' as any },
   meBadge: {
     backgroundColor: Colors.cta,
     borderRadius: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 2,
   },
   meBadgeText: { fontSize: 10, fontWeight: '600', color: '#FFF' },
