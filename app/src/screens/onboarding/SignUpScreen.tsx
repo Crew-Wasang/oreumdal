@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TextInput,
   ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
+  Modal, TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,6 +18,114 @@ import { OremdalLogo, Sparkle } from '../../components/common/Icons';
 type Nav = NativeStackNavigationProp<MainStackParamList, 'SignUp'>;
 type Provider = 'google' | 'kakao' | 'apple';
 type Step = 'social' | 'profile';
+type DocKey = 'terms' | 'privacy';
+
+const DOC_CONTENT: Record<DocKey, { title: string; sections: { heading: string; body: string }[] }> = {
+  terms: {
+    title: '이용약관',
+    sections: [
+      { heading: '제1조 (목적)', body: '본 약관은 오름달(이하 "회사")이 제공하는 AI 투자 심리 코칭 서비스(이하 "서비스")의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.' },
+      { heading: '제2조 (서비스의 성격)', body: '오름달은 매매 의사결정의 심리적 패턴을 진단·코칭하는 서비스로, 투자 자문이나 매수·매도 권유를 제공하지 않습니다. 모든 매매 판단과 결과 책임은 회원에게 있습니다.' },
+      { heading: '제3조 (회원가입)', body: '회원은 카카오·Apple·Google 계정을 통해 가입할 수 있으며, 가입 시 본 약관에 동의한 것으로 간주됩니다.' },
+      { heading: '제4조 (계정의 관리)', body: '회원은 자신의 계정 정보를 안전하게 관리할 의무가 있으며, 계정이 도용되거나 제3자에 의해 사용된 경우 즉시 회사에 통지해야 합니다.' },
+      { heading: '제5조 (서비스 이용의 제한)', body: '회사는 회원이 약관을 위반하거나 서비스의 정상적인 운영을 방해한 경우 사전 통지 없이 이용을 제한할 수 있습니다.' },
+      { heading: '제6조 (책임의 한계)', body: '회사는 회원의 매매 결과로 발생한 손익에 대해 어떠한 책임도 지지 않습니다. 서비스가 제공하는 코칭 내용은 참고 자료이며, 투자 결정은 회원의 단독 판단에 따릅니다.' },
+      { heading: '제7조 (약관의 변경)', body: '회사는 필요 시 약관을 변경할 수 있으며, 변경 시 최소 7일 전 서비스 내 공지를 통해 안내합니다.' },
+    ],
+  },
+  privacy: {
+    title: '개인정보 처리방침',
+    sections: [
+      { heading: '1. 수집하는 개인정보 항목', body: '이메일 주소, 닉네임, 프로필 이미지(소셜 로그인 제공자로부터 전달), 서비스 이용 기록(매매 충동 체크 응답, 감정 기록, 매매 기록).' },
+      { heading: '2. 개인정보의 수집·이용 목적', body: '회원 식별 및 로그인, 맞춤형 심리 코칭 제공, 개인화된 리포트 생성, 서비스 개선을 위한 통계 분석.' },
+      { heading: '3. 개인정보의 보관 기간', body: '회원 탈퇴 시까지 보관하며, 탈퇴 후 30일 내 모든 개인정보를 파기합니다. 다만 관련 법령에 따라 보존 의무가 있는 경우에는 해당 기간 동안 보관합니다.' },
+      { heading: '4. 개인정보의 제3자 제공', body: '회사는 회원의 개인정보를 제3자에게 제공하지 않습니다. 단, 법령에 따른 요청이 있을 경우에는 예외로 합니다.' },
+      { heading: '5. 개인정보의 처리 위탁', body: '원활한 서비스 제공을 위해 클라우드 인프라(AWS), AI 분석(OpenAI)에 일부 데이터 처리를 위탁하며, 위탁 시 개인정보 보호 의무를 명확히 합니다.' },
+      { heading: '6. 회원의 권리', body: '회원은 언제든지 개인정보 열람·정정·삭제·처리정지를 요청할 수 있으며, 마이페이지 또는 고객센터(help@oremdal.app)를 통해 요청할 수 있습니다.' },
+      { heading: '7. 개인정보 보호책임자', body: '성명: 오름달팀 / 연락처: privacy@oremdal.app' },
+    ],
+  },
+};
+
+function LegalDocModal({ docKey, onClose }: { docKey: DocKey; onClose: () => void }) {
+  const doc = DOC_CONTENT[docKey];
+  return (
+    <Modal visible animationType="slide" transparent onRequestClose={onClose}>
+      <TouchableOpacity style={legalStyles.backdrop} activeOpacity={1} onPress={onClose} />
+      <View style={legalStyles.sheet}>
+        <View style={legalStyles.sheetHeader}>
+          <Text style={legalStyles.sheetTitle}>{doc.title}</Text>
+          <ScaleButton onPress={onClose} style={legalStyles.closeBtn}>
+            <Text style={legalStyles.closeBtnText}>✕</Text>
+          </ScaleButton>
+        </View>
+        <ScrollView style={legalStyles.body} showsVerticalScrollIndicator={false}>
+          {doc.sections.map((s) => (
+            <View key={s.heading} style={legalStyles.section}>
+              <Text style={legalStyles.sectionHeading}>{s.heading}</Text>
+              <Text style={legalStyles.sectionBody}>{s.body}</Text>
+            </View>
+          ))}
+          <Text style={legalStyles.effectiveDate}>시행일: 2026년 1월 1일</Text>
+        </ScrollView>
+        <View style={legalStyles.footer}>
+          <ScaleButton style={legalStyles.confirmBtn} onPress={onClose}>
+            <Text style={legalStyles.confirmBtnText}>확인</Text>
+          </ScaleButton>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const legalStyles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  sheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    maxHeight: '85%',
+    backgroundColor: Colors.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderTopWidth: 0.5,
+    borderTopColor: Colors.border,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.border,
+  },
+  sheetTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
+  closeBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { fontSize: 16, color: Colors.textMuted },
+  body: { paddingHorizontal: 20, paddingTop: 16 },
+  section: { marginBottom: 16 },
+  sectionHeading: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary, marginBottom: 4 },
+  sectionBody: { fontSize: 12, color: Colors.textSecondary, lineHeight: 12 * 1.7 },
+  effectiveDate: { fontSize: 11, color: Colors.textMuted, marginBottom: 24 },
+  footer: {
+    padding: 16,
+    borderTopWidth: 0.5,
+    borderTopColor: Colors.border,
+  },
+  confirmBtn: {
+    backgroundColor: Colors.textPrimary,
+    borderRadius: 16,
+    padding: 14,
+    alignItems: 'center',
+  },
+  confirmBtnText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+});
 
 const API_BASE = 'https://oreumdal.co.kr';
 const DEEP_LINK_BASE = 'oremdal://app';
@@ -44,6 +153,7 @@ export default function SignUpScreen() {
   const [nickname, setNickname] = useState('');
   const [agreeRequired, setAgreeRequired] = useState(false);
   const [agreeMarketing, setAgreeMarketing] = useState(false);
+  const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
 
   const [pendingAuth, setPendingAuth] = useState<{
     userId: string;
@@ -168,9 +278,16 @@ export default function SignUpScreen() {
               )}
             </ScaleButton>
 
-            <Text style={styles.terms}>가입 시 이용약관과 개인정보 처리방침에 동의합니다</Text>
+            <Text style={styles.terms}>
+              가입 시{' '}
+              <Text style={styles.termsLink} onPress={() => setOpenDoc('terms')}>이용약관</Text>
+              과{' '}
+              <Text style={styles.termsLink} onPress={() => setOpenDoc('privacy')}>개인정보 처리방침</Text>
+              에 동의합니다
+            </Text>
           </View>
         </View>
+        {openDoc && <LegalDocModal docKey={openDoc} onClose={() => setOpenDoc(null)} />}
       </SafeAreaView>
     );
   }
@@ -332,6 +449,11 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: 'center',
     marginTop: 4,
+  },
+  termsLink: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    textDecorationLine: 'underline',
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center', marginBottom: 8 },
   backBtnText: { fontSize: 18, color: Colors.textSecondary },

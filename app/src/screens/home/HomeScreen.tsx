@@ -155,12 +155,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {!isLoggedIn && (
-        <GuestDataBanner onLogin={() => navigation.navigate('SignUp', { trigger: 'chk' })} />
-      )}
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
-        {/* 헤더 */}
+      {/* 고정 헤더 */}
+      <View style={styles.stickyHeader}>
+        {!isLoggedIn && (
+          <GuestDataBanner onLogin={() => navigation.navigate('SignUp', { trigger: 'chk' })} />
+        )}
         <View style={styles.header}>
           <View>
             <Text style={styles.headerDate}>{getTodayLabel()}</Text>
@@ -175,6 +174,9 @@ export default function HomeScreen() {
             <BellIcon size={22} color={Colors.textSecondary} />
           </ScaleButton>
         </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* 메인 CTA 그라디언트 카드 */}
         <ScaleButton onPress={handleCheckPress} style={styles.ctaCardWrap}>
@@ -253,14 +255,21 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  content: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24, gap: 28 },
+  stickyHeader: {
+    backgroundColor: Colors.background,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.border,
+    paddingBottom: 12,
+  },
+  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24, gap: 28 },
 
   // 헤더
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingTop: 4,
+    paddingHorizontal: 20,
+    paddingTop: 8,
   },
   headerDate: { fontSize: 12, color: Colors.textMuted },
   headerGreet: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary, marginTop: 4 },
