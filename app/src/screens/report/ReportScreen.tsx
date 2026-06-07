@@ -14,6 +14,7 @@ import {
 } from '../../lib/reportUtils';
 import { generateInsight } from '../../lib/ai';
 import SignUpBottomSheet from '../../components/common/SignUpBottomSheet';
+import ScaleButton from '../../components/common/ScaleButton';
 import GrowthSummaryCard from '../../components/report/GrowthSummaryCard';
 import ImpulseGraph from '../../components/report/ImpulseGraph';
 import OutcomeComparisonCard from '../../components/report/OutcomeComparisonCard';
@@ -434,6 +435,15 @@ export default function ReportScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {!isLoggedIn && (
+        <ScaleButton
+          onPress={() => navigation.navigate('SignUp', { trigger: 'report' })}
+          style={reportGuestStyles.banner}
+        >
+          <Text style={reportGuestStyles.text}>로그인하면 기록과 리포트를 저장할 수 있어요</Text>
+          <Text style={reportGuestStyles.cta}>로그인하기 →</Text>
+        </ScaleButton>
+      )}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* 헤더 */}
@@ -732,4 +742,22 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5, borderTopColor: Colors.border,
     paddingTop: 10, marginTop: 2,
   },
+});
+
+const reportGuestStyles = StyleSheet.create({
+  banner: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    backgroundColor: '#FFFBEB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  text: { fontSize: 12, color: '#92400E', flex: 1 },
+  cta: { fontSize: 12, fontWeight: '600', color: '#B45309', marginLeft: 8 },
 });

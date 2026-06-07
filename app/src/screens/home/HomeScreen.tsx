@@ -14,6 +14,33 @@ import {
 } from '../../components/common/Icons';
 import { triggerNotifOpen } from '../../lib/notifModalTrigger';
 
+function GuestDataBanner({ onLogin }: { onLogin: () => void }) {
+  return (
+    <ScaleButton onPress={onLogin} style={guestBannerStyles.banner}>
+      <Text style={guestBannerStyles.text}>로그인하면 기록과 리포트를 저장할 수 있어요</Text>
+      <Text style={guestBannerStyles.cta}>로그인하기 →</Text>
+    </ScaleButton>
+  );
+}
+
+const guestBannerStyles = StyleSheet.create({
+  banner: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    backgroundColor: '#FFFBEB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  text: { fontSize: 12, color: '#92400E', flex: 1 },
+  cta: { fontSize: 12, fontWeight: '600', color: '#B45309', marginLeft: 8 },
+});
+
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
 const EMOTION_LABEL: Record<EmotionType, string> = {
@@ -128,6 +155,9 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {!isLoggedIn && (
+        <GuestDataBanner onLogin={() => navigation.navigate('SignUp', { trigger: 'chk' })} />
+      )}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* 헤더 */}
