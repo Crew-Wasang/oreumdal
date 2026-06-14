@@ -13,6 +13,7 @@ import CheckChatScreen from '../screens/check/CheckChatScreen';
 import RecordDetailScreen from '../screens/records/RecordDetailScreen';
 import PostTradeScreen from '../screens/records/PostTradeScreen';
 import SignUpScreen from '../screens/onboarding/SignUpScreen';
+import PersonalityProfileScreen from '../screens/mypage/PersonalityProfileScreen';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -77,6 +78,11 @@ export default function MainNavigator() {
         name="SignUp"
         component={SignUpScreen}
         options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="PersonalityProfile"
+        component={PersonalityProfileScreen}
+        options={{ animation: 'slide_from_right' }}
       />
     </Stack.Navigator>
   );

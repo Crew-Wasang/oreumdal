@@ -11,6 +11,7 @@ import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
 import ScaleButton from '../../components/common/ScaleButton';
 import SignUpBottomSheet from '../../components/common/SignUpBottomSheet';
+import { searchStocks, Stock } from '../../data/stocks';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
@@ -29,15 +30,21 @@ export default function PostTradeScreen() {
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
 
   const [stockName, setStockName] = useState('');
+  const [suggestions, setSuggestions] = useState<Stock[]>([]);
   const [direction, setDirection] = useState<TradeDirection | null>(null);
   const [emotions, setEmotions] = useState<EmotionType[]>([]);
   const [memo, setMemo] = useState('');
   const [showSignUp, setShowSignUp] = useState(false);
 
+  const MAX_EMOTIONS = 2;
   const canSave = stockName.trim().length > 0 && direction !== null;
 
   const toggleEmotion = (type: EmotionType) =>
-    setEmotions(prev => prev.includes(type) ? prev.filter(e => e !== type) : [...prev, type]);
+    setEmotions(prev =>
+      prev.includes(type)
+        ? prev.filter(e => e !== type)
+        : prev.length >= MAX_EMOTIONS ? prev : [...prev, type]
+    );
 
   const handleSave = () => {
     if (!canSave || !direction) return;
@@ -86,10 +93,25 @@ export default function PostTradeScreen() {
               placeholder="예: 삼성전자, AAPL"
               placeholderTextColor={Colors.textMuted}
               value={stockName}
-              onChangeText={setStockName}
+              onChangeText={(v) => { setStockName(v); setSuggestions(searchStocks(v)); }}
               autoFocus
               returnKeyType="done"
+              onSubmitEditing={() => setSuggestions([])}
             />
+            {suggestions.length > 0 && (
+              <View style={styles.suggestionBox}>
+                {suggestions.map((s) => (
+                  <ScaleButton
+                    key={s.code}
+                    style={styles.suggestionItem}
+                    onPress={() => { setStockName(s.name); setSuggestions([]); }}
+                  >
+                    <Text style={styles.suggestionName}>{s.name}</Text>
+                    <Text style={styles.suggestionCode}>{s.code}</Text>
+                  </ScaleButton>
+                ))}
+              </View>
+            )}
           </View>
 
           <View style={styles.field}>
@@ -111,15 +133,17 @@ export default function PostTradeScreen() {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>당시 감정 (복수 선택, 선택)</Text>
+            <Text style={styles.fieldLabel}>당시 감정 (최대 2개, 선택)</Text>
             <View style={styles.emotionWrap}>
               {EMOTIONS.map(({ type, label }) => {
                 const active = emotions.includes(type);
+                const disabled = !active && emotions.length >= MAX_EMOTIONS;
                 return (
                   <ScaleButton
                     key={type}
-                    style={[styles.emotionPill, active && styles.emotionPillActive]}
+                    style={[styles.emotionPill, active && styles.emotionPillActive, disabled && styles.emotionPillDisabled]}
                     onPress={() => toggleEmotion(type)}
+                    disabled={disabled}
                   >
                     <Text style={[styles.emotionPillText, active && styles.emotionPillTextActive]}>
                       {label}
@@ -207,6 +231,26 @@ const styles = StyleSheet.create({
   dirBtnBuyText: { color: Colors.buy },
   dirBtnSellText: { color: Colors.sell },
 
+  suggestionBox: {
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.background,
+    overflow: 'hidden',
+    marginTop: 4,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.border,
+  },
+  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
+  suggestionCode: { fontSize: 12, color: Colors.textMuted },
+
   emotionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   emotionPill: {
     paddingVertical: 7, paddingHorizontal: 14,
@@ -214,8 +258,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border,
   },
   emotionPillActive: { backgroundColor: Colors.ctaLight, borderColor: Colors.cta, borderWidth: 1.5 },
+  emotionPillDisabled: { opacity: 0.35 },
   emotionPillText: { fontSize: 13, color: Colors.textSecondary },
-  emotionPillTextActive: { color: Colors.ctaLightText, fontWeight: '500' },
+  emotionPillTextActive: { color: Colors.textPrimary, fontWeight: '500' },
 
   saveBtn: {
     backgroundColor: Colors.cta, borderRadius: 16,

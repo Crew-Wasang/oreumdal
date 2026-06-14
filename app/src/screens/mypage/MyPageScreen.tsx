@@ -55,6 +55,7 @@ export default function MyPageScreen() {
   const {
     principles, setPrinciples, personalityType,
     nickname, provider, logout, notifSettings, setNotifSettings, setNickname,
+    isLoggedIn,
   } = useUserStore();
   const clearRecords = useRecordStore((s) => s.clearRecords);
 
@@ -82,6 +83,10 @@ export default function MyPageScreen() {
     if (!trimmed) return;
     if (principleLines.length >= MAX_PRINCIPLES) {
       setPrincipleError(`최대 ${MAX_PRINCIPLES}개까지 추가할 수 있어요`);
+      return;
+    }
+    if (principleLines.includes(trimmed)) {
+      setPrincipleError('이미 추가된 원칙이에요');
       return;
     }
     if (trimmed.length < 5) {
@@ -158,6 +163,28 @@ export default function MyPageScreen() {
     { label: '로그아웃', danger: true, onPress: handleLogout },
   ];
 
+  if (!isLoggedIn) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.loginRequiredWrap}>
+          <Text style={styles.pageTitle}>마이</Text>
+          <View style={styles.loginRequiredBody}>
+            <Text style={styles.loginRequiredTitle}>로그인이 필요해요</Text>
+            <Text style={styles.loginRequiredDesc}>
+              로그인 후 투자 원칙과{'\n'}프로필을 관리할 수 있어요
+            </Text>
+            <ScaleButton
+              style={styles.loginBtn}
+              onPress={() => (navigation as any).navigate('SignUp', { trigger: 'save' })}
+            >
+              <Text style={styles.loginBtnText}>로그인하기</Text>
+            </ScaleButton>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -169,7 +196,10 @@ export default function MyPageScreen() {
           <Text style={styles.pageTitle}>마이</Text>
 
           {/* 프로필 카드 */}
-          <View style={styles.profileCard}>
+          <ScaleButton
+            style={styles.profileCard}
+            onPress={() => (navigation as any).navigate('PersonalityProfile')}
+          >
             <LinearGradient
               colors={[Colors.accent, Colors.gradientEnd]}
               start={{ x: 0, y: 0 }}
@@ -180,13 +210,14 @@ export default function MyPageScreen() {
                 {(nickname || '?')[0].toUpperCase()}
               </Text>
             </LinearGradient>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.profileName}>{nickname || '이름 없음'}</Text>
               <Text style={styles.profileSub}>
                 {personalityType ? PERSONALITY_LABEL[personalityType] ?? personalityType : '성향 미진단'}
               </Text>
             </View>
-          </View>
+            <ChevronRight size={16} color={Colors.textMuted} />
+          </ScaleButton>
 
           {/* 투자 원칙 */}
           <View style={styles.section}>
@@ -450,4 +481,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cta, borderRadius: 12, padding: 13, alignItems: 'center',
   },
   saveNicknameBtnText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
+
+  loginRequiredWrap: { flex: 1, padding: 20 },
+  loginRequiredBody: {
+    flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12,
+  },
+  loginRequiredTitle: { fontSize: 17, fontWeight: '600', color: Colors.textPrimary },
+  loginRequiredDesc: {
+    fontSize: 13, color: Colors.textMuted, textAlign: 'center', lineHeight: 20,
+  },
+  loginBtn: {
+    backgroundColor: Colors.cta, borderRadius: 16,
+    paddingVertical: 14, paddingHorizontal: 40, marginTop: 8,
+  },
+  loginBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
 });

@@ -105,6 +105,7 @@ export default function CheckChatScreen() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputMode, setInputMode] = useState<InputMode>('done');
+  const [aiError, setAiError] = useState(false);
   const [customText, setCustomText] = useState('');
   const [result, setResult] = useState<ResultData | null>(null);
   const [tradeOutcome, setTradeOutcome] = useState<TradeOutcome>(null);
@@ -113,6 +114,7 @@ export default function CheckChatScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const outcomeFadeAnim = useRef(new Animated.Value(0)).current;
+  const lastAiCallRef = useRef<ChatMessage[]>([]);
 
   const userTurn = messages.filter(m => m.role === 'user').length;
 
@@ -120,7 +122,9 @@ export default function CheckChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
 
   const callAIQuestion = async (currentMessages: ChatMessage[]) => {
+    lastAiCallRef.current = currentMessages;
     setIsTyping(true);
+    setAiError(false);
     scrollToBottom();
     try {
       const reply = await sendCoachingMessage({
@@ -136,18 +140,21 @@ export default function CheckChatScreen() {
       else if (userCount === 1) setInputMode('q2');
       else setInputMode('q3');
     } catch {
-      const userCount = currentMessages.filter(m => m.role === 'user').length;
-      if (userCount === 0) setInputMode('q1');
-      else if (userCount === 1) setInputMode('q2');
-      else setInputMode('q3');
+      setAiError(true);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '잠시 연결이 불안정해요. 다시 시도해주세요.',
+        content: '잠시 연결이 불안정해요.',
       }]);
     } finally {
       setIsTyping(false);
       scrollToBottom();
     }
+  };
+
+  const handleRetry = () => {
+    setAiError(false);
+    setMessages(prev => prev.slice(0, -1));
+    callAIQuestion(lastAiCallRef.current);
   };
 
   const callAIConclusion = async (currentMessages: ChatMessage[]) => {
@@ -429,7 +436,15 @@ export default function CheckChatScreen() {
           <View style={{ height: 20 }} />
         </ScrollView>
 
-        {!result && inputMode !== 'done' && (
+        {!result && aiError && !isTyping && (
+          <View style={styles.retryArea}>
+            <ScaleButton style={styles.retryBtn} onPress={handleRetry}>
+              <Text style={styles.retryBtnText}>다시 시도</Text>
+            </ScaleButton>
+          </View>
+        )}
+
+        {!result && !aiError && inputMode !== 'done' && (
           <View style={styles.inputArea}>
             <TextInput
               style={styles.customInput}
@@ -586,6 +601,19 @@ const styles = StyleSheet.create({
   },
   principlesTag: { fontSize: 11, color: Colors.cta },
   principlesText: { fontSize: 13, fontWeight: '500', color: Colors.textPrimary, marginTop: 2 },
+
+  retryArea: {
+    borderTopWidth: 0.5, borderTopColor: Colors.border,
+    paddingHorizontal: 16, paddingVertical: 14,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+  },
+  retryBtn: {
+    paddingVertical: 12, paddingHorizontal: 28,
+    borderRadius: 14, backgroundColor: Colors.surfaceElevated,
+    borderWidth: 0.5, borderColor: Colors.border,
+  },
+  retryBtnText: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
 
   inputArea: {
     flexDirection: 'row', alignItems: 'center', gap: 10,

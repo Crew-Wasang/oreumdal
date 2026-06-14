@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { OnboardingStackParamList } from '../../types';
 import { Colors } from '../../constants/colors';
@@ -8,6 +8,7 @@ import ScaleButton from '../../components/common/ScaleButton';
 import { ChevronLeft } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'PersonalityTest'>;
+type Route = RouteProp<OnboardingStackParamList, 'PersonalityTest'>;
 
 const QUESTIONS = [
   {
@@ -75,6 +76,7 @@ function calcPersonality(answers: string[]): string {
 
 export default function PersonalityTestScreen() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
@@ -89,7 +91,10 @@ export default function PersonalityTestScreen() {
       const newAnswers = [...answers, idx];
       if (isLast) {
         const types = newAnswers.map((optIdx, qIdx) => QUESTIONS[qIdx].options[optIdx].type);
-        navigation.navigate('PersonalityResult', { personalityType: calcPersonality(types) });
+        navigation.navigate('PersonalityResult', {
+          personalityType: calcPersonality(types),
+          fromRedo: route.params?.fromRedo,
+        });
       } else {
         setAnswers(newAnswers);
         setCurrent(prev => prev + 1);

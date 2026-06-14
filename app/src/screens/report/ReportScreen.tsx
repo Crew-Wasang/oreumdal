@@ -604,7 +604,10 @@ export default function ReportScreen() {
       <SignUpBottomSheet
         visible={showSignUp}
         trigger="report"
-        onClose={() => setShowSignUp(false)}
+        onClose={() => {
+          setShowSignUp(false);
+          (navigation as any).navigate('Tabs', { screen: 'Home' });
+        }}
       />
     </SafeAreaView>
   );

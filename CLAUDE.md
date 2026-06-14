@@ -75,8 +75,8 @@
 | REC-02 | 매매 기록 상세 | 당시 AI 코칭 내용 + 결과 기록 |
 | REC-03 | 매매 기록 남기기 | 이미 매매한 경우 사후 기록 |
 | REP-01 | AI 리포트 | 성장 추이, 매매 패턴, AI 심화 분석, 심화 인사이트, 시장 맥락 |
-| MGT-01 | 마이페이지 | 프로필, 투자 원칙 설정 (AI 컨텍스트 유일한 소스), 메뉴 |
-| MGT-02 | 설정 | 알림, 계정, 로그아웃 |
+| MGT-01 | 마이페이지 | 프로필 카드(→성향 프로필), 투자 원칙 설정, 알림/계정 설정(모달), 로그아웃 |
+| MGT-01-P | 투자 성향 프로필 | MainStack의 `PersonalityProfile` 화면. 마이 > 프로필 카드 탭 |
 
 ### 하단 탭
 홈 | 기록 | 리포트 | 마이
@@ -91,17 +91,18 @@
 | 역할 | 라이브러리 |
 |------|-----------|
 | 내비게이션 | `@react-navigation/native` + `@react-navigation/native-stack` + `@react-navigation/bottom-tabs` |
-| 상태 관리 | Zustand (`useRecordStore`, `useUserStore`, `usePrinciplesStore`) |
+| 상태 관리 | Zustand (`useRecordStore`, `useUserStore`) — principles는 `useUserStore` 내부 필드 |
 | 백엔드/인증 | Supabase |
 | 그라디언트 | `expo-linear-gradient` |
 | SVG 아이콘 | `react-native-svg` (커스텀 컴포넌트, 외부 아이콘 라이브러리 미사용) |
-| AI | Claude API (`ANTHROPIC_API_KEY`) — 기본 프로바이더 |
+| AI | OpenAI API (`EXPO_PUBLIC_OPENAI_API_KEY`) — preview/production 빌드 실사용 |
 
 ### 환경 변수
 - `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-- `ANTHROPIC_API_KEY` — 서버사이드 전용 (EXPO_PUBLIC_ 붙이지 않음)
-- `EXPO_PUBLIC_AI_PROVIDER` — `'claude'` 또는 `'openai'`
+- `EXPO_PUBLIC_OPENAI_API_KEY` — EAS 대시보드에서 관리 (Sensitive visibility)
+- `EXPO_PUBLIC_AI_PROVIDER` — `eas.json` preview/production에 `"openai"` 하드코딩
 - `.env` 파일은 gitignore됨. `.env.example`을 참조해 로컬 설정
+- EAS 환경 변수 수정은 expo.dev 웹 대시보드 사용 (CLI `eas env:*` 명령어 불안정)
 
 ## 디자인 방향
 
@@ -150,13 +151,28 @@
 
 ## 개발 규칙
 
-### 절대 수정 금지
-- `useRecordStore`, `useUserStore` — 비즈니스 로직 스토어
+### 수정 시 신중히
+- `useRecordStore` — 비즈니스 로직 스토어. UI 변경으로 건드리지 않음
+- `useUserStore` — 마찬가지. 단, 버그 수정(e.g. logout 시 필드 누락)은 허용. 수정 시 `logout()`, `loadFromStorage()` 양쪽 모두 확인
 - `lib/reportUtils.ts` 내 계산 로직 — UI 변경 시에도 함부로 수정하지 않음
 
 ### 내비게이션
 - `MainStackParamList` 타입 기준으로 navigate 호출
 - `SignUp` 화면은 반드시 `{ trigger: 'chk' | 'save' | 'report' }` 파라미터 필요
+- 크로스 스택(Main ↔ Onboarding) 이동은 `(navigation as any).navigate(...)` 패턴 사용
+  - Main → Onboarding: `(navigation as any).navigate('Onboarding', { screen: 'PersonalityTest', params: { fromRedo: true } })`
+  - Onboarding → Main 복귀: `(navigation as any).navigate('Main')`
+
+### 비로그인 처리 패턴
+- **HomeScreen**: 최근 코칭 섹션 `{isLoggedIn && ...}`으로 조건 렌더링
+- **MyPageScreen**: hooks 이후 `if (!isLoggedIn) return <로그인 필요 화면>` early return
+- **ReportScreen**: SignUpBottomSheet `onClose`에서 `navigate('Tabs', { screen: 'Home' })` — 닫으면 홈으로 이동
+- **각 액션 버튼**: `isLoggedIn ? 기능실행 : navigate('SignUp', { trigger })` 패턴
+
+### 알림 설정 접근
+- 홈 벨 버튼 → HomeScreen 내 Modal 직접 표시 (탭 이동 없음)
+- 마이페이지 내 "알림 설정" 메뉴 → MyPageScreen 내 Modal
+- 두 곳이 독립적으로 동일한 UI를 렌더링 (공유 컴포넌트 아님)
 
 ### AI 리포트 섹션 구성
 | 섹션 | 컴포넌트 | 잠금 조건 |

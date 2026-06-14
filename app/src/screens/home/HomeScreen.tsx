@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, Modal, Switch, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,7 +12,13 @@ import { useUserStore } from '../../store/userStore';
 import {
   Sparkle, BellIcon, ChevronRight,
 } from '../../components/common/Icons';
-import { triggerNotifOpen } from '../../lib/notifModalTrigger';
+import {
+  requestNotificationPermission,
+  scheduleDailyReminder,
+  cancelDailyReminder,
+  scheduleWeeklyReport,
+  cancelWeeklyReport,
+} from '../../lib/notifications';
 
 function GuestDataBanner({ onLogin }: { onLogin: () => void }) {
   return (
@@ -121,6 +127,37 @@ export default function HomeScreen() {
   const records = useRecordStore((s) => s.records);
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
   const nickname = useUserStore((s) => s.nickname);
+  const notifSettings = useUserStore((s) => s.notifSettings);
+  const setNotifSettings = useUserStore((s) => s.setNotifSettings);
+  const [showNotif, setShowNotif] = useState(false);
+
+  const handleNotifToggleDaily = async (val: boolean) => {
+    if (val) {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        Alert.alert('알림 권한 필요', '설정 > 오름달에서 알림을 허용해주세요.');
+        return;
+      }
+      await scheduleDailyReminder(9);
+    } else {
+      await cancelDailyReminder();
+    }
+    setNotifSettings({ ...notifSettings, dailyEnabled: val });
+  };
+
+  const handleNotifToggleWeekly = async (val: boolean) => {
+    if (val) {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        Alert.alert('알림 권한 필요', '설정 > 오름달에서 알림을 허용해주세요.');
+        return;
+      }
+      await scheduleWeeklyReport(2, 9);
+    } else {
+      await cancelWeeklyReport();
+    }
+    setNotifSettings({ ...notifSettings, weeklyEnabled: val });
+  };
 
   const recentSessions = useMemo(
     () => records.filter((r) => r.type === 'check').slice(0, 2),
@@ -168,7 +205,7 @@ export default function HomeScreen() {
             </Text>
           </View>
           <ScaleButton
-            onPress={() => { triggerNotifOpen(); navigation.navigate('Tabs', { screen: 'My' } as any); }}
+            onPress={() => setShowNotif(true)}
             style={styles.settingsBtn}
           >
             <BellIcon size={22} color={Colors.textSecondary} />
@@ -213,31 +250,33 @@ export default function HomeScreen() {
         </ScaleButton>
 
         {/* 최근 코칭 */}
-        <View>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>최근 코칭</Text>
-            <ScaleButton onPress={() => navigation.navigate('Tabs', { screen: 'Records' } as any)}>
-              <Text style={styles.sectionMore}>전체보기</Text>
-            </ScaleButton>
-          </View>
+        {isLoggedIn && (
+          <View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>최근 코칭</Text>
+              <ScaleButton onPress={() => navigation.navigate('Tabs', { screen: 'Records' } as any)}>
+                <Text style={styles.sectionMore}>전체보기</Text>
+              </ScaleButton>
+            </View>
 
-          {recentSessions.length > 0 ? (
-            <View style={styles.recentList}>
-              {recentSessions.map((s) => (
-                <RecentCard
-                  key={s.id}
-                  record={s}
-                  onPress={() => navigation.navigate('RecordDetail', { sessionId: s.id })}
-                />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyRecent}>
-              <Text style={styles.emptyRecentText}>아직 코칭 기록이 없어요</Text>
-              <Text style={styles.emptyRecentSub}>첫 충동 체크를 시작해봐요</Text>
-            </View>
-          )}
-        </View>
+            {recentSessions.length > 0 ? (
+              <View style={styles.recentList}>
+                {recentSessions.map((s) => (
+                  <RecentCard
+                    key={s.id}
+                    record={s}
+                    onPress={() => navigation.navigate('RecordDetail', { sessionId: s.id })}
+                  />
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyRecent}>
+                <Text style={styles.emptyRecentText}>아직 코칭 기록이 없어요</Text>
+                <Text style={styles.emptyRecentSub}>첫 충동 체크를 시작해봐요</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -247,6 +286,55 @@ export default function HomeScreen() {
         onStart={handleStart}
         onClose={() => setSheetVisible(false)}
       />
+
+      <Modal visible={showNotif} animationType="slide" presentationStyle="pageSheet">
+        <SafeAreaView style={styles.modalSafe}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>알림 설정</Text>
+            <ScaleButton onPress={() => setShowNotif(false)} style={styles.modalClose}>
+              <Text style={styles.modalCloseText}>✕</Text>
+            </ScaleButton>
+          </View>
+          <ScrollView contentContainerStyle={styles.modalContent}>
+            <View style={styles.notifCard}>
+              <View style={styles.notifCardHeader}>
+                <View style={{ gap: 4 }}>
+                  <Text style={styles.notifCardLabel}>매일 리마인더</Text>
+                  <Text style={styles.notifCardTime}>매일 오전 9시</Text>
+                </View>
+                <Switch
+                  value={notifSettings.dailyEnabled}
+                  onValueChange={handleNotifToggleDaily}
+                  trackColor={{ true: Colors.cta }}
+                  thumbColor="#FFF"
+                />
+              </View>
+              <Text style={styles.notifCardDesc}>매매 전 체크를 잊지 않도록 매일 알려드려요</Text>
+            </View>
+            <View style={styles.notifCard}>
+              <View style={styles.notifCardHeader}>
+                <View style={{ gap: 4 }}>
+                  <Text style={styles.notifCardLabel}>주간 리포트</Text>
+                  <Text style={styles.notifCardTime}>매주 월요일 오전 9시</Text>
+                </View>
+                <Switch
+                  value={notifSettings.weeklyEnabled}
+                  onValueChange={handleNotifToggleWeekly}
+                  trackColor={{ true: Colors.cta }}
+                  thumbColor="#FFF"
+                />
+              </View>
+              <Text style={styles.notifCardDesc}>지난주 나의 투자 심리 패턴을 알려드려요</Text>
+            </View>
+            <View style={styles.notifCard}>
+              <Text style={styles.notifCardLabel}>코칭 후 결과 추적</Text>
+              <Text style={styles.notifCardDesc}>
+                코칭 화면에서 "나중에 알려주기"를 선택하면 8시간 후 자동으로 알림을 보내드려요
+              </Text>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -396,4 +484,22 @@ const styles = StyleSheet.create({
   emptyRecentSub: { fontSize: 12, color: Colors.textMuted },
 
   bottomPad: { height: 8 },
+
+  modalSafe: { flex: 1, backgroundColor: Colors.background },
+  modalHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    padding: 20, paddingBottom: 16,
+  },
+  modalTitle: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
+  modalClose: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
+  modalCloseText: { fontSize: 18, color: Colors.textSecondary },
+  modalContent: { padding: 20, gap: 12 },
+  notifCard: {
+    backgroundColor: Colors.surface, borderRadius: 16, padding: 18,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 10,
+  },
+  notifCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  notifCardLabel: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
+  notifCardTime: { fontSize: 12, color: Colors.textSecondary },
+  notifCardDesc: { fontSize: 13, color: Colors.textMuted, lineHeight: 13 * 1.6 },
 });

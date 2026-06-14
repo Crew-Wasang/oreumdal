@@ -9,7 +9,7 @@ import ScaleButton from '../../components/common/ScaleButton';
 import { useUserStore } from '../../store/userStore';
 import { Sparkle, ThumbsUp, AlertTriangle } from '../../components/common/Icons';
 
-type Nav = NativeStackNavigationProp<OnboardingStackParamList>;
+type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'PersonalityResult'>;
 type Route = RouteProp<OnboardingStackParamList, 'PersonalityResult'>;
 
 type TypeKey = 'analytical' | 'reactive' | 'optimistic' | 'hesitant';
@@ -63,7 +63,11 @@ export default function PersonalityResultScreen() {
 
   const handleNext = () => {
     setPersonalityType(myType);
-    navigation.navigate('InvestmentPrinciples');
+    if (route.params?.fromRedo) {
+      (navigation as any).navigate('Main');
+    } else {
+      navigation.navigate('InvestmentPrinciples');
+    }
   };
 
   return (
@@ -153,7 +157,9 @@ export default function PersonalityResultScreen() {
         </View>
 
         <ScaleButton style={styles.cta} onPress={handleNext}>
-          <Text style={styles.ctaText}>오름달 시작하기</Text>
+          <Text style={styles.ctaText}>
+            {route.params?.fromRedo ? '완료' : '오름달 시작하기'}
+          </Text>
         </ScaleButton>
       </ScrollView>
     </SafeAreaView>
