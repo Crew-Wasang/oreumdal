@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Modal, Switch, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -44,7 +44,7 @@ const guestBannerStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   text: { fontSize: 12, color: '#92400E', flex: 1 },
-  cta: { fontSize: 12, fontWeight: '600', color: '#B45309', marginLeft: 8 },
+  cta: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#B45309', marginLeft: 8 },
 });
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   headerDate: { fontSize: 12, color: Colors.textMuted },
-  headerGreet: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary, marginTop: 4 },
+  headerGreet: { fontSize: 18, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, marginTop: 4 },
   settingsBtn: { padding: 4, marginTop: 4 },
 
   // CTA 카드
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   ctaAiTagText: { fontSize: 11, color: 'rgba(255,255,255,0.8)' },
   ctaTitle: {
     fontSize: 26,
-    fontWeight: '700',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
     color: '#FFF',
     lineHeight: 26 * 1.3,
     marginTop: 12,
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  ctaPrimaryPillText: { fontSize: 13, fontWeight: '600', color: Colors.cta },
+  ctaPrimaryPillText: { fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.cta },
   ctaSecondaryPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -426,9 +426,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.25)',
   },
-  ctaSecondaryPillText: { fontSize: 12, fontWeight: '500', color: '#FFF' },
+  ctaSecondaryPillText: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: '#FFF' },
 
-  sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
+  sectionTitle: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
 
   // 최근 코칭
   sectionHeader: {
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   recentCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recentCardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  recentCardStock: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  recentCardStock: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   recentCardTime: { fontSize: 11, color: Colors.textMuted },
   recentCardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recentCardVerdict: { fontSize: 13, color: Colors.textSubtle },
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
   actionBuy: { backgroundColor: Colors.buyBg },
   actionSell: { backgroundColor: Colors.sellBg },
-  actionBadgeText: { fontSize: 10, fontWeight: '500' },
+  actionBadgeText: { fontSize: 10, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   actionBuyText: { color: Colors.buy },
   actionSellText: { color: Colors.sell },
 
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 20, paddingBottom: 16,
   },
-  modalTitle: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary },
+  modalTitle: { fontSize: 18, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   modalClose: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
   modalCloseText: { fontSize: 18, color: Colors.textSecondary },
   modalContent: { padding: 20, gap: 12 },
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
   notifCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  notifCardLabel: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
+  notifCardLabel: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   notifCardTime: { fontSize: 12, color: Colors.textSecondary },
   notifCardDesc: { fontSize: 13, color: Colors.textMuted, lineHeight: 13 * 1.6 },
 });

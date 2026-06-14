@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, TextInput, ScrollView,
   KeyboardAvoidingView, Platform, Modal, Animated,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: Colors.border },
 
   scrollContent: { paddingHorizontal: 24, paddingTop: 8, paddingBottom: 8, gap: 24 },
-  title: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary, lineHeight: 22 * 1.4 },
+  title: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary, lineHeight: 22 * 1.4 },
   subtitle: { fontSize: 13, color: Colors.textSecondary, marginTop: -16 },
 
   section: { gap: 10 },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.border,
   },
-  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
+  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   suggestionCode: { fontSize: 12, color: Colors.textMuted },
 
   dirRow: { flexDirection: 'row', gap: 12 },
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
   dirBtnBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buyBorder, borderWidth: 1.5 },
   dirBtnSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sellBorder, borderWidth: 1.5 },
-  dirBtnText: { fontSize: 15, fontWeight: '600', color: Colors.textLight },
+  dirBtnText: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textLight },
   dirBtnBuyText: { color: Colors.buy },
   dirBtnSellText: { color: Colors.sell },
 
@@ -236,10 +236,10 @@ const styles = StyleSheet.create({
   },
   emotionPillDisabled: { opacity: 0.35 },
   emotionPillText: { fontSize: 13, color: Colors.textLight },
-  emotionPillTextActive: { color: Colors.ctaLightText, fontWeight: '500' },
+  emotionPillTextActive: { color: Colors.ctaLightText, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
 
   footer: { paddingHorizontal: 20, paddingVertical: 16, borderTopWidth: 0.5, borderTopColor: Colors.border },
   startBtn: { backgroundColor: Colors.cta, borderRadius: 16, padding: 17, alignItems: 'center' },
   startBtnDisabled: { opacity: 0.35 },
-  startBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+  startBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
 });

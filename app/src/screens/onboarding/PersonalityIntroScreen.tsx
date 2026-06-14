@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -76,12 +76,12 @@ const styles = StyleSheet.create({
   },
   tag: {
     fontSize: 12,
-    fontWeight: '500',
+    fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500',
     color: Colors.cta,
   },
   title: {
     fontSize: 26,
-    fontWeight: '700',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     lineHeight: 26 * 1.4,
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   pointText: { gap: 2, flex: 1 },
-  pointLabel: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  pointLabel: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   pointDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.6 },
   cta: {
     backgroundColor: Colors.cta,
@@ -116,5 +116,5 @@ const styles = StyleSheet.create({
     padding: 17,
     alignItems: 'center',
   },
-  ctaText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
 });

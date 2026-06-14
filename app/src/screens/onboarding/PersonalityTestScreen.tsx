@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     height: 48,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  headerTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   progressBg: {
     height: 3,
     marginHorizontal: 20,
@@ -176,10 +176,10 @@ const styles = StyleSheet.create({
   },
   progressFill: { height: '100%', backgroundColor: Colors.cta, borderRadius: 2 },
   body: { padding: 24, paddingTop: 28, gap: 28, paddingBottom: 40 },
-  stepLabel: { fontSize: 12, fontWeight: '500', color: Colors.cta },
+  stepLabel: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.cta },
   question: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     lineHeight: 22 * 1.4,
   },
@@ -198,5 +198,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.ctaLight,
   },
   optionText: { fontSize: 14, color: Colors.textLight, lineHeight: 14 * 1.5 },
-  optionTextActive: { color: Colors.ctaLightText, fontWeight: '600' },
+  optionTextActive: { color: Colors.ctaLightText, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
 });

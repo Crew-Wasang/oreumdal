@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView,
   TextInput, KeyboardAvoidingView, Platform,
@@ -165,11 +165,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
   },
-  tag: { fontSize: 12, fontWeight: '500', color: Colors.cta },
+  tag: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.cta },
 
   title: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     lineHeight: 22 * 1.4,
   },
@@ -205,9 +205,9 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   checkboxActive: { backgroundColor: Colors.cta, borderColor: Colors.cta },
-  checkmark: { fontSize: 11, color: '#FFF', fontWeight: '700' },
+  checkmark: { fontSize: 11, color: '#FFF', fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700' },
   itemText: { fontSize: 14, color: Colors.textSubtle, flex: 1 },
-  itemTextActive: { color: Colors.ctaLightText, fontWeight: '500' },
+  itemTextActive: { color: Colors.ctaLightText, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   itemTextDisabled: { color: Colors.textMuted },
 
   customWrap: {
@@ -237,6 +237,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   ctaDisabled: { opacity: 0.4 },
-  ctaText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
   ctaTextSecondary: { color: Colors.textLight },
 });

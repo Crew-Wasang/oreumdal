@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TextInput, ScrollView, SafeAreaView,
   KeyboardAvoidingView, Platform, Animated, Alert,
@@ -486,8 +486,8 @@ const styles = StyleSheet.create({
   },
   closeBtn: { width: 40, height: 40, justifyContent: 'center' },
   closeBtnText: { fontSize: 18, color: Colors.textSecondary },
-  headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  turnCounter: { fontSize: 13, fontWeight: '600', color: Colors.cta, width: 40, textAlign: 'right' },
+  headerTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  turnCounter: { fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.cta, width: 40, textAlign: 'right' },
 
   chatContent: { padding: 20, gap: 14, paddingBottom: 8 },
 
@@ -532,8 +532,8 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4,
     borderRadius: 20,
   },
-  verdictTagText: { fontSize: 11, fontWeight: '500' },
-  verdictText: { fontSize: 26, fontWeight: '700', lineHeight: 26 * 1.3 },
+  verdictTagText: { fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
+  verdictText: { fontSize: 26, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', lineHeight: 26 * 1.3 },
   verdictReason: { fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.7 },
 
   scoreCard: {
@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
   },
   scoreHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   scoreLabel: { fontSize: 13, color: Colors.textSecondary },
-  scoreValue: { fontSize: 22, fontWeight: '700' },
+  scoreValue: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700' },
   barBg: { height: 8, backgroundColor: Colors.impulseBar, borderRadius: 4, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 4 },
   barLabels: { flexDirection: 'row', justifyContent: 'space-between' },
@@ -561,14 +561,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: 20, padding: 20,
     borderWidth: 0.5, borderColor: Colors.border, gap: 12,
   },
-  outcomeSectionLabel: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary },
+  outcomeSectionLabel: { fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   outcomeButtons: { gap: 8 },
   outcomeBtn: {
     paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12,
     backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
     alignItems: 'center',
   },
-  outcomeBtnText: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
+  outcomeBtnText: { fontSize: 14, color: Colors.textPrimary, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   outcomeConfirm: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.7, fontStyle: 'italic' },
 
   saveCard: {
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
     flex: 1, paddingVertical: 12, borderRadius: 14,
     backgroundColor: Colors.cta, alignItems: 'center',
   },
-  savePrimaryText: { fontSize: 14, fontWeight: '600', color: '#FFF' },
+  savePrimaryText: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
   saveSecondary: {
     flex: 1, paddingVertical: 12, borderRadius: 14,
     backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(99,102,241,0.12)', alignItems: 'center', justifyContent: 'center',
   },
   principlesTag: { fontSize: 11, color: Colors.cta },
-  principlesText: { fontSize: 13, fontWeight: '500', color: Colors.textPrimary, marginTop: 2 },
+  principlesText: { fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.textPrimary, marginTop: 2 },
 
   retryArea: {
     borderTopWidth: 0.5, borderTopColor: Colors.border,
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     borderRadius: 14, backgroundColor: Colors.surfaceElevated,
     borderWidth: 0.5, borderColor: Colors.border,
   },
-  retryBtnText: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
+  retryBtnText: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
 
   inputArea: {
     flexDirection: 'row', alignItems: 'center', gap: 10,

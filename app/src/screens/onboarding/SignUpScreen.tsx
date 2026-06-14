@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TextInput,
   ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
@@ -105,12 +105,12 @@ const legalStyles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.border,
   },
-  sheetTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
+  sheetTitle: { fontSize: 16, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
   closeBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   closeBtnText: { fontSize: 16, color: Colors.textMuted },
   body: { paddingHorizontal: 20, paddingTop: 16 },
   section: { marginBottom: 16 },
-  sectionHeading: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary, marginBottom: 4 },
+  sectionHeading: { fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 4 },
   sectionBody: { fontSize: 12, color: Colors.textSecondary, lineHeight: 12 * 1.7 },
   effectiveDate: { fontSize: 11, color: Colors.textMuted, marginBottom: 24 },
   footer: {
@@ -124,7 +124,7 @@ const legalStyles = StyleSheet.create({
     padding: 14,
     alignItems: 'center',
   },
-  confirmBtnText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  confirmBtnText: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
 });
 
 const API_BASE = 'https://oreumdal.co.kr';
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '700',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     lineHeight: 26 * 1.3,
   },
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   kakaoBtnText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
     color: '#191600',
   },
   appleBtn: {
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   },
   appleBtnText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
     color: '#FFFFFF',
   },
   googleBtn: {
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
   },
   googleBtnText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
     color: Colors.textPrimary,
   },
   terms: {
@@ -486,9 +486,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
-  checkmark: { fontSize: 12, color: '#FFF', fontWeight: '700' },
+  checkmark: { fontSize: 12, color: '#FFF', fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700' },
   checkLabel: { fontSize: 14, color: Colors.textSecondary, flex: 1 },
-  required: { color: Colors.cta, fontWeight: '600' },
+  required: { color: Colors.cta, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
   optional: { color: Colors.textMuted },
   completeBtn: {
     backgroundColor: Colors.cta,
@@ -498,5 +498,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   completeBtnDisabled: { opacity: 0.35 },
-  completeBtnText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  completeBtnText: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
 });

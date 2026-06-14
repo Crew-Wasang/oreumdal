@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Colors } from '../../constants/colors';
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border, gap: 4,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  cardTitle: { fontSize: 12, fontWeight: '600', color: Colors.textSubtle },
+  cardTitle: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textSubtle },
   cardHint: { fontSize: 11, color: Colors.textMuted },
 
   graphWrap: { position: 'relative', height: GRAPH_H },

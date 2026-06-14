@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, Pressable,
 } from 'react-native';
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
     color: Colors.textPrimary,
     letterSpacing: -0.3,
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   signUpBtnText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
     color: '#FFF',
   },
   cancelBtn: {

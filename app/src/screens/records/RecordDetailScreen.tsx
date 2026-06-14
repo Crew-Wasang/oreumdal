@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView,
 } from 'react-native';
@@ -162,18 +162,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
   backBtn: { paddingVertical: 4, paddingRight: 8 },
-  backText: { fontSize: 16, color: Colors.accent, fontWeight: '500' },
-  headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  backText: { fontSize: 16, color: Colors.accent, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
+  headerTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
 
   content: { padding: 20, gap: 16 },
 
   metaDate: { fontSize: 12, color: Colors.textMuted },
   metaNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  metaStock: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
+  metaStock: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
   dirBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
   dirBuyBadge: { backgroundColor: Colors.buyBg },
   dirSellBadge: { backgroundColor: Colors.sellBg },
-  dirBadgeText: { fontSize: 11, fontWeight: '500' },
+  dirBadgeText: { fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   dirBuyText: { color: Colors.buy },
   dirSellText: { color: Colors.sell },
 
@@ -183,14 +183,14 @@ const styles = StyleSheet.create({
   resultCardAmber: { backgroundColor: '#FFFBEB', borderColor: '#FCD34D' },
   resultCardOk: { backgroundColor: '#F0FDF4', borderColor: '#6EE7B7' },
   resultCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  resultVerdict: { fontSize: 14, fontWeight: '600' },
+  resultVerdict: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
   verdictAmberText: { color: Colors.impulse },
   verdictOkText: { color: Colors.ok },
-  resultScore: { fontSize: 14, fontWeight: '700' },
+  resultScore: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700' },
   resultReason: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
 
   sectionLabel: {
-    fontSize: 13, fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
+    fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
   },
 
   memoCard: {
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   outcomeBtnActive: {
     backgroundColor: '#FFF1F2', borderWidth: 1, borderColor: '#FECDD3',
   },
-  outcomeBtnText: { fontSize: 13, color: Colors.textSubtle, fontWeight: '500' },
+  outcomeBtnText: { fontSize: 13, color: Colors.textSubtle, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   outcomeBtnOkText: { color: Colors.ok },
   outcomeBtnActiveText: { color: '#BE123C' },
 

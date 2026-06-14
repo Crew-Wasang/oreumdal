@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MainStackParamList, MainTabParamList } from '../types';
@@ -41,7 +41,7 @@ function TabNavigator() {
             paddingBottom: 16,
             height: 70,
           },
-          tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
+          tabBarLabelStyle: { fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
           tabBarIcon: ({ color }) =>
             IconComponent ? <IconComponent size={22} color={color} /> : null,
         };

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+﻿import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator,
 } from 'react-native';
@@ -58,7 +58,7 @@ function InsufficientCard({ count }: { count: number }) {
         <Text style={styles.insufficientTitle}>아직 데이터가 부족해요</Text>
       </View>
       <Text style={styles.insufficientDesc}>
-        코칭을 <Text style={{ fontWeight: '700' }}>5회 이상</Text> 받으면 나만의 패턴을 볼 수 있어요.
+        코칭을 <Text style={{ fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700' }}>5회 이상</Text> 받으면 나만의 패턴을 볼 수 있어요.
       </Text>
       <View style={styles.insufficientBottom}>
         <View>
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
   header: { paddingTop: 8, gap: 4 },
   headerSubRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   headerSub: { fontSize: 12, color: Colors.cta },
-  title: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
+  title: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
 
   // 데이터 부족 카드
   insufficientCard: {
@@ -629,12 +629,12 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#FCD34D', gap: 10,
   },
   insufficientHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  insufficientTitle: { fontSize: 14, fontWeight: '700', color: Colors.impulse },
+  insufficientTitle: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.impulse },
   insufficientDesc: { fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.6 },
   insufficientBottom: { gap: 8 },
   insufficientCountLabel: { fontSize: 11, color: Colors.textMuted },
   insufficientCount: { marginTop: 2 },
-  insufficientCountNum: { fontSize: 28, fontWeight: '700', color: Colors.impulse },
+  insufficientCountNum: { fontSize: 28, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.impulse },
   insufficientCountDen: { fontSize: 13, color: Colors.textSecondary },
 
   // 공통 카드
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
     borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
-  cardTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  cardTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   cardDesc: { fontSize: 14, color: Colors.textSecondary, lineHeight: 14 * 1.6 },
 
   progressBarBg: {
@@ -653,9 +653,9 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row' },
   statItem: { flex: 1, alignItems: 'center', gap: 4 },
   statDivider: { width: 0.5, backgroundColor: Colors.border, marginVertical: 4 },
-  statValue: { fontSize: 24, fontWeight: '600', color: Colors.textPrimary },
+  statValue: { fontSize: 24, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   statLabel: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
+    fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.textMuted,
     letterSpacing: 1, textTransform: 'uppercase',
   },
 
@@ -673,22 +673,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(24,24,27,0.85)',
   },
   lockBadgeText: {
-    fontSize: 11, fontWeight: '600', color: '#FFF', letterSpacing: 0.5,
+    fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF', letterSpacing: 0.5,
   },
-  lockedText: { fontSize: 12, fontWeight: '600', color: Colors.textPrimary },
+  lockedText: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
 
   // 섹션 헤더
   sectionHeader: {
-    fontSize: 14, fontWeight: '600', color: Colors.textPrimary, marginTop: 4,
+    fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, marginTop: 4,
   },
 
   // AI 인사이트 카드
   insightTitle: {
-    fontSize: 11, fontWeight: '500', color: Colors.textMuted,
+    fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.textMuted,
     letterSpacing: 1, textTransform: 'uppercase',
   },
   insightMain: {
-    fontSize: 15, fontWeight: '500', color: Colors.textPrimary,
+    fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.textPrimary,
     lineHeight: 15 * 1.6,
   },
   insightSub: { fontSize: 13, color: Colors.textMuted },
@@ -714,11 +714,11 @@ const styles = StyleSheet.create({
   heatLegendCell: { width: 14, height: 8, borderRadius: 2 },
 
   // 종목 추이
-  deepCardTitle: { fontSize: 12, fontWeight: '600', color: Colors.textSubtle },
+  deepCardTitle: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textSubtle },
   deepCardTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   deepCardMeta: { fontSize: 11, color: Colors.textMuted },
   tickerScoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 4 },
-  tickerScore: { fontSize: 18, fontWeight: '700', color: Colors.buy },
+  tickerScore: { fontSize: 18, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.buy },
   tickerScoreSub: { fontSize: 11, color: Colors.textMuted },
 
   // Fear & Greed
@@ -726,9 +726,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 4,
   },
   fgScore: {
-    fontSize: 40, fontWeight: '700', letterSpacing: -1,
+    fontSize: 40, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', letterSpacing: -1,
   },
-  fgRating: { fontSize: 15, fontWeight: '600' },
+  fgRating: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
   fgTime: { fontSize: 12, color: Colors.textMuted, marginTop: 2 },
   gaugeBg: {
     height: 8, backgroundColor: Colors.border,
@@ -762,5 +762,5 @@ const reportGuestStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   text: { fontSize: 12, color: '#92400E', flex: 1 },
-  cta: { fontSize: 12, fontWeight: '600', color: '#B45309', marginLeft: 8 },
+  cta: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#B45309', marginLeft: 8 },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView,
   TextInput, KeyboardAvoidingView, Platform,
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   closeBtn: { width: 40, height: 40, justifyContent: 'center' },
   closeBtnText: { fontSize: 18, color: Colors.textSecondary },
-  headerTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
+  headerTitle: { fontSize: 16, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
 
   subtitle: {
     fontSize: 12, color: Colors.textSecondary,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   dirBtnBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buyBorder, borderWidth: 1.5 },
   dirBtnSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sellBorder, borderWidth: 1.5 },
-  dirBtnText: { fontSize: 14, fontWeight: '600', color: Colors.textSecondary },
+  dirBtnText: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textSecondary },
   dirBtnBuyText: { color: Colors.buy },
   dirBtnSellText: { color: Colors.sell },
 
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.border,
   },
-  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontWeight: '500' },
+  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   suggestionCode: { fontSize: 12, color: Colors.textMuted },
 
   emotionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -260,12 +260,12 @@ const styles = StyleSheet.create({
   emotionPillActive: { backgroundColor: Colors.ctaLight, borderColor: Colors.cta, borderWidth: 1.5 },
   emotionPillDisabled: { opacity: 0.35 },
   emotionPillText: { fontSize: 13, color: Colors.textSecondary },
-  emotionPillTextActive: { color: Colors.textPrimary, fontWeight: '500' },
+  emotionPillTextActive: { color: Colors.textPrimary, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
 
   saveBtn: {
     backgroundColor: Colors.cta, borderRadius: 16,
     padding: 16, alignItems: 'center',
   },
   saveBtnDisabled: { backgroundColor: Colors.surfaceElevated },
-  saveBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+  saveBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
 });

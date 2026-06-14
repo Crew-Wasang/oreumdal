@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     height: 48,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  headerTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
 
   content: { padding: 24, paddingTop: 12, paddingBottom: 48, gap: 14 },
 
@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
   },
-  tag: { fontSize: 12, fontWeight: '500', color: Colors.cta },
+  tag: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.cta },
 
-  title: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary, lineHeight: 24 * 1.4 },
+  title: { fontSize: 24, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary, lineHeight: 24 * 1.4 },
   titleAccent: { color: Colors.cta },
 
   mainCard: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   avatarText: { fontSize: 22, color: Colors.cta },
-  mainCardLabel: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary },
+  mainCardLabel: { fontSize: 16, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   mainCardRisk: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   mainCardSummary: { fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.7 },
 
@@ -202,9 +202,9 @@ const styles = StyleSheet.create({
   weaknessCard: { backgroundColor: '#FFF1F2', borderColor: '#FECDD3' },
   halfCardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   strengthDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#22C55E' },
-  strengthLabel: { fontSize: 14, fontWeight: '700', color: '#15803D' },
+  strengthLabel: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: '#15803D' },
   weaknessDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#EF4444' },
-  weaknessLabel: { fontSize: 14, fontWeight: '700', color: '#B91C1C' },
+  weaknessLabel: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: '#B91C1C' },
   halfCardBody: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
 
   tipCard: {
@@ -218,10 +218,10 @@ const styles = StyleSheet.create({
     borderColor: Colors.ctaBorder,
   },
   tipText: { flex: 1, fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.7 },
-  tipBold: { fontWeight: '700', color: Colors.cta },
+  tipBold: { fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.cta },
 
   emptyWrap: { alignItems: 'center', paddingVertical: 40, gap: 8 },
-  emptyTitle: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary },
+  emptyTitle: { fontSize: 16, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   emptyDesc: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', lineHeight: 13 * 1.7 },
 
   retakeBtn: { alignSelf: 'center', paddingVertical: 10, marginTop: 8 },

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, TextInput,
 } from 'react-native';
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
   header: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 4 },
-  title: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
+  title: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
   subtitle: { fontSize: 12, color: Colors.textMuted, marginTop: 2 },
 
   searchWrap: { paddingHorizontal: 20, paddingVertical: 10 },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   directionPillBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buy },
   directionPillSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sell },
-  directionPillText: { fontSize: 12, fontWeight: '500', color: Colors.textSecondary },
+  directionPillText: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.textSecondary },
   directionPillBuyText: { color: Colors.buy },
   directionPillSellText: { color: Colors.sell },
   tabPill: {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border,
   },
   tabPillActive: { backgroundColor: Colors.textPrimary, borderColor: Colors.textPrimary },
-  tabPillText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
+  tabPillText: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textSecondary },
   tabPillTextActive: { color: '#FFF' },
 
   list: { paddingHorizontal: 20, gap: 12 },
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  cardStock: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  cardStock: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
   cardDate: { fontSize: 11, color: Colors.textMuted },
   cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardVerdict: { fontSize: 13, color: Colors.textSubtle },
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
   buyBadge: { backgroundColor: Colors.buyBg },
   sellBadge: { backgroundColor: Colors.sellBg },
-  actionBadgeText: { fontSize: 10, fontWeight: '500' },
+  actionBadgeText: { fontSize: 10, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
   buyText: { color: Colors.buy },
   sellText: { color: Colors.sell },
 
@@ -265,11 +265,11 @@ const styles = StyleSheet.create({
   scoreBadgeNeutralText: { color: Colors.textMuted },
 
   lockedWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
-  lockedTitle: { fontSize: 17, fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
+  lockedTitle: { fontSize: 17, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
   lockedDesc: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   lockedBtn: {
     marginTop: 8, backgroundColor: Colors.cta, borderRadius: 16,
     paddingVertical: 14, paddingHorizontal: 32,
   },
-  lockedBtnText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+  lockedBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
 });
