@@ -72,11 +72,11 @@ export default function PostTradeScreen() {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={styles.header}>
+          <View style={{ width: 40 }} />
+          <Text style={styles.headerTitle}>매매 기록 남기기</Text>
           <ScaleButton onPress={() => navigation.goBack()} style={styles.closeBtn}>
             <Text style={styles.closeBtnText}>✕</Text>
           </ScaleButton>
-          <Text style={styles.headerTitle}>매매 기록 남기기</Text>
-          <View style={{ width: 40 }} />
         </View>
 
         <Text style={styles.subtitle}>이미 끝난 매매를 기록만 남겨요 · AI 코칭은 진행되지 않아요</Text>
