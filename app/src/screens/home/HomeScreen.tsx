@@ -235,7 +235,7 @@ export default function HomeScreen() {
 
             <View style={styles.ctaBtnRow}>
               <View style={styles.ctaPrimaryPill}>
-                <Text style={styles.ctaPrimaryPillText}>충동 체크 시작하기</Text>
+                <Text style={styles.ctaPrimaryPillText}>매매 전 · 충동 체크 시작하기</Text>
                 <ChevronRight size={14} color={Colors.cta} />
               </View>
               <ScaleButton
