@@ -38,8 +38,8 @@ function TabNavigator() {
             backgroundColor: Colors.background,
             borderTopWidth: 0.5,
             borderTopColor: Colors.border,
-            paddingBottom: 16,
-            height: 70,
+            paddingBottom: 28,
+            height: 82,
           },
           tabBarLabelStyle: { fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
           tabBarIcon: ({ color }) =>
