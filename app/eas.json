@@ -25,7 +25,10 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_AI_PROVIDER": "openai"
+      }
     }
   },
   "submit": {
