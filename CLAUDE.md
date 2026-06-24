@@ -95,6 +95,7 @@
 | 백엔드/인증 | Supabase |
 | 그라디언트 | `expo-linear-gradient` |
 | SVG 아이콘 | `react-native-svg` (커스텀 컴포넌트, 외부 아이콘 라이브러리 미사용) |
+| 폰트 | `expo-font` — Spoqa Han Sans Neo (`SpoqaHanSansNeo-Regular/Medium/Bold`) |
 | AI | OpenAI API (`EXPO_PUBLIC_OPENAI_API_KEY`) — preview/production 빌드 실사용 |
 
 ### 환경 변수
@@ -164,10 +165,11 @@
   - Onboarding → Main 복귀: `(navigation as any).navigate('Main')`
 
 ### 비로그인 처리 패턴
-- **HomeScreen**: 최근 코칭 섹션 `{isLoggedIn && ...}`으로 조건 렌더링
+- **HomeScreen**: 최근 코칭 섹션 `{isLoggedIn && ...}`으로 조건 렌더링 + 상단 `GuestDataBanner` 표시
+- **ReportScreen**: 상단 `GuestDataBanner` 표시. SignUpBottomSheet `onClose`에서 `navigate('Tabs', { screen: 'Home' })` — 닫으면 홈으로 이동
 - **MyPageScreen**: hooks 이후 `if (!isLoggedIn) return <로그인 필요 화면>` early return
-- **ReportScreen**: SignUpBottomSheet `onClose`에서 `navigate('Tabs', { screen: 'Home' })` — 닫으면 홈으로 이동
 - **각 액션 버튼**: `isLoggedIn ? 기능실행 : navigate('SignUp', { trigger })` 패턴
+- **GuestDataBanner 디자인**: `backgroundColor: '#FFFBEB'`, `borderColor: '#FCD34D'` amber 배너. HomeScreen/ReportScreen 인라인 정의 (공유 컴포넌트 아님)
 
 ### 알림 설정 접근
 - 홈 벨 버튼 → HomeScreen 내 Modal 직접 표시 (탭 이동 없음)
@@ -183,6 +185,53 @@
 | 심화 인사이트 | `Heatmap7Day`, `TickerTrendCard` | 7회 미만 / 취약 종목 없으면 숨김 |
 | 시장 맥락 | `FearGreedCard` | 항상 표시 (외부 API) |
 
+### 앱 아이콘 파일 규칙
+- `app/assets/oremdal-icon-tile.png` → `app.json` `expo.icon` (iOS 앱 아이콘, 불투명 배경 필수)
+- `app/assets/oremdal-icon.png` → Android Adaptive Icon `foregroundImage` (배경 없는 투명 PNG)
+- iOS는 반드시 불투명 아이콘 사용. 투명 PNG 제출 시 App Store 심사 거절됨
+
+### 탭바 (MainNavigator.tsx)
+- `tabBarStyle`: `paddingBottom: 28`, `height: 82` — 하단 홈 인디케이터 여백 확보용
+
+### 이용약관/개인정보처리방침 모달
+- SignUpScreen 내에 `LegalDocModal` 컴포넌트가 인라인 정의됨
+- RN `Modal` + `ScrollView` 구조. 약관 전문(`DOC_CONTENT`)도 같은 파일에 상수로 포함
+- 외부 웹뷰 없음. 앱 내 바텀시트 형태
+
 ### 보안 주의
 - `EXPO_PUBLIC_` prefix가 붙은 키는 클라이언트 번들에 포함됨
 - AI API 키(`ANTHROPIC_API_KEY`)는 `EXPO_PUBLIC_` 없이 유지 — 현재는 직접 호출 중이나 향후 서버 프록시 전환 필요
+
+## 배포 (EAS)
+
+### Apple 계정 정보
+- Apple ID: crewwasang02@gmail.com
+- Team: GIUNG LEE (5C3374X8ZW)
+- Bundle ID: com.oremdal.app
+- App Store Connect App ID: 6763870794
+
+### 빌드 설정
+- `eas.json`의 `appVersionSource: "remote"`, `autoIncrement: "buildNumber"` — 빌드 번호 자동 증가
+- **버전 문자열 (`version`)은 수동 관리** — `app/app.json`의 `expo.version`을 직접 수정
+
+### EAS 빌드 & 제출 명령어
+```bash
+cd app
+
+# 1. iOS TestFlight 빌드 (production 프로파일)
+eas build --platform ios --profile production
+
+# 2. App Store Connect 제출 (가장 최근 빌드 자동 선택)
+eas submit --platform ios --latest
+```
+
+### 배포 플로우
+1. `app.json`의 `version` 수동 업데이트 → 커밋
+2. `eas build --platform ios --profile production` 실행 → EAS 클라우드에서 빌드 (10~15분 소요)
+3. 빌드 완료 후 `eas submit --platform ios --latest` — TestFlight 업로드
+4. App Store Connect(appstoreconnect.apple.com) 에서 TestFlight 빌드 확인 후 외부 테스터 배포
+
+### 주의사항
+- EAS 환경 변수 수정은 **expo.dev 웹 대시보드만** 사용 (`eas env:*` CLI 불안정)
+- `EXPO_PUBLIC_OPENAI_API_KEY`는 EAS 대시보드에서 Sensitive visibility로 관리
+- 빌드 중 터미널 닫아도 무방 — EAS 클라우드에서 계속 진행됨

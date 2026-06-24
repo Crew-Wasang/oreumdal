@@ -379,14 +379,19 @@ export default function MyPageScreen() {
               </View>
               {editingNickname ? (
                 <View style={{ gap: 10 }}>
-                  <TextInput
-                    style={styles.principleInput}
-                    value={nicknameDraft}
-                    onChangeText={(v) => setNicknameDraft(v.slice(0, 10))}
-                    autoFocus
-                    maxLength={10}
-                    returnKeyType="done"
-                  />
+                  <View style={styles.nicknameInputRow}>
+                    <TextInput
+                      style={[styles.principleInput, { flex: 1 }]}
+                      value={nicknameDraft}
+                      onChangeText={(v) => setNicknameDraft(v.slice(0, 10))}
+                      autoFocus
+                      maxLength={10}
+                      returnKeyType="done"
+                      placeholder="닉네임은 10자 이내로 입력해 주세요."
+                      placeholderTextColor={Colors.textMuted}
+                    />
+                    <Text style={styles.nicknameCount}>({nicknameDraft.length}/10)</Text>
+                  </View>
                   <ScaleButton
                     style={[styles.saveNicknameBtn, !nicknameDraft.trim() && { opacity: 0.4 }]}
                     onPress={handleSaveNickname}
@@ -500,6 +505,8 @@ const styles = StyleSheet.create({
 
   editLink: { fontSize: 13, color: Colors.accent, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   accountValue: { fontSize: 14, color: Colors.textPrimary },
+  nicknameInputRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  nicknameCount: { fontSize: 12, color: Colors.textMuted },
   saveNicknameBtn: {
     backgroundColor: Colors.cta, borderRadius: 12, padding: 13, alignItems: 'center',
   },
