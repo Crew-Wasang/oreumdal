@@ -54,7 +54,7 @@ export default function MyPageScreen() {
   const navigation = useNavigation<Nav>();
   const {
     principles, setPrinciples, personalityType,
-    nickname, provider, logout, notifSettings, setNotifSettings, setNickname,
+    nickname, provider, logout, deleteAccount, notifSettings, setNotifSettings, setNickname,
     isLoggedIn,
   } = useUserStore();
   const clearRecords = useRecordStore((s) => s.clearRecords);
@@ -146,9 +146,28 @@ export default function MyPageScreen() {
       { text: '취소', style: 'cancel' },
       {
         text: '로그아웃', style: 'destructive',
-        onPress: () => { logout(); clearRecords(); navigation.replace('Main'); },
+        onPress: () => { logout(); navigation.replace('Main'); },
       },
     ]);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      '회원 탈퇴',
+      '탈퇴하면 모든 코칭 기록과 투자 원칙이 삭제되며 복구할 수 없어요.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '탈퇴하기',
+          style: 'destructive',
+          onPress: () => {
+            deleteAccount();
+            clearRecords();
+            navigation.replace('Main');
+          },
+        },
+      ],
+    );
   };
 
   const handleSaveNickname = () => {
@@ -384,6 +403,10 @@ export default function MyPageScreen() {
               <Text style={styles.notifCardLabel}>소셜 로그인</Text>
               <Text style={styles.accountValue}>{PROVIDER_LABEL[provider] || provider || '-'}</Text>
             </View>
+
+            <ScaleButton onPress={handleDeleteAccount} style={styles.withdrawBtn}>
+              <Text style={styles.withdrawBtnText}>회원 탈퇴</Text>
+            </ScaleButton>
           </ScrollView>
         </SafeAreaView>
       </Modal>
@@ -394,7 +417,7 @@ export default function MyPageScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { padding: 20, gap: 20, paddingBottom: 48 },
-  pageTitle: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary, paddingTop: 4 },
+  pageTitle: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary, paddingTop: 4 },
 
   profileCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
@@ -405,13 +428,13 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24,
     alignItems: 'center', justifyContent: 'center',
   },
-  profileAvatarText: { fontSize: 18, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: '#FFF' },
-  profileName: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  profileAvatarText: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: '#FFF' },
+  profileName: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   profileSub: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
 
   section: { gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  sectionTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  sectionTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   sectionDesc: { fontSize: 12, color: Colors.textMuted, marginTop: -4 },
 
   principleList: { gap: 8 },
@@ -420,7 +443,7 @@ const styles = StyleSheet.create({
     padding: 14, borderRadius: 16,
     backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
   },
-  principleIndex: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.cta, marginTop: 1, minWidth: 20 },
+  principleIndex: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta, marginTop: 1, minWidth: 20 },
   principleText: { flex: 1, fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.5 },
   principleDelete: { padding: 2 },
   principleDeleteText: { fontSize: 13, color: Colors.textMuted },
@@ -461,7 +484,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 20, paddingBottom: 16,
   },
-  modalTitle: { fontSize: 18, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  modalTitle: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   modalClose: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
   modalCloseText: { fontSize: 18, color: Colors.textSecondary },
   modalContent: { padding: 20, gap: 12 },
@@ -471,22 +494,30 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
   notifCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  notifCardLabel: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  notifCardLabel: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   notifCardTime: { fontSize: 12, color: Colors.textSecondary },
   notifCardDesc: { fontSize: 13, color: Colors.textMuted, lineHeight: 13 * 1.6 },
 
-  editLink: { fontSize: 13, color: Colors.accent, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
+  editLink: { fontSize: 13, color: Colors.accent, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   accountValue: { fontSize: 14, color: Colors.textPrimary },
   saveNicknameBtn: {
     backgroundColor: Colors.cta, borderRadius: 12, padding: 13, alignItems: 'center',
   },
-  saveNicknameBtnText: { color: '#FFF', fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
+  saveNicknameBtnText: { color: '#FFF', fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600' },
+
+  withdrawBtn: {
+    paddingVertical: 14, alignItems: 'center', marginTop: 8,
+  },
+  withdrawBtnText: {
+    fontSize: 13, color: Colors.textMuted,
+    textDecorationLine: 'underline',
+  },
 
   loginRequiredWrap: { flex: 1, padding: 20 },
   loginRequiredBody: {
     flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12,
   },
-  loginRequiredTitle: { fontSize: 17, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  loginRequiredTitle: { fontSize: 17, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   loginRequiredDesc: {
     fontSize: 13, color: Colors.textMuted, textAlign: 'center', lineHeight: 20,
   },
@@ -494,5 +525,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cta, borderRadius: 16,
     paddingVertical: 14, paddingHorizontal: 40, marginTop: 8,
   },
-  loginBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
+  loginBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });

@@ -94,8 +94,15 @@ export default function RecordsScreen() {
 
   const filtered = useMemo(() => {
     let result = records;
-    if (tab === 'followed') result = result.filter(r => r.trade_outcome === 'skipped');
-    if (tab === 'skipped') result = result.filter(r => r.trade_outcome === 'traded');
+    // 조언 따름: AI 판단과 행동이 일치한 케이스 (ok+traded, reconsider+skipped)
+    if (tab === 'followed') result = result.filter(r =>
+      (r.verdict === 'ok' && r.trade_outcome === 'traded') ||
+      (r.verdict === 'reconsider' && r.trade_outcome === 'skipped')
+    );
+    // 그대로 매매: AI가 말렸는데 매매한 케이스만
+    if (tab === 'skipped') result = result.filter(r =>
+      r.verdict === 'reconsider' && r.trade_outcome === 'traded'
+    );
     if (selectedDirections.length > 0) {
       result = result.filter(r => selectedDirections.includes(r.direction as Direction));
     }
@@ -200,7 +207,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
   header: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 4 },
-  title: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
+  title: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   subtitle: { fontSize: 12, color: Colors.textMuted, marginTop: 2 },
 
   searchWrap: { paddingHorizontal: 20, paddingVertical: 10 },
@@ -221,7 +228,7 @@ const styles = StyleSheet.create({
   },
   directionPillBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buy },
   directionPillSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sell },
-  directionPillText: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.textSecondary },
+  directionPillText: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.textSecondary },
   directionPillBuyText: { color: Colors.buy },
   directionPillSellText: { color: Colors.sell },
   tabPill: {
@@ -230,7 +237,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border,
   },
   tabPillActive: { backgroundColor: Colors.textPrimary, borderColor: Colors.textPrimary },
-  tabPillText: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textSecondary },
+  tabPillText: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSecondary },
   tabPillTextActive: { color: '#FFF' },
 
   list: { paddingHorizontal: 20, gap: 12 },
@@ -243,7 +250,7 @@ const styles = StyleSheet.create({
   },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  cardStock: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  cardStock: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   cardDate: { fontSize: 11, color: Colors.textMuted },
   cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardVerdict: { fontSize: 13, color: Colors.textSubtle },
@@ -251,7 +258,7 @@ const styles = StyleSheet.create({
   actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
   buyBadge: { backgroundColor: Colors.buyBg },
   sellBadge: { backgroundColor: Colors.sellBg },
-  actionBadgeText: { fontSize: 10, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
+  actionBadgeText: { fontSize: 10, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   buyText: { color: Colors.buy },
   sellText: { color: Colors.sell },
 
@@ -265,11 +272,11 @@ const styles = StyleSheet.create({
   scoreBadgeNeutralText: { color: Colors.textMuted },
 
   lockedWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
-  lockedTitle: { fontSize: 17, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
+  lockedTitle: { fontSize: 17, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
   lockedDesc: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   lockedBtn: {
     marginTop: 8, backgroundColor: Colors.cta, borderRadius: 16,
     paddingVertical: 14, paddingHorizontal: 32,
   },
-  lockedBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
+  lockedBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });

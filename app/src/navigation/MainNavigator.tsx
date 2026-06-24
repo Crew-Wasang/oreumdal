@@ -11,7 +11,6 @@ import ReportScreen from '../screens/report/ReportScreen';
 import MyPageScreen from '../screens/mypage/MyPageScreen';
 import CheckChatScreen from '../screens/check/CheckChatScreen';
 import RecordDetailScreen from '../screens/records/RecordDetailScreen';
-import PostTradeScreen from '../screens/records/PostTradeScreen';
 import SignUpScreen from '../screens/onboarding/SignUpScreen';
 import PersonalityProfileScreen from '../screens/mypage/PersonalityProfileScreen';
 
@@ -41,7 +40,7 @@ function TabNavigator() {
             paddingBottom: 16,
             height: 70,
           },
-          tabBarLabelStyle: { fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
+          tabBarLabelStyle: { fontSize: 11, fontFamily: 'A2Z-Medium', fontWeight: '500' },
           tabBarIcon: ({ color }) =>
             IconComponent ? <IconComponent size={22} color={color} /> : null,
         };
@@ -68,11 +67,6 @@ export default function MainNavigator() {
         name="RecordDetail"
         component={RecordDetailScreen}
         options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="PostTrade"
-        component={PostTradeScreen}
-        options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen
         name="SignUp"

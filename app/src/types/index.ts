@@ -17,7 +17,7 @@ export interface ChatMessage {
 
 export interface SessionRecord {
   id: string;
-  type: 'check' | 'post';
+  type: 'check';
   stock_name: string;
   direction: TradeDirection;
   emotions: EmotionType[];
@@ -69,7 +69,6 @@ export type MainStackParamList = {
     emotionLabel: string;
   };
   RecordDetail: { sessionId: string };
-  PostTrade: undefined;
   SignUp: { trigger: 'chk' | 'save' | 'report' };
   PersonalityProfile: undefined;
 };

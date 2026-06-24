@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
+    fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: Colors.textPrimary,
     letterSpacing: -0.3,
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   signUpBtnText: {
     fontSize: 15,
-    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600',
+    fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: '#FFF',
   },
   cancelBtn: {

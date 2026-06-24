@@ -9,19 +9,17 @@ import RootNavigator from './src/navigation/RootNavigator';
 
 SplashScreen.preventAutoHideAsync();
 
-// 모든 Text 컴포넌트에 Spoqa 기본 적용
+// 모든 Text 컴포넌트에 A2Z 기본 적용
 (Text as any).defaultProps = (Text as any).defaultProps ?? {};
-(Text as any).defaultProps.style = [{ fontFamily: 'SpoqaHanSansNeo-Regular' }];
+(Text as any).defaultProps.style = [{ fontFamily: 'A2Z-Regular' }];
 (TextInput as any).defaultProps = (TextInput as any).defaultProps ?? {};
-(TextInput as any).defaultProps.style = [{ fontFamily: 'SpoqaHanSansNeo-Regular' }];
+(TextInput as any).defaultProps.style = [{ fontFamily: 'A2Z-Regular' }];
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    'SpoqaHanSansNeo-Thin': require('./assets/fonts/SpoqaHanSansNeo-Thin.ttf'),
-    'SpoqaHanSansNeo-Light': require('./assets/fonts/SpoqaHanSansNeo-Light.ttf'),
-    'SpoqaHanSansNeo-Regular': require('./assets/fonts/SpoqaHanSansNeo-Regular.ttf'),
-    'SpoqaHanSansNeo-Medium': require('./assets/fonts/SpoqaHanSansNeo-Medium.ttf'),
-    'SpoqaHanSansNeo-Bold': require('./assets/fonts/SpoqaHanSansNeo-Bold.ttf'),
+    'A2Z-Regular': require('./assets/fonts/A2ZRegular.ttf'),
+    'A2Z-Medium': require('./assets/fonts/A2ZMedium.ttf'),
+    'A2Z-Bold': require('./assets/fonts/A2ZBold.ttf'),
   });
 
   useEffect(() => {

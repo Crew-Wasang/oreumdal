@@ -1,14 +1,14 @@
-﻿import React, { useState } from 'react';
+﻿import React from 'react';
 import {
-  View, Text, StyleSheet, SafeAreaView, ScrollView,
+  View, Text, StyleSheet, SafeAreaView, ScrollView, Alert,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
-import { MainStackParamList, TradeOutcome } from '../../types';
+import { MainStackParamList } from '../../types';
 import { useRecordStore } from '../../store/recordStore';
 import ScaleButton from '../../components/common/ScaleButton';
-import { Sparkle } from '../../components/common/Icons';
+import { TrashIcon } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 type Route = RouteProp<MainStackParamList, 'RecordDetail'>;
@@ -22,9 +22,26 @@ export default function RecordDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { sessionId } = route.params;
-  const { records, updateTradeOutcome } = useRecordStore();
+  const { records, deleteRecord } = useRecordStore();
   const record = records.find((r) => r.id === sessionId);
-  const [localOutcome, setLocalOutcome] = useState<TradeOutcome>(record?.trade_outcome ?? null);
+
+  const handleDelete = () => {
+    Alert.alert(
+      '기록 삭제',
+      '이 코칭 기록을 삭제할까요? 삭제한 기록은 복구할 수 없어요.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: () => {
+            deleteRecord(sessionId);
+            navigation.goBack();
+          },
+        },
+      ],
+    );
+  };
 
   if (!record) {
     return (
@@ -40,11 +57,6 @@ export default function RecordDetailScreen() {
   const isOk = record.verdict === 'ok';
   const score = record.impulse_score ?? 0;
 
-  const handleOutcomeSelect = (outcome: TradeOutcome) => {
-    setLocalOutcome(outcome);
-    updateTradeOutcome(sessionId, outcome);
-  };
-
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
@@ -52,7 +64,9 @@ export default function RecordDetailScreen() {
           <Text style={styles.backText}>‹ 뒤로</Text>
         </ScaleButton>
         <Text style={styles.headerTitle}>기록 상세</Text>
-        <View style={{ width: 60 }} />
+        <ScaleButton onPress={handleDelete} style={styles.deleteBtn}>
+          <TrashIcon size={20} color={Colors.textSecondary} />
+        </ScaleButton>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -86,14 +100,6 @@ export default function RecordDetailScreen() {
           </View>
         )}
 
-        {/* POST 메모 */}
-        {record.type === 'post' && record.memo && (
-          <View style={styles.memoCard}>
-            <Text style={styles.sectionLabel}>메모</Text>
-            <Text style={styles.memoText}>{record.memo}</Text>
-          </View>
-        )}
-
         {/* 코칭 대화 */}
         {record.type === 'check' && record.messages.length > 0 && (
           <View style={styles.chatSection}>
@@ -118,33 +124,6 @@ export default function RecordDetailScreen() {
           </View>
         )}
 
-        {/* 매매 결과 기록 */}
-        <View style={styles.outcomeCard}>
-          <Text style={styles.outcomeCardLabel}>매매 후 결과 (직접 기록)</Text>
-          <View style={styles.outcomeButtons}>
-            <ScaleButton
-              style={[styles.outcomeBtn, localOutcome === 'skipped' && styles.outcomeBtnOk]}
-              onPress={() => handleOutcomeSelect(localOutcome === 'skipped' ? null : 'skipped')}
-            >
-              <Text style={[styles.outcomeBtnText, localOutcome === 'skipped' && styles.outcomeBtnOkText]}>
-                매매 안 함
-              </Text>
-            </ScaleButton>
-            <ScaleButton
-              style={[styles.outcomeBtn, localOutcome === 'traded' && styles.outcomeBtnActive]}
-              onPress={() => handleOutcomeSelect(localOutcome === 'traded' ? null : 'traded')}
-            >
-              <Text style={[styles.outcomeBtnText, localOutcome === 'traded' && styles.outcomeBtnActiveText]}>
-                그대로 매매
-              </Text>
-            </ScaleButton>
-          </View>
-          <View style={styles.outcomeNote}>
-            <Sparkle size={11} color={Colors.cta} />
-            <Text style={styles.outcomeNoteText}>결과를 남기면 AI 리포트의 정확도가 올라가요</Text>
-          </View>
-        </View>
-
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
@@ -162,18 +141,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
   backBtn: { paddingVertical: 4, paddingRight: 8 },
-  backText: { fontSize: 16, color: Colors.accent, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
-  headerTitle: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  backText: { fontSize: 16, color: Colors.accent, fontFamily: 'A2Z-Medium', fontWeight: '500' },
+  headerTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  deleteBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 
   content: { padding: 20, gap: 16 },
 
   metaDate: { fontSize: 12, color: Colors.textMuted },
   metaNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  metaStock: { fontSize: 22, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.textPrimary },
+  metaStock: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   dirBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
   dirBuyBadge: { backgroundColor: Colors.buyBg },
   dirSellBadge: { backgroundColor: Colors.sellBg },
-  dirBadgeText: { fontSize: 11, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
+  dirBadgeText: { fontSize: 11, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   dirBuyText: { color: Colors.buy },
   dirSellText: { color: Colors.sell },
 
@@ -183,21 +163,15 @@ const styles = StyleSheet.create({
   resultCardAmber: { backgroundColor: '#FFFBEB', borderColor: '#FCD34D' },
   resultCardOk: { backgroundColor: '#F0FDF4', borderColor: '#6EE7B7' },
   resultCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  resultVerdict: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600' },
+  resultVerdict: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600' },
   verdictAmberText: { color: Colors.impulse },
   verdictOkText: { color: Colors.ok },
-  resultScore: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700' },
+  resultScore: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '700' },
   resultReason: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
 
   sectionLabel: {
-    fontSize: 13, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
+    fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
   },
-
-  memoCard: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
-    borderWidth: 0.5, borderColor: Colors.border,
-  },
-  memoText: { fontSize: 14, color: Colors.textPrimary, lineHeight: 14 * 1.7 },
 
   chatSection: { gap: 0 },
   chatBubbles: { gap: 8 },
@@ -216,27 +190,4 @@ const styles = StyleSheet.create({
   textAI: { fontSize: 13, color: Colors.textPrimary, lineHeight: 13 * 1.75 },
   textUser: { fontSize: 13, color: '#FFF', lineHeight: 13 * 1.75 },
 
-  outcomeCard: {
-    backgroundColor: Colors.surface, borderRadius: 20, padding: 16,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
-  },
-  outcomeCardLabel: { fontSize: 12, color: Colors.textSecondary },
-  outcomeButtons: { flexDirection: 'row', gap: 10 },
-  outcomeBtn: {
-    flex: 1, paddingVertical: 10, borderRadius: 14,
-    backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
-    alignItems: 'center',
-  },
-  outcomeBtnOk: {
-    backgroundColor: '#F0FDF4', borderColor: Colors.okMid, borderWidth: 1,
-  },
-  outcomeBtnActive: {
-    backgroundColor: '#FFF1F2', borderWidth: 1, borderColor: '#FECDD3',
-  },
-  outcomeBtnText: { fontSize: 13, color: Colors.textSubtle, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500' },
-  outcomeBtnOkText: { color: Colors.ok },
-  outcomeBtnActiveText: { color: '#BE123C' },
-
-  outcomeNote: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  outcomeNoteText: { fontSize: 11, color: Colors.textMuted },
 });

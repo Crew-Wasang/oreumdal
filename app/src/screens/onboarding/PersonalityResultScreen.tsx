@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -60,6 +60,10 @@ export default function PersonalityResultScreen() {
 
   const myType = (route.params.personalityType as TypeKey) ?? 'analytical';
   const data = PERSONALITY_DATA[myType];
+
+  useEffect(() => {
+    if (route.params?.fromRedo) navigation.setOptions({ gestureEnabled: false });
+  }, [route.params?.fromRedo, navigation]);
 
   const handleNext = () => {
     setPersonalityType(myType);
@@ -180,11 +184,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
   },
-  tag: { fontSize: 12, fontFamily: 'SpoqaHanSansNeo-Medium', fontWeight: '500', color: Colors.cta },
+  tag: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
 
   title: {
     fontSize: 24,
-    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
+    fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     lineHeight: 24 * 1.4,
   },
@@ -207,7 +211,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: { fontSize: 22, color: Colors.cta },
-  mainCardLabel: { fontSize: 16, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  mainCardLabel: { fontSize: 16, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   mainCardRisk: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   mainCardSummary: { fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.7 },
   tipRow: {
@@ -219,7 +223,7 @@ const styles = StyleSheet.create({
     borderTopColor: `${Colors.ctaBorder}99`,
   },
   tipText: { flex: 1, fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
-  tipBold: { fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700', color: Colors.cta },
+  tipBold: { fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.cta },
 
   cardRow: { flexDirection: 'row', gap: 10 },
   halfCard: {
@@ -247,14 +251,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  showAllText: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  showAllText: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   showAllChevron: { fontSize: 12, color: Colors.textMuted },
 
   allList: { paddingHorizontal: 16, paddingBottom: 12 },
   typeRow: { paddingVertical: 12, gap: 4 },
   typeRowDivider: { borderTopWidth: 0.5, borderTopColor: Colors.border },
   typeRowHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  typeRowLabel: { fontSize: 14, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: Colors.textPrimary },
+  typeRowLabel: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   typeRowLabelMe: { color: Colors.cta },
   typeRowRisk: { fontSize: 11, color: Colors.textMuted, marginLeft: 'auto' as any },
   meBadge: {
@@ -263,7 +267,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  meBadgeText: { fontSize: 10, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
+  meBadgeText: { fontSize: 10, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
   typeRowSummary: { fontSize: 12, color: Colors.textSecondary, lineHeight: 12 * 1.6 },
 
   cta: {
@@ -273,5 +277,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 4,
   },
-  ctaText: { fontSize: 15, fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
 });

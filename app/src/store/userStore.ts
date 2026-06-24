@@ -50,6 +50,7 @@ interface UserStore {
   completeOnboarding: () => void;
   login: (params: LoginParams) => void;
   logout: () => void;
+  deleteAccount: () => void;
   loadFromStorage: () => Promise<void>;
   setNotifSettings: (s: NotifSettings) => void;
 }
@@ -98,17 +99,25 @@ export const useUserStore = create<UserStore>((set) => ({
 
   logout: () => {
     set({
-      isLoggedIn: false, nickname: '', userId: '', accessToken: '',
+      isLoggedIn: false, userId: '', accessToken: '',
       refreshToken: '', provider: '', principles: '', personalityType: '',
     });
     AsyncStorage.removeItem(KEYS.isLoggedIn);
-    AsyncStorage.removeItem(KEYS.nickname);
     AsyncStorage.removeItem(KEYS.userId);
     AsyncStorage.removeItem(KEYS.accessToken);
     AsyncStorage.removeItem(KEYS.refreshToken);
     AsyncStorage.removeItem(KEYS.provider);
     AsyncStorage.removeItem(KEYS.principles);
     AsyncStorage.removeItem(KEYS.personality);
+  },
+
+  deleteAccount: () => {
+    set({
+      isLoggedIn: false, nickname: '', userId: '', accessToken: '',
+      refreshToken: '', provider: '', principles: '', personalityType: '',
+      hasCompletedOnboarding: false, notifSettings: DEFAULT_NOTIF,
+    });
+    AsyncStorage.multiRemove(Object.values(KEYS));
   },
 
   loadFromStorage: async () => {

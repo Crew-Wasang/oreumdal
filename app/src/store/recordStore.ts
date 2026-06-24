@@ -8,8 +8,6 @@ function daysAgo(d: number): string {
   return new Date(Date.now() - d * 86400000).toISOString();
 }
 
-const M: ChatMessage[] = []; // 빈 대화 (post 타입용)
-
 const MOCK_RECORDS: SessionRecord[] = [
   // ─── 이번 주 (0~6일 전) ───────────────────────────────────────────────────
   {
@@ -139,19 +137,13 @@ const MOCK_RECORDS: SessionRecord[] = [
     ],
     trade_outcome: 'skipped', created_at: daysAgo(12),
   },
-  {
-    id: '10', type: 'post', stock_name: 'TSLA', direction: 'buy',
-    emotions: ['excited'], emotion_label: '흥분',
-    messages: M,
-    trade_outcome: 'traded', memo: '실적 발표 기대',
-    created_at: daysAgo(13),
-  },
 ];
 
 interface RecordStore {
   records: SessionRecord[];
   addRecord: (record: Omit<SessionRecord, 'id' | 'created_at'>) => void;
   updateTradeOutcome: (id: string, outcome: TradeOutcome) => void;
+  deleteRecord: (id: string) => void;
   clearRecords: () => void;
   loadUserRecords: () => Promise<void>;
   saveUserRecords: (records: SessionRecord[]) => void;
@@ -178,6 +170,14 @@ export const useRecordStore = create<RecordStore>((set, get) => ({
       const next = state.records.map((r) =>
         r.id === id ? { ...r, trade_outcome: outcome } : r
       );
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return { records: next };
+    });
+  },
+
+  deleteRecord: (id) => {
+    set((state) => {
+      const next = state.records.filter((r) => r.id !== id);
       AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       return { records: next };
     });

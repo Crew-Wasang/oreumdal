@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'SpoqaHanSansNeo-Bold', fontWeight: '700',
+    fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     letterSpacing: -0.5,
   },
