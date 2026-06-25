@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView, Platform, Modal, Animated,
   Dimensions, TouchableWithoutFeedback, PanResponder,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { EmotionType, TradeDirection } from '../../types';
 import ScaleButton from '../common/ScaleButton';
@@ -188,11 +189,18 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
 
           <View style={styles.footer}>
             <ScaleButton
-              style={[styles.startBtn, !canStart && styles.startBtnDisabled]}
+              style={[styles.startBtnWrap, !canStart && styles.startBtnDisabled]}
               onPress={() => canStart && direction && onStart({ stockName: stockName.trim(), direction, emotions })}
               disabled={!canStart}
             >
-              <Text style={styles.startBtnText}>AI 코치와 대화 시작</Text>
+              <LinearGradient
+                colors={['#6366F1', '#4F46E5', '#7C3AED']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.startBtn}
+              >
+                <Text style={styles.startBtnText}>AI 코치와 대화 시작</Text>
+              </LinearGradient>
             </ScaleButton>
           </View>
         </KeyboardAvoidingView>
@@ -274,7 +282,8 @@ const styles = StyleSheet.create({
   emotionPillTextActive: { color: Colors.ctaLightText, fontFamily: 'A2Z-Medium', fontWeight: '500' },
 
   footer: { paddingHorizontal: 20, paddingVertical: 16, borderTopWidth: 0.5, borderTopColor: Colors.border },
-  startBtn: { backgroundColor: Colors.cta, borderRadius: 16, padding: 17, alignItems: 'center' },
+  startBtnWrap: { borderRadius: 16 },
   startBtnDisabled: { opacity: 0.35 },
+  startBtn: { borderRadius: 16, padding: 17, alignItems: 'center' },
   startBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });

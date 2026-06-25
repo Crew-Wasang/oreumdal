@@ -160,10 +160,17 @@ export default function PersonalityResultScreen() {
           )}
         </View>
 
-        <ScaleButton style={styles.cta} onPress={handleNext}>
-          <Text style={styles.ctaText}>
-            {route.params?.fromRedo ? '완료' : '오름달 시작하기'}
-          </Text>
+        <ScaleButton style={styles.ctaWrap} onPress={handleNext}>
+          <LinearGradient
+            colors={['#6366F1', '#4F46E5', '#7C3AED']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.cta}
+          >
+            <Text style={styles.ctaText}>
+              {route.params?.fromRedo ? '완료' : '오름달 시작하기'}
+            </Text>
+          </LinearGradient>
         </ScaleButton>
       </ScrollView>
     </SafeAreaView>
@@ -270,12 +277,7 @@ const styles = StyleSheet.create({
   meBadgeText: { fontSize: 10, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
   typeRowSummary: { fontSize: 12, color: Colors.textSecondary, lineHeight: 12 * 1.6 },
 
-  cta: {
-    backgroundColor: Colors.cta,
-    borderRadius: 16,
-    padding: 17,
-    alignItems: 'center',
-    marginTop: 4,
-  },
+  ctaWrap: { borderRadius: 16, marginTop: 4 },
+  cta: { borderRadius: 16, padding: 17, alignItems: 'center' },
   ctaText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
 });

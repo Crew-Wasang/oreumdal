@@ -402,8 +402,15 @@ export default function CheckChatScreen() {
                 <View style={styles.saveCard}>
                   <Text style={styles.saveSectionLabel}>이 코칭을 기록으로 저장할까요?</Text>
                   <View style={styles.saveButtons}>
-                    <ScaleButton style={styles.savePrimary} onPress={handleSaveAndClose}>
-                      <Text style={styles.savePrimaryText}>기록 저장하고 닫기</Text>
+                    <ScaleButton style={styles.savePrimaryWrap} onPress={handleSaveAndClose}>
+                      <LinearGradient
+                        colors={['#6366F1', '#4F46E5', '#7C3AED']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.savePrimary}
+                      >
+                        <Text style={styles.savePrimaryText}>기록 저장하고 닫기</Text>
+                      </LinearGradient>
                     </ScaleButton>
                     <ScaleButton style={styles.saveSecondary} onPress={handleSkipSave}>
                       <Text style={styles.saveSecondaryText}>저장 안 함</Text>
@@ -577,10 +584,8 @@ const styles = StyleSheet.create({
   },
   saveSectionLabel: { fontSize: 13, color: Colors.textSubtle },
   saveButtons: { flexDirection: 'row', gap: 10 },
-  savePrimary: {
-    flex: 1, paddingVertical: 12, borderRadius: 14,
-    backgroundColor: Colors.cta, alignItems: 'center',
-  },
+  savePrimaryWrap: { flex: 1, borderRadius: 14 },
+  savePrimary: { paddingVertical: 12, borderRadius: 14, alignItems: 'center' },
   savePrimaryText: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
   saveSecondary: {
     flex: 1, paddingVertical: 12, borderRadius: 14,

@@ -2,6 +2,7 @@
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, Pressable,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../types';
@@ -53,8 +54,15 @@ export default function SignUpBottomSheet({ visible, trigger, onClose }: Props) 
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.desc}>{desc}</Text>
 
-        <ScaleButton style={styles.signUpBtn} onPress={handleSignUp}>
-          <Text style={styles.signUpBtnText}>가입하기</Text>
+        <ScaleButton style={styles.signUpBtnWrap} onPress={handleSignUp}>
+          <LinearGradient
+            colors={['#6366F1', '#4F46E5', '#7C3AED']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.signUpBtn}
+          >
+            <Text style={styles.signUpBtnText}>가입하기</Text>
+          </LinearGradient>
         </ScaleButton>
 
         <TouchableOpacity onPress={onClose} style={styles.cancelBtn}>
@@ -99,13 +107,8 @@ const styles = StyleSheet.create({
     lineHeight: 14 * 1.7,
     marginTop: -4,
   },
-  signUpBtn: {
-    backgroundColor: Colors.cta,
-    borderRadius: 10,
-    padding: 17,
-    alignItems: 'center',
-    marginTop: 4,
-  },
+  signUpBtnWrap: { borderRadius: 10, marginTop: 4 },
+  signUpBtn: { borderRadius: 10, padding: 17, alignItems: 'center' },
   signUpBtnText: {
     fontSize: 15,
     fontFamily: 'A2Z-Bold', fontWeight: '600',
