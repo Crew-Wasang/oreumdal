@@ -2,7 +2,7 @@
 import {
   View, Text, StyleSheet, TextInput, ScrollView,
   KeyboardAvoidingView, Platform, Modal, Animated,
-  Dimensions, TouchableWithoutFeedback,
+  Dimensions, TouchableWithoutFeedback, PanResponder,
 } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { EmotionType, TradeDirection } from '../../types';
@@ -29,6 +29,8 @@ interface Props {
 export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
   const slideAnim = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const panY = useRef(new Animated.Value(0)).current;
+  const isSwipeClosing = useRef(false);
   const [stockName, setStockName] = useState('');
   const [suggestions, setSuggestions] = useState<Stock[]>([]);
   const [direction, setDirection] = useState<TradeDirection | null>(null);
@@ -36,17 +38,45 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
 
   const canStart = stockName.trim().length > 0 && direction !== null && emotions.length > 0;
 
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 0 && Math.abs(g.dy) > Math.abs(g.dx),
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) panY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 100 || g.vy > 0.8) {
+          isSwipeClosing.current = true;
+          Animated.parallel([
+            Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+            Animated.timing(panY, { toValue: SHEET_HEIGHT, duration: 220, useNativeDriver: true }),
+          ]).start(() => onClose());
+        } else {
+          Animated.spring(panY, { toValue: 0, tension: 65, friction: 11, useNativeDriver: true }).start();
+        }
+      },
+    })
+  ).current;
+
   useEffect(() => {
     if (visible) {
+      panY.setValue(0);
+      isSwipeClosing.current = false;
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
         Animated.spring(slideAnim, { toValue: 0, tension: 65, friction: 11, useNativeDriver: true }),
       ]).start();
     } else {
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: SHEET_HEIGHT, duration: 220, useNativeDriver: true }),
-      ]).start();
+      if (!isSwipeClosing.current) {
+        Animated.parallel([
+          Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+          Animated.timing(slideAnim, { toValue: SHEET_HEIGHT, duration: 220, useNativeDriver: true }),
+        ]).start();
+      } else {
+        slideAnim.setValue(SHEET_HEIGHT);
+        panY.setValue(0);
+      }
       setStockName(''); setSuggestions([]); setDirection(null); setEmotions([]);
     }
   }, [visible]);
@@ -66,8 +96,10 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
       </TouchableWithoutFeedback>
 
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}>
-        <View style={styles.handleWrap}><View style={styles.handle} /></View>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: Animated.add(slideAnim, panY) }] }]}>
+        <View style={styles.handleWrap} {...panResponder.panHandlers}>
+          <View style={styles.handle} />
+        </View>
 
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView
