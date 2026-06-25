@@ -9,6 +9,7 @@ import { MainStackParamList } from '../../types';
 import { useRecordStore } from '../../store/recordStore';
 import ScaleButton from '../../components/common/ScaleButton';
 import { TrashIcon, ChevronLeft } from '../../components/common/Icons';
+import ActionTag from '../../components/common/ActionTag';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 type Route = RouteProp<MainStackParamList, 'RecordDetail'>;
@@ -75,11 +76,7 @@ export default function RecordDetailScreen() {
           <Text style={styles.metaDate}>{formatDate(record.created_at)}</Text>
           <View style={styles.metaNameRow}>
             <Text style={styles.metaStock}>{record.stock_name}</Text>
-            <View style={[styles.dirBadge, isBuy ? styles.dirBuyBadge : styles.dirSellBadge]}>
-              <Text style={[styles.dirBadgeText, isBuy ? styles.dirBuyText : styles.dirSellText]}>
-                {isBuy ? '매수' : '매도'}
-              </Text>
-            </View>
+            <ActionTag action={isBuy ? '매수' : '매도'} />
           </View>
         </View>
 
@@ -149,12 +146,6 @@ const styles = StyleSheet.create({
   metaDate: { fontSize: 12, color: Colors.textMuted },
   metaNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   metaStock: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
-  dirBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
-  dirBuyBadge: { backgroundColor: Colors.buyBg },
-  dirSellBadge: { backgroundColor: Colors.sellBg },
-  dirBadgeText: { fontSize: 11, fontFamily: 'A2Z-Medium', fontWeight: '500' },
-  dirBuyText: { color: Colors.buy },
-  dirSellText: { color: Colors.sell },
 
   resultCard: {
     borderRadius: 20, padding: 16, borderWidth: 1, gap: 8,

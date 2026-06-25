@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { MainStackParamList, EmotionType, TradeDirection, SessionRecord } from '../../types';
 import ScaleButton from '../../components/common/ScaleButton';
+import ActionTag from '../../components/common/ActionTag';
 import CheckBottomSheet from '../../components/check/CheckBottomSheet';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
@@ -90,19 +91,12 @@ function RecentCard({
   const verdictLabel = isOk ? '지금 매매해도 괜찮아요' : '한 번 더 생각해봐요';
   const scoreColor = isOk ? styles.scoreBadgeOk : styles.scoreBadgeAmber;
   const scoreTextColor = isOk ? styles.scoreBadgeOkText : styles.scoreBadgeAmberText;
-  const actionStyle = isBuy ? styles.actionBuy : styles.actionSell;
-  const actionTextStyle = isBuy ? styles.actionBuyText : styles.actionSellText;
-
   return (
     <ScaleButton style={styles.recentCard} onPress={onPress}>
       <View style={styles.recentCardTop}>
         <View style={styles.recentCardLeft}>
           <Text style={styles.recentCardStock}>{record.stock_name}</Text>
-          <View style={[styles.actionBadge, actionStyle]}>
-            <Text style={[styles.actionBadgeText, actionTextStyle]}>
-              {isBuy ? '매수' : '매도'}
-            </Text>
-          </View>
+          <ActionTag action={isBuy ? '매수' : '매도'} />
         </View>
         <Text style={styles.recentCardTime}>{formatTime(record.created_at)}</Text>
       </View>
@@ -431,12 +425,6 @@ const styles = StyleSheet.create({
   recentCardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recentCardVerdict: { fontSize: 13, color: Colors.textSubtle },
 
-  actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
-  actionBuy: { backgroundColor: Colors.buyBg },
-  actionSell: { backgroundColor: Colors.sellBg },
-  actionBadgeText: { fontSize: 10, fontFamily: 'A2Z-Medium', fontWeight: '500' },
-  actionBuyText: { color: Colors.buy },
-  actionSellText: { color: Colors.sell },
 
   scoreBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   scoreBadgeAmber: { backgroundColor: Colors.impulseBg },

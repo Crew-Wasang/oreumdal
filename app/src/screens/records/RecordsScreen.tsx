@@ -9,6 +9,7 @@ import { MainStackParamList, SessionRecord } from '../../types';
 import { useRecordStore } from '../../store/recordStore';
 import { useUserStore } from '../../store/userStore';
 import ScaleButton from '../../components/common/ScaleButton';
+import ActionTag from '../../components/common/ActionTag';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 type Tab = 'all' | 'followed' | 'skipped';
@@ -48,11 +49,7 @@ function RecordCard({ record, onPress }: { record: SessionRecord; onPress: () =>
       <View style={styles.cardTop}>
         <View style={styles.cardLeft}>
           <Text style={styles.cardStock}>{record.stock_name}</Text>
-          <View style={[styles.actionBadge, isBuy ? styles.buyBadge : styles.sellBadge]}>
-            <Text style={[styles.actionBadgeText, isBuy ? styles.buyText : styles.sellText]}>
-              {isBuy ? '매수' : '매도'}
-            </Text>
-          </View>
+          <ActionTag action={isBuy ? '매수' : '매도'} />
         </View>
         <Text style={styles.cardDate}>{formatDate(record.created_at)}</Text>
       </View>
@@ -255,12 +252,6 @@ const styles = StyleSheet.create({
   cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardVerdict: { fontSize: 13, color: Colors.textSubtle },
 
-  actionBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
-  buyBadge: { backgroundColor: Colors.buyBg },
-  sellBadge: { backgroundColor: Colors.sellBg },
-  actionBadgeText: { fontSize: 10, fontFamily: 'A2Z-Medium', fontWeight: '500' },
-  buyText: { color: Colors.buy },
-  sellText: { color: Colors.sell },
 
   scoreBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   scoreBadgeAmber: { backgroundColor: Colors.impulseBg },
