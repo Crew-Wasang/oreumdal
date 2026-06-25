@@ -315,15 +315,17 @@ export default function CheckChatScreen() {
             <Animated.View style={[styles.resultWrap, { opacity: fadeAnim }]}>
               {/* 판정 카드 */}
               <LinearGradient
-                colors={isOk ? ['#D1FAE5', '#ECFDF5'] : ['#FEF3C7', '#FFF7ED']}
+                colors={isOk
+                  ? ['#D1FAE5', '#ECFDF5']
+                  : ['rgba(167,243,208,0.55)', 'rgba(110,231,183,0.35)', 'rgba(253,186,116,0.35)', 'rgba(251,146,60,0.45)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={[styles.verdictCard, { borderColor: isOk ? '#6EE7B7' : '#FCD34D' }]}
+                style={[styles.verdictCard, { borderColor: isOk ? '#6EE7B7' : 'rgba(110,231,183,0.5)' }]}
               >
-                <View style={[styles.verdictGlow, { backgroundColor: isOk ? 'rgba(52,211,153,0.3)' : 'rgba(251,191,36,0.3)' }]} />
-                <View style={[styles.verdictTag, { backgroundColor: isOk ? '#A7F3D0' : '#FDE68A' }]}>
-                  <Sparkle size={11} color={isOk ? Colors.ok : Colors.impulse} />
-                  <Text style={[styles.verdictTagText, { color: isOk ? Colors.ok : Colors.impulse }]}>AI 코치 의견</Text>
+                <View style={[styles.verdictGlow, { backgroundColor: isOk ? 'rgba(52,211,153,0.3)' : 'rgba(167,243,208,0.3)' }]} />
+                <View style={[styles.verdictTag, { backgroundColor: isOk ? '#A7F3D0' : 'rgba(255,255,255,0.7)' }]}>
+                  <Sparkle size={11} color={isOk ? Colors.ok : Colors.textSecondary} />
+                  <Text style={[styles.verdictTagText, { color: isOk ? Colors.ok : '#3F3F46' }]}>AI 코치 의견</Text>
                 </View>
                 <Text style={[styles.verdictText, { color: isOk ? Colors.ok : Colors.textPrimary }]}>
                   {isOk ? '지금\n매매해도 괜찮아요' : '한 번 더\n생각해봐요'}
@@ -341,7 +343,7 @@ export default function CheckChatScreen() {
                 </View>
                 <View style={styles.barBg}>
                   <LinearGradient
-                    colors={[Colors.impulseGradientLow, Colors.impulseGradientMid, Colors.impulseGradientHigh]}
+                    colors={[Colors.impulseGradientLow, Colors.impulseGradientMid, '#F59E0B']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={[styles.barFill, { width: `${result.score}%` as any }]}

@@ -94,9 +94,15 @@ export default function PersonalityResultScreen() {
           style={styles.mainCard}
         >
           <View style={styles.mainCardTop}>
-            <View style={styles.avatarBox}>
+            <LinearGradient
+              colors={['#A7F3D0', '#6EE7B7', '#FDBA74', '#FB923C']}
+              locations={[0, 0.38, 0.74, 1]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.avatarBox}
+            >
               <Text style={styles.avatarText}>◐</Text>
-            </View>
+            </LinearGradient>
             <View style={{ flex: 1 }}>
               <Text style={styles.mainCardLabel}>{data.label}</Text>
               <Text style={styles.mainCardRisk}>충동 위험도 · {data.risk}</Text>
@@ -119,7 +125,7 @@ export default function PersonalityResultScreen() {
             <Text style={styles.halfCardBody}>{data.strength}</Text>
           </View>
           <View style={[styles.halfCard, styles.weaknessCard]}>
-            <AlertTriangle size={18} color="#E11D48" />
+            <AlertTriangle size={18} color="#D97706" />
             <Text style={styles.halfCardBody}>{data.weakness}</Text>
           </View>
         </View>
@@ -213,11 +219,10 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: `${Colors.cta}22`,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontSize: 22, color: Colors.cta },
+  avatarText: { fontSize: 22, color: '#FFF' },
   mainCardLabel: { fontSize: 16, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   mainCardRisk: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   mainCardSummary: { fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.7 },
@@ -241,7 +246,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   strengthCard: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
-  weaknessCard: { backgroundColor: '#FFF1F2', borderColor: '#FECDD3' },
+  weaknessCard: { backgroundColor: '#FFFBEB', borderColor: '#FDE68A' },
   halfCardBody: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
 
   showAllContainer: {
