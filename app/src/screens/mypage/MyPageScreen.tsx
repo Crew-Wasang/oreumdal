@@ -206,13 +206,15 @@ export default function MyPageScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <View style={styles.stickyHeader}>
+        <Text style={styles.pageTitle}>마이</Text>
+      </View>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.pageTitle}>마이</Text>
 
           {/* 프로필 카드 */}
           <ScaleButton
@@ -421,8 +423,12 @@ export default function MyPageScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+  stickyHeader: {
+    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12,
+    borderBottomWidth: 0.5, borderBottomColor: Colors.border,
+  },
   content: { padding: 20, gap: 20, paddingBottom: 48 },
-  pageTitle: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary, paddingTop: 4 },
+  pageTitle: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
 
   profileCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14,

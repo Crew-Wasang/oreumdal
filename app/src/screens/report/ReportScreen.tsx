@@ -441,16 +441,15 @@ export default function ReportScreen() {
           <Text style={reportGuestStyles.cta}>로그인하기 →</Text>
         </ScaleButton>
       )}
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
-        {/* 헤더 */}
-        <View style={styles.header}>
-          <View style={styles.headerSubRow}>
-            <Sparkle size={12} color={Colors.cta} />
-            <Text style={styles.headerSub}>AI 리포트 · 최근 30일</Text>
-          </View>
-          <Text style={styles.title}>나의 투자 심리 패턴</Text>
+      <View style={styles.stickyHeader}>
+        <View style={styles.headerSubRow}>
+          <Sparkle size={12} color={Colors.cta} />
+          <Text style={styles.headerSub}>AI 리포트 · 최근 30일</Text>
         </View>
+        <Text style={styles.title}>나의 투자 심리 패턴</Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* 데이터 부족 안내 */}
         {tier === 'insufficient' && <InsufficientCard count={checkCount} />}
@@ -615,6 +614,10 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { padding: 24, gap: 16 },
 
+  stickyHeader: {
+    paddingHorizontal: 24, paddingTop: 8, paddingBottom: 12, gap: 4,
+    borderBottomWidth: 0.5, borderBottomColor: Colors.border,
+  },
   header: { paddingTop: 8, gap: 4 },
   headerSubRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   headerSub: { fontSize: 12, color: Colors.cta },
