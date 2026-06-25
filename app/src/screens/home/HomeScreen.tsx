@@ -196,7 +196,7 @@ export default function HomeScreen() {
           <View>
             <Text style={styles.headerDate}>{getTodayLabel()}</Text>
             <Text style={styles.headerGreet}>
-              안녕하세요, {nickname || '반가워요'}님
+              {isLoggedIn ? `안녕하세요, ${nickname || ''}님` : '오름달에 오신 것을 환영합니다'}
             </Text>
           </View>
           <ScaleButton
