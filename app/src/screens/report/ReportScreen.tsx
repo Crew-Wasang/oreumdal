@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
 
 const reportGuestStyles = StyleSheet.create({
   banner: {
-    marginHorizontal: 16,
+    marginHorizontal: 20,
     marginTop: 8,
     backgroundColor: '#FFFBEB',
     borderRadius: 12,

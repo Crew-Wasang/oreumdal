@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   lockedDesc: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   lockedBtn: {
     marginTop: 8, backgroundColor: Colors.cta, borderRadius: 16,
-    paddingVertical: 14, paddingHorizontal: 32,
+    paddingVertical: 14, paddingHorizontal: 40,
   },
   lockedBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });
