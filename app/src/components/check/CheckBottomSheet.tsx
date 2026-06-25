@@ -146,16 +146,18 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
               <Text style={styles.sectionLabel}>방향</Text>
               <View style={styles.dirRow}>
                 <ScaleButton
-                  style={[styles.dirBtn, direction === 'buy' && styles.dirBtnBuy]}
+                  style={[styles.dirBtn, direction === 'buy' && styles.dirBtnSelected]}
                   onPress={() => setDirection('buy')}
                 >
-                  <Text style={[styles.dirBtnText, direction === 'buy' && styles.dirBtnBuyText]}>매수</Text>
+                  <View style={[styles.dirDot, styles.dirDotBuy]} />
+                  <Text style={[styles.dirBtnText, direction === 'buy' && styles.dirBtnTextSelected]}>매수</Text>
                 </ScaleButton>
                 <ScaleButton
-                  style={[styles.dirBtn, direction === 'sell' && styles.dirBtnSell]}
+                  style={[styles.dirBtn, direction === 'sell' && styles.dirBtnSelected]}
                   onPress={() => setDirection('sell')}
                 >
-                  <Text style={[styles.dirBtnText, direction === 'sell' && styles.dirBtnSellText]}>매도</Text>
+                  <View style={[styles.dirDot, styles.dirDotSell]} />
+                  <Text style={[styles.dirBtnText, direction === 'sell' && styles.dirBtnTextSelected]}>매도</Text>
                 </ScaleButton>
               </View>
             </View>
@@ -248,13 +250,14 @@ const styles = StyleSheet.create({
   dirBtn: {
     flex: 1, paddingVertical: 14, borderRadius: 16,
     backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
-    alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
   },
-  dirBtnBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buyBorder, borderWidth: 1.5 },
-  dirBtnSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sellBorder, borderWidth: 1.5 },
+  dirBtnSelected: { backgroundColor: '#18181B', borderColor: '#18181B', borderWidth: 1.5 },
+  dirDot: { width: 8, height: 8, borderRadius: 4 },
+  dirDotBuy: { backgroundColor: '#F43F5E' },
+  dirDotSell: { backgroundColor: '#6366F1' },
   dirBtnText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textLight },
-  dirBtnBuyText: { color: Colors.buy },
-  dirBtnSellText: { color: Colors.sell },
+  dirBtnTextSelected: { color: '#FFF' },
 
   emotionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   emotionPill: {
