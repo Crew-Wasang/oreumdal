@@ -244,8 +244,8 @@ const HEAT_SLOTS = ['09–10', '10–12', '12–14', '14–16', '장외'];
 
 function heatCellColor(v: number): string {
   if (v === 0) return Colors.surfaceElevated;
-  if (v >= 75) return '#F43F5E';
-  if (v >= 55) return '#FB923C';
+  if (v >= 75) return '#F59E0B';
+  if (v >= 55) return '#FBBF24';
   if (v >= 35) return Colors.impulseMid;
   return Colors.okMid;
 }
@@ -279,7 +279,7 @@ function Heatmap7Day({ data, hasData }: { data: number[][]; hasData: boolean }) 
 
       <View style={styles.heatLegend}>
         <Text style={styles.heatLegendText}>낮음</Text>
-        {[Colors.okMid, Colors.impulseMid, '#FB923C', '#F43F5E'].map((c, i) => (
+        {[Colors.okMid, Colors.impulseMid, '#FBBF24', '#F59E0B'].map((c, i) => (
           <View key={i} style={[styles.heatLegendCell, { backgroundColor: c }]} />
         ))}
         <Text style={styles.heatLegendText}>높음</Text>

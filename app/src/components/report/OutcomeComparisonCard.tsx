@@ -24,7 +24,7 @@ export default function OutcomeComparisonCard({ stats, insight, loading }: Props
         <>
           <View style={styles.stackBar}>
             <View style={{ flex: heldPct, backgroundColor: Colors.okMid }} />
-            <View style={{ flex: 100 - heldPct, backgroundColor: Colors.buy }} />
+            <View style={{ flex: 100 - heldPct, backgroundColor: '#FBBF24' }} />
           </View>
 
           <View style={styles.colGrid}>
@@ -73,13 +73,13 @@ const styles = StyleSheet.create({
   },
   tradedCard: {
     flex: 1, padding: 12, borderRadius: 12,
-    backgroundColor: '#FFF1F2', borderWidth: 1, borderColor: '#FECDD3',
+    backgroundColor: '#FFFBEB', borderWidth: 1, borderColor: '#FDE68A',
     gap: 2,
   },
   heldLabel: { fontSize: 11, color: '#047857' },
   heldCount: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   heldSub: { fontSize: 11, color: Colors.textMuted },
-  tradedLabel: { fontSize: 11, color: '#BE123C' },
+  tradedLabel: { fontSize: 11, color: '#B45309' },
   tradedCount: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   tradedSub: { fontSize: 11, color: Colors.textMuted },
 

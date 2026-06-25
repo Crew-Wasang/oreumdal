@@ -59,8 +59,8 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
         <Svg width={GRAPH_W} height={GRAPH_H}>
           <Defs>
             <LinearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor={Colors.cta} stopOpacity="0.35" />
-              <Stop offset="100%" stopColor={Colors.cta} stopOpacity="0" />
+              <Stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
+              <Stop offset="100%" stopColor="#10B981" stopOpacity="0" />
             </LinearGradient>
           </Defs>
 
@@ -97,7 +97,7 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
           {/* 라인 */}
           <Path
             d={linePath}
-            stroke={Colors.cta}
+            stroke="#10B981"
             strokeWidth={2}
             fill="none"
             strokeLinejoin="round"
@@ -114,7 +114,7 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
                 cx={x}
                 cy={y}
                 r={3}
-                fill={Colors.cta}
+                fill="#10B981"
               />
             );
           })}

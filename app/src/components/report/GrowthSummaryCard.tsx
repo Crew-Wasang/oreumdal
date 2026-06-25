@@ -48,7 +48,7 @@ export default function GrowthSummaryCard({ thisWeekAvg, lastWeekAvg, totalAvgIm
 
       {hasComparison && (
         <View style={styles.miniBarGrid}>
-          <MiniBar label="이번 주" value={thisWeekAvg!} color={Colors.cta} />
+          <MiniBar label="이번 주" value={thisWeekAvg!} color="#F59E0B" />
           <MiniBar label="지난 주" value={lastWeekAvg!} color="#D4D4D8" />
         </View>
       )}
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   headerLabel: { fontSize: 12, color: Colors.textMuted },
   trendText: { fontSize: 11, fontFamily: 'A2Z-Bold', fontWeight: '700' },
   trendGood: { color: Colors.ok },
-  trendBad: { color: Colors.buy },
+  trendBad: { color: '#D97706' },
 
   scoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
   score: { fontSize: 28, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
