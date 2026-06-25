@@ -8,7 +8,7 @@ import { Colors } from '../../constants/colors';
 import { MainStackParamList } from '../../types';
 import { useRecordStore } from '../../store/recordStore';
 import ScaleButton from '../../components/common/ScaleButton';
-import { TrashIcon } from '../../components/common/Icons';
+import { TrashIcon, ChevronLeft } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 type Route = RouteProp<MainStackParamList, 'RecordDetail'>;
@@ -61,7 +61,7 @@ export default function RecordDetailScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <ScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>‹ 뒤로</Text>
+          <ChevronLeft size={26} color={Colors.textPrimary} />
         </ScaleButton>
         <Text style={styles.headerTitle}>기록 상세</Text>
         <ScaleButton onPress={handleDelete} style={styles.deleteBtn}>
@@ -140,8 +140,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 14,
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
-  backBtn: { paddingVertical: 4, paddingRight: 8 },
-  backText: { fontSize: 16, color: Colors.accent, fontFamily: 'A2Z-Medium', fontWeight: '500' },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   deleteBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 
