@@ -585,16 +585,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border, gap: 12,
   },
   saveSectionLabel: { fontSize: 13, color: Colors.textSubtle },
-  saveButtons: { flexDirection: 'row', gap: 10 },
-  savePrimaryWrap: { flex: 1, borderRadius: 14 },
-  savePrimary: { paddingVertical: 12, borderRadius: 14, alignItems: 'center' },
-  savePrimaryText: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
-  saveSecondary: {
-    flex: 1, paddingVertical: 12, borderRadius: 14,
-    backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
-    alignItems: 'center',
-  },
-  saveSecondaryText: { fontSize: 14, color: Colors.textLight },
+  saveButtons: { flexDirection: 'column', gap: 4 },
+  savePrimaryWrap: { borderRadius: 14 },
+  savePrimary: { paddingVertical: 16, borderRadius: 14, alignItems: 'center' },
+  savePrimaryText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  saveSecondary: { paddingVertical: 10, alignItems: 'center' },
+  saveSecondaryText: { fontSize: 14, color: Colors.textMuted },
 
   principlesCard: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
