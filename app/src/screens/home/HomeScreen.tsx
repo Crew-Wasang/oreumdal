@@ -219,7 +219,7 @@ export default function HomeScreen() {
               <Sparkle size={12} color="rgba(255,255,255,0.85)" />
               <Text style={styles.ctaAiTagText}>AI 심리 코치</Text>
             </View>
-            <Text style={styles.ctaTitle}>지금 매매하고{'\n'}싶어요?</Text>
+            <Text style={styles.ctaTitle}>지금 매매를 고민하고 있나요?</Text>
             <Text style={styles.ctaSubtitle}>결정 전, 1분만 같이 점검해봐요</Text>
 
             <View style={styles.ctaBtnRow}>
