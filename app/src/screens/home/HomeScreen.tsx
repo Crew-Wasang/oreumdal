@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 8,
   },
-  headerDate: { fontSize: 12, color: Colors.textMuted },
+  headerDate: { fontSize: 12, color: Colors.cta },
   headerGreet: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginTop: 4 },
   settingsBtn: { padding: 4, marginTop: 4 },
 

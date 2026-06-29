@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
 
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: Colors.border },
   title: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
-  subtitle: { fontSize: 12, color: Colors.textMuted, marginTop: 2 },
+  subtitle: { fontSize: 12, color: Colors.cta, marginTop: 2 },
 
   searchWrap: { paddingHorizontal: 20, paddingVertical: 10 },
   searchInput: {
