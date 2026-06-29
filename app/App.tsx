@@ -4,16 +4,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { Text, TextInput } from 'react-native';
+
 import RootNavigator from './src/navigation/RootNavigator';
 
 SplashScreen.preventAutoHideAsync();
-
-// 모든 Text 컴포넌트에 A2Z 기본 적용
-(Text as any).defaultProps = (Text as any).defaultProps ?? {};
-(Text as any).defaultProps.style = [{ fontFamily: 'A2Z-Regular' }];
-(TextInput as any).defaultProps = (TextInput as any).defaultProps ?? {};
-(TextInput as any).defaultProps.style = [{ fontFamily: 'A2Z-Regular' }];
 
 export default function App() {
   const [fontsLoaded] = useFonts({

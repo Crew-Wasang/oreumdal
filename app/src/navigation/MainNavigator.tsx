@@ -40,7 +40,7 @@ function TabNavigator() {
             paddingBottom: 28,
             height: 82,
           },
-          tabBarLabelStyle: { fontSize: 11, fontFamily: 'A2Z-Medium', fontWeight: '500' },
+          tabBarLabelStyle: { fontSize: 11 },
           tabBarIcon: ({ color }) =>
             IconComponent ? <IconComponent size={22} color={color} /> : null,
         };
