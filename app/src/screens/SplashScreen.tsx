@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,7 +19,7 @@ export default function SplashScreen({ navigation }: Props) {
     const init = async () => {
       await Promise.all([
         loadFromStorage(),
-        new Promise<void>((r) => setTimeout(r, 1800)),
+        new Promise<void>((r) => setTimeout(r, 400)),
       ]);
       const { hasCompletedOnboarding, isLoggedIn } = useUserStore.getState();
       if (isLoggedIn) {
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 0,
   },
   logoWrap: {
     alignItems: 'center',
