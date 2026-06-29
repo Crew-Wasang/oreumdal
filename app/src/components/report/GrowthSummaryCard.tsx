@@ -61,7 +61,7 @@ export default function GrowthSummaryCard({ thisWeekAvg, lastWeekAvg, totalAvgIm
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 10,
+    borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 10,
   },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerLabel: { fontSize: 12, color: Colors.textMuted },

@@ -169,7 +169,7 @@ export default function ImpulseGraph({ points, onPointPress }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface, borderRadius: 16, padding: CARD_PADDING,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 4,
+    borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 4,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   cardTitle: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },

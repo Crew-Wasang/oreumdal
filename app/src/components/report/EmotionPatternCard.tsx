@@ -96,7 +96,7 @@ export default function EmotionPatternCard({ stats, insight, loading }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
+    borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 12,
   },
   title: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
   empty: { fontSize: 14, color: Colors.textMuted, lineHeight: 14 * 1.6 },

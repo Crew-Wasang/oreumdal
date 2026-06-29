@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
   // 공통 카드
   card: {
     backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 10,
+    borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 10,
   },
   cardTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   cardDesc: { fontSize: 14, color: Colors.textSecondary, lineHeight: 14 * 1.6 },
@@ -695,7 +695,7 @@ const styles = StyleSheet.create({
   aiCommentBox: {
     backgroundColor: Colors.background, borderRadius: 10,
     padding: 12, marginTop: 2,
-    borderWidth: 0.5, borderColor: Colors.border,
+    borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border,
     minHeight: 40, justifyContent: 'center',
   },
   aiCommentText: {
