@@ -112,6 +112,8 @@ export default function CheckChatScreen() {
   const [saved, setSaved] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const resultScrolledRef = useRef(false);
+  const saveScrolledRef = useRef(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const outcomeFadeAnim = useRef(new Animated.Value(0)).current;
   const lastAiCallRef = useRef<ChatMessage[]>([]);
@@ -173,6 +175,7 @@ export default function CheckChatScreen() {
         marketContext: sessionCtx.current.marketContext || undefined,
         messages: currentMessages,
       });
+      resultScrolledRef.current = false;
       setResult({
         score: res.impulseScore,
         verdict: res.conclusion === 'ok' ? '괜찮아요' : '다시 생각해봐요',
@@ -180,11 +183,11 @@ export default function CheckChatScreen() {
       });
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
     } catch {
+      resultScrolledRef.current = false;
       setResult({ score: 55, verdict: '다시 생각해봐요', reason: '결과를 분석하지 못했어요' });
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
     } finally {
       setIsTyping(false);
-      scrollToBottom();
     }
   };
 
@@ -273,9 +276,9 @@ export default function CheckChatScreen() {
   };
 
   const handleTradeOutcome = (outcome: TradeOutcome) => {
+    saveScrolledRef.current = false;
     setTradeOutcome(outcome);
     Animated.timing(outcomeFadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
-    scrollToBottom();
   };
 
   const isOk = result?.verdict === '괜찮아요';
@@ -317,7 +320,15 @@ export default function CheckChatScreen() {
           {isTyping && <TypingBubble />}
 
           {result && (
-            <Animated.View style={[styles.resultWrap, { opacity: fadeAnim }]}>
+            <Animated.View
+              style={[styles.resultWrap, { opacity: fadeAnim }]}
+              onLayout={(e) => {
+                if (resultScrolledRef.current) return;
+                resultScrolledRef.current = true;
+                const y = e.nativeEvent.layout.y;
+                setTimeout(() => scrollRef.current?.scrollTo({ y: Math.max(0, y - 16), animated: true }), 50);
+              }}
+            >
               {/* 판정 카드 */}
               <LinearGradient
                 colors={isOk
@@ -406,7 +417,15 @@ export default function CheckChatScreen() {
 
               {/* 저장 — outcome 선택 후에만 노출 */}
               {tradeOutcome !== null && !saved && (
-                <View style={styles.saveCard}>
+                <View
+                  style={styles.saveCard}
+                  onLayout={(e) => {
+                    if (saveScrolledRef.current) return;
+                    saveScrolledRef.current = true;
+                    const y = e.nativeEvent.layout.y;
+                    setTimeout(() => scrollRef.current?.scrollTo({ y: y - 16, animated: true }), 50);
+                  }}
+                >
                   <Text style={styles.saveSectionLabel}>이 코칭을 기록으로 저장할까요?</Text>
                   <View style={styles.saveButtons}>
                     <ScaleButton style={styles.savePrimaryWrap} onPress={handleSaveAndClose}>
