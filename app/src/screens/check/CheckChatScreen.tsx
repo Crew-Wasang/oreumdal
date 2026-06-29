@@ -1,7 +1,7 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TextInput, ScrollView, SafeAreaView,
-  KeyboardAvoidingView, Platform, Animated, Alert,
+  KeyboardAvoidingView, Platform, Animated, Alert, Keyboard,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -120,6 +120,11 @@ export default function CheckChatScreen() {
 
   const scrollToBottom = () =>
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidShow', scrollToBottom);
+    return () => sub.remove();
+  }, []);
 
   const callAIQuestion = async (currentMessages: ChatMessage[]) => {
     lastAiCallRef.current = currentMessages;
