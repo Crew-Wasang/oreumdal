@@ -83,9 +83,6 @@ export default function PersonalityTestScreen() {
 
   const fromRedo = route.params?.fromRedo;
 
-  useEffect(() => {
-    if (fromRedo) navigation.setOptions({ gestureEnabled: false });
-  }, [fromRedo, navigation]);
 
   const question = QUESTIONS[current];
   const isLast = current === QUESTIONS.length - 1;

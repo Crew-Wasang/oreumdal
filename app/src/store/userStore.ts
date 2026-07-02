@@ -100,15 +100,13 @@ export const useUserStore = create<UserStore>((set) => ({
   logout: () => {
     set({
       isLoggedIn: false, userId: '', accessToken: '',
-      refreshToken: '', provider: '', principles: '', personalityType: '',
+      refreshToken: '', provider: '',
     });
     AsyncStorage.removeItem(KEYS.isLoggedIn);
     AsyncStorage.removeItem(KEYS.userId);
     AsyncStorage.removeItem(KEYS.accessToken);
     AsyncStorage.removeItem(KEYS.refreshToken);
     AsyncStorage.removeItem(KEYS.provider);
-    AsyncStorage.removeItem(KEYS.principles);
-    AsyncStorage.removeItem(KEYS.personality);
   },
 
   deleteAccount: () => {

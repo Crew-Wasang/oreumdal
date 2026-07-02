@@ -153,10 +153,39 @@ export default function HomeScreen() {
     setNotifSettings({ ...notifSettings, weeklyEnabled: val });
   };
 
-  const recentSessions = useMemo(
-    () => records.filter((r) => r.type === 'check').slice(0, 2),
+  const checkRecords = useMemo(
+    () => records.filter((r) => r.type === 'check'),
     [records],
   );
+
+  const recentSessions = useMemo(
+    () => checkRecords.slice(0, 3),
+    [checkRecords],
+  );
+
+  const streak = useMemo(() => {
+    if (checkRecords.length === 0) return 0;
+    const dates = new Set(checkRecords.map((r) => r.created_at.slice(0, 10)));
+    let count = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      if (dates.has(key)) count++;
+      else break;
+    }
+    return count;
+  }, [checkRecords]);
+
+  const preventionRate = useMemo(() => {
+    const reconsiderWithOutcome = checkRecords.filter(
+      (r) => r.verdict === 'reconsider' && r.trade_outcome != null,
+    );
+    if (reconsiderWithOutcome.length < 3) return null;
+    const prevented = reconsiderWithOutcome.filter((r) => r.trade_outcome === 'skipped');
+    return Math.round((prevented.length / reconsiderWithOutcome.length) * 100);
+  }, [checkRecords]);
 
   const handleCheckPress = () => {
     if (isLoggedIn) setSheetVisible(true);
@@ -230,6 +259,20 @@ export default function HomeScreen() {
             </View>
           </LinearGradient>
         </ScaleButton>
+
+        {/* 스트릭 + 통계 */}
+        {isLoggedIn && streak > 0 && (
+          <View style={styles.statsCard}>
+            <Text style={styles.statsLine}>
+              <Text style={styles.statsStreakNum}>{streak}일 연속</Text>
+              {' '}기록 중
+            </Text>
+            <Text style={styles.statsMeta}>
+              {`총 ${checkRecords.length}건`}
+              {preventionRate !== null ? `  ·  충동 방지율 ${preventionRate}%` : ''}
+            </Text>
+          </View>
+        )}
 
         {/* 최근 코칭 */}
         {isLoggedIn && (
@@ -432,6 +475,31 @@ const styles = StyleSheet.create({
   scoreBadgeText: { fontSize: 11 },
   scoreBadgeAmberText: { color: Colors.impulse },
   scoreBadgeOkText: { color: Colors.ok },
+
+  // 스트릭 + 통계
+  statsCard: {
+    backgroundColor: Colors.ctaLight,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 0.5,
+    borderColor: Colors.ctaBorder,
+    gap: 4,
+  },
+  statsLine: {
+    fontSize: 15,
+    color: Colors.textPrimary,
+  },
+  statsStreakNum: {
+    fontSize: 15,
+    fontFamily: 'A2Z-Bold',
+    fontWeight: '700',
+    color: Colors.cta,
+  },
+  statsMeta: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
 
   // 빈 상태
   emptyRecent: {

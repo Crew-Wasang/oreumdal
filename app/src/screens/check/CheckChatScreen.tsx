@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, TextInput, ScrollView, SafeAreaView,
   KeyboardAvoidingView, Platform, Animated, Alert, Keyboard,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
@@ -120,11 +120,12 @@ export default function CheckChatScreen() {
 
   const userTurn = messages.filter(m => m.role === 'user').length;
 
-  const scrollToBottom = () =>
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+  const scrollToBottom = (delay = 100) =>
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), delay);
 
   useEffect(() => {
-    const sub = Keyboard.addListener('keyboardDidShow', scrollToBottom);
+    // 키보드가 완전히 올라온 뒤 레이아웃 재계산 시간을 충분히 확보
+    const sub = Keyboard.addListener('keyboardDidShow', () => scrollToBottom(300));
     return () => sub.remove();
   }, []);
 
@@ -449,7 +450,27 @@ export default function CheckChatScreen() {
               {!principles && (
                 <ScaleButton
                   style={styles.principlesCard}
-                  onPress={() => navigation.navigate('Tabs', { screen: 'My' } as any)}
+                  onPress={() => {
+                    doSave();
+                    setSaved(true);
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{
+                          name: 'Tabs',
+                          state: {
+                            index: 3,
+                            routes: [
+                              { name: 'Home' },
+                              { name: 'Records' },
+                              { name: 'Report' },
+                              { name: 'My' },
+                            ],
+                          },
+                        }],
+                      })
+                    );
+                  }}
                 >
                   <View style={styles.principlesLeft}>
                     <View style={styles.principlesIconBox}>

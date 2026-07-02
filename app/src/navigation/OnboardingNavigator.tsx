@@ -12,8 +12,20 @@ export default function OnboardingNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="PersonalityIntro" component={PersonalityIntroScreen} />
-      <Stack.Screen name="PersonalityTest" component={PersonalityTestScreen} />
-      <Stack.Screen name="PersonalityResult" component={PersonalityResultScreen} />
+      <Stack.Screen
+        name="PersonalityTest"
+        component={PersonalityTestScreen}
+        options={({ route }) => ({
+          gestureEnabled: !route.params?.fromRedo,
+        })}
+      />
+      <Stack.Screen
+        name="PersonalityResult"
+        component={PersonalityResultScreen}
+        options={({ route }) => ({
+          gestureEnabled: !route.params?.fromRedo,
+        })}
+      />
       <Stack.Screen name="InvestmentPrinciples" component={InvestmentPrinciplesScreen} />
     </Stack.Navigator>
   );

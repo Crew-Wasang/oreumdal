@@ -58,6 +58,10 @@ export default function RecordDetailScreen() {
   const isOk = record.verdict === 'ok';
   const score = record.impulse_score ?? 0;
 
+  const tradeOutcomeLabel =
+    record.trade_outcome === 'traded' ? '매매 실행' :
+    record.trade_outcome === 'skipped' ? '매매 안 함' : '미기록';
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
@@ -77,6 +81,16 @@ export default function RecordDetailScreen() {
           <View style={styles.metaNameRow}>
             <Text style={styles.metaStock}>{record.stock_name}</Text>
             <ActionTag action={isBuy ? '매수' : '매도'} />
+          </View>
+          <View style={styles.infoRows}>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>선택한 감정</Text>
+              <Text style={styles.infoValue}>{record.emotion_label || '—'}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>매매 여부</Text>
+              <Text style={styles.infoValue}>{tradeOutcomeLabel}</Text>
+            </View>
           </View>
         </View>
 
@@ -146,6 +160,10 @@ const styles = StyleSheet.create({
   metaDate: { fontSize: 12, color: Colors.textMuted },
   metaNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   metaStock: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  infoRows: { marginTop: 12, gap: 6 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  infoLabel: { fontSize: 13, color: Colors.textSecondary },
+  infoValue: { fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
 
   resultCard: {
     borderRadius: 20, padding: 16, borderWidth: 1, gap: 8,

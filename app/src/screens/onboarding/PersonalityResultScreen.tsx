@@ -62,8 +62,9 @@ export default function PersonalityResultScreen() {
   const data = PERSONALITY_DATA[myType];
 
   useEffect(() => {
-    if (route.params?.fromRedo) navigation.setOptions({ gestureEnabled: false });
-  }, [route.params?.fromRedo, navigation]);
+    // redo 플로우에서 결과 화면 진입 즉시 저장 — 스와이프 등으로 이탈해도 새 성향이 반영됨
+    if (route.params?.fromRedo) setPersonalityType(myType);
+  }, []);
 
   const handleNext = () => {
     setPersonalityType(myType);

@@ -161,7 +161,12 @@ function FearGreedCard() {
 
   useEffect(() => {
     fetch('https://production.dataviz.cnn.io/index/fearandgreed/graphdata', {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        'Accept': 'application/json',
+        'Referer': 'https://edition.cnn.com/markets/fear-and-greed',
+        'Origin': 'https://edition.cnn.com',
+      },
     })
       .then((r) => r.json())
       .then((json) => {
