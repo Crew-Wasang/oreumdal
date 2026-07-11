@@ -127,8 +127,8 @@ export default function RecordsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={styles.title}>매매 기록</Text>
         <Text style={styles.subtitle}>총 {records.length}회의 코칭 기록</Text>
+        <Text style={styles.title}>매매 기록</Text>
       </View>
 
       <View style={styles.searchWrap}>

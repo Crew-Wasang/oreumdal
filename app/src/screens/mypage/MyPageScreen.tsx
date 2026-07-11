@@ -163,7 +163,7 @@ export default function MyPageScreen() {
           onPress: () => {
             deleteAccount();
             clearRecords();
-            navigation.replace('Main');
+            (navigation as any).navigate('Onboarding');
           },
         },
       ],
@@ -185,20 +185,20 @@ export default function MyPageScreen() {
   if (!isLoggedIn) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.loginRequiredWrap}>
+        <View style={styles.stickyHeader}>
           <Text style={styles.pageTitle}>마이</Text>
-          <View style={styles.loginRequiredBody}>
-            <Text style={styles.loginRequiredTitle}>로그인이 필요해요</Text>
-            <Text style={styles.loginRequiredDesc}>
-              로그인 후 투자 원칙과{'\n'}프로필을 관리할 수 있어요
-            </Text>
-            <ScaleButton
-              style={styles.loginBtn}
-              onPress={() => (navigation as any).navigate('SignUp', { trigger: 'save' })}
-            >
-              <Text style={styles.loginBtnText}>로그인하기</Text>
-            </ScaleButton>
-          </View>
+        </View>
+        <View style={styles.loginRequiredBody}>
+          <Text style={styles.loginRequiredTitle}>로그인이 필요해요</Text>
+          <Text style={styles.loginRequiredDesc}>
+            로그인 후 투자 원칙과{'\n'}프로필을 관리할 수 있어요
+          </Text>
+          <ScaleButton
+            style={styles.loginBtn}
+            onPress={() => (navigation as any).navigate('SignUp', { trigger: 'save' })}
+          >
+            <Text style={styles.loginBtnText}>로그인하기</Text>
+          </ScaleButton>
         </View>
       </SafeAreaView>
     );
@@ -439,8 +439,8 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24,
     alignItems: 'center', justifyContent: 'center',
   },
-  profileAvatarText: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: '#FFF' },
-  profileName: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  profileAvatarText: { fontSize: 18, fontWeight: '700', color: '#FFF' },
+  profileName: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   profileSub: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
 
   section: { gap: 12 },
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
   },
   loginRequiredTitle: { fontSize: 17, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   loginRequiredDesc: {
-    fontSize: 13, color: Colors.textMuted, textAlign: 'center', lineHeight: 20,
+    fontSize: 13, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20,
   },
   loginBtn: {
     backgroundColor: Colors.cta, borderRadius: 16,

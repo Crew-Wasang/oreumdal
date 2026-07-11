@@ -2,7 +2,7 @@
 import {
   View, Text, StyleSheet, TextInput, ScrollView,
   KeyboardAvoidingView, Platform, Modal, Animated,
-  Dimensions, TouchableWithoutFeedback, PanResponder,
+  Dimensions, TouchableWithoutFeedback, PanResponder, Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
@@ -84,12 +84,14 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
 
   const MAX_EMOTIONS = 2;
 
-  const toggleEmotion = (type: EmotionType) =>
+  const toggleEmotion = (type: EmotionType) => {
+    Keyboard.dismiss();
     setEmotions(prev =>
       prev.includes(type)
         ? prev.filter(e => e !== type)
         : prev.length >= MAX_EMOTIONS ? prev : [...prev, type]
     );
+  };
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
@@ -132,7 +134,7 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
                     <ScaleButton
                       key={s.code}
                       style={styles.suggestionItem}
-                      onPress={() => { setStockName(s.name); setSuggestions([]); }}
+                      onPress={() => { setStockName(s.name); setSuggestions([]); Keyboard.dismiss(); }}
                     >
                       <Text style={styles.suggestionName}>{s.name}</Text>
                       <Text style={styles.suggestionCode}>{s.code}</Text>
@@ -148,14 +150,14 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
               <View style={styles.dirRow}>
                 <ScaleButton
                   style={[styles.dirBtn, direction === 'buy' && styles.dirBtnSelected]}
-                  onPress={() => setDirection('buy')}
+                  onPress={() => { setDirection('buy'); Keyboard.dismiss(); }}
                 >
                   <View style={[styles.dirDot, styles.dirDotBuy]} />
                   <Text style={[styles.dirBtnText, direction === 'buy' && styles.dirBtnTextSelected]}>매수</Text>
                 </ScaleButton>
                 <ScaleButton
                   style={[styles.dirBtn, direction === 'sell' && styles.dirBtnSelected]}
-                  onPress={() => setDirection('sell')}
+                  onPress={() => { setDirection('sell'); Keyboard.dismiss(); }}
                 >
                   <View style={[styles.dirDot, styles.dirDotSell]} />
                   <Text style={[styles.dirBtnText, direction === 'sell' && styles.dirBtnTextSelected]}>매도</Text>

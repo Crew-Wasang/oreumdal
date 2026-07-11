@@ -194,7 +194,12 @@ export default function SignUpScreen() {
           provider,
         });
         await useRecordStore.getState().loadUserRecords();
-        navigation.goBack();
+        const { hasCompletedOnboarding } = useUserStore.getState();
+        if (!hasCompletedOnboarding) {
+          (navigation as any).navigate('Onboarding', { screen: 'PersonalityTest' });
+        } else {
+          navigation.goBack();
+        }
         return;
       }
 
@@ -223,7 +228,7 @@ export default function SignUpScreen() {
       refreshToken: pendingAuth.refreshToken,
       provider: pendingAuth.provider,
     });
-    navigation.goBack();
+    (navigation as any).navigate('Onboarding', { screen: 'PersonalityTest' });
   };
 
   if (step === 'social') {

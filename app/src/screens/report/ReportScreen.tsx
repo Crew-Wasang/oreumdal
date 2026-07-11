@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator,
 } from 'react-native';
 import Svg, { Path, Circle, Defs, LinearGradient as SvgGrad, Stop as SvgStop } from 'react-native-svg';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
 import { MainStackParamList } from '../../types';
@@ -357,13 +357,8 @@ export default function ReportScreen() {
   const remaining10 = Math.max(10 - checkCount, 0);
 
   // ── 회원가입 프롬프트 ─────────────────────────────────────────────────────
-  const [showSignUp, setShowSignUp] = useState(false);
-  useFocusEffect(
-    useCallback(() => {
-      if (!isLoggedIn) setShowSignUp(true);
-      return () => setShowSignUp(false);
-    }, [isLoggedIn]),
-  );
+  // 비로그인 상태면 무조건 노출. 상태 관리 없이 isLoggedIn에서 직접 파생.
+  const showSignUp = !isLoggedIn;
 
   // ── 기존 AI 인사이트 (섹션 3·4) ──────────────────────────────────────────
   const [outcomeInsight, setOutcomeInsight] = useState<string | null>(null);
@@ -606,7 +601,6 @@ export default function ReportScreen() {
         visible={showSignUp}
         trigger="report"
         onClose={() => {
-          setShowSignUp(false);
           (navigation as any).navigate('Tabs', { screen: 'Home' });
         }}
       />
@@ -620,7 +614,7 @@ const styles = StyleSheet.create({
   content: { padding: 24, gap: 16 },
 
   stickyHeader: {
-    paddingHorizontal: 24, paddingTop: 8, paddingBottom: 12, gap: 4,
+    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 4,
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
   header: { paddingTop: 8, gap: 4 },
