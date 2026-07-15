@@ -419,11 +419,10 @@ export default function CheckChatScreen() {
               {tradeOutcome !== null && !saved && (
                 <View
                   style={styles.saveCard}
-                  onLayout={(e) => {
+                  onLayout={() => {
                     if (saveScrolledRef.current) return;
                     saveScrolledRef.current = true;
-                    const y = e.nativeEvent.layout.y;
-                    setTimeout(() => scrollRef.current?.scrollTo({ y: y - 16, animated: true }), 50);
+                    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
                   }}
                 >
                   <Text style={styles.saveSectionLabel}>이 코칭을 기록으로 저장할까요?</Text>
