@@ -124,8 +124,7 @@ export default function CheckChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), delay);
 
   useEffect(() => {
-    // 키보드가 완전히 올라온 뒤 레이아웃 재계산 시간을 충분히 확보
-    const sub = Keyboard.addListener('keyboardDidShow', () => scrollToBottom(300));
+    const sub = Keyboard.addListener('keyboardWillShow', scrollToBottom);
     return () => sub.remove();
   }, []);
 
