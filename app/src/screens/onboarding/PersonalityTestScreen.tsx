@@ -13,7 +13,7 @@ type Route = RouteProp<OnboardingStackParamList, 'PersonalityTest'>;
 const QUESTIONS = [
   {
     id: 1,
-    question: '손실이 나고 있는 종목을 보면\n가장 먼저 드는 생각은?',
+    question: '손실이 난 종목을 보면\n가장 먼저 무엇을 하나요?',
     options: [
       { label: '왜 떨어지는지 원인부터 찾는다', type: 'A' },
       { label: '일단 팔고 손실을 줄인다', type: 'B' },
