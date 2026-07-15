@@ -200,13 +200,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
   },
-  tag: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
+  tag: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
 
   title: {
     fontSize: 24,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
-    lineHeight: 24 * 1.4,
+    lineHeight: 36,
   },
   titleAccent: { color: Colors.cta },
 
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: { fontSize: 22, color: '#FFF' },
-  mainCardLabel: { fontSize: 16, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  mainCardLabel: { fontSize: 16, lineHeight: 24, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   mainCardRisk: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   mainCardSummary: { fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.7 },
   tipRow: {
@@ -266,14 +266,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  showAllText: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  showAllText: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   showAllChevron: { fontSize: 12, color: Colors.textMuted },
 
   allList: { paddingHorizontal: 16, paddingBottom: 12 },
   typeRow: { paddingVertical: 12, gap: 4 },
   typeRowDivider: { borderTopWidth: 0.5, borderTopColor: Colors.border },
   typeRowHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  typeRowLabel: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  typeRowLabel: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   typeRowLabelMe: { color: Colors.cta },
   typeRowRisk: { fontSize: 11, color: Colors.textMuted, marginLeft: 'auto' as any },
   meBadge: {
@@ -282,10 +282,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  meBadgeText: { fontSize: 10, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  meBadgeText: { fontSize: 10, lineHeight: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
   typeRowSummary: { fontSize: 12, color: Colors.textSecondary, lineHeight: 12 * 1.6 },
 
   ctaWrap: { borderRadius: 16, marginTop: 4 },
   cta: { borderRadius: 16, padding: 17, alignItems: 'center' },
-  ctaText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
 });

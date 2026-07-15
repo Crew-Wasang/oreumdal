@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 4,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  cardTitle: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
+  cardTitle: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
   cardHint: { fontSize: 11, color: Colors.textMuted },
 
   graphWrap: { position: 'relative', height: GRAPH_H },

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
     borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 12,
   },
-  title: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
+  title: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
   empty: { fontSize: 14, color: Colors.textMuted, lineHeight: 14 * 1.6 },
 
   chartRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     alignItems: 'center', justifyContent: 'center',
   },
-  donutValue: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  donutValue: { fontSize: 18, lineHeight: 27, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   donutLabel: { fontSize: 10, color: Colors.textMuted },
 
   legend: { flex: 1, gap: 6 },

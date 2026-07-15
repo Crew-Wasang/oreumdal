@@ -25,5 +25,5 @@ const styles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3 },
   dotBuy: { backgroundColor: '#F43F5E' },
   dotSell: { backgroundColor: '#6366F1' },
-  text: { fontSize: 10, color: '#3F3F46', fontFamily: 'A2Z-Medium', fontWeight: '500' },
+  text: { fontSize: 10, lineHeight: 15, color: '#3F3F46', fontFamily: 'A2Z-Medium', fontWeight: '500' },
 });

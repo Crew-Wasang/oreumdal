@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: 16, padding: 16,
     borderWidth: StyleSheet.hairlineWidth, borderColor: Colors.border, gap: 12,
   },
-  title: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
+  title: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSubtle },
   empty: { fontSize: 14, color: Colors.textMuted, lineHeight: 14 * 1.6 },
 
   stackBar: {
@@ -77,10 +77,10 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   heldLabel: { fontSize: 11, color: '#047857' },
-  heldCount: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  heldCount: { fontSize: 18, lineHeight: 27, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   heldSub: { fontSize: 11, color: Colors.textMuted },
   tradedLabel: { fontSize: 11, color: '#B45309' },
-  tradedCount: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  tradedCount: { fontSize: 18, lineHeight: 27, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   tradedSub: { fontSize: 11, color: Colors.textMuted },
 
   insightWrap: { paddingTop: 12, borderTopWidth: 0.5, borderTopColor: Colors.border },

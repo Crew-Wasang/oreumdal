@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     height: 48,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  headerTitle: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   progressBg: {
     height: 3,
     marginHorizontal: 20,
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
   },
   progressFill: { height: '100%', backgroundColor: Colors.cta, borderRadius: 2 },
   body: { padding: 24, paddingTop: 28, gap: 28, paddingBottom: 40 },
-  stepLabel: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
+  stepLabel: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
   question: {
     fontSize: 22,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
-    lineHeight: 22 * 1.4,
+    lineHeight: 33,
   },
   options: { gap: 10 },
   option: {

@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    fontSize: 18,
+    fontSize: 18, lineHeight: 27,
     fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: Colors.textPrimary,
     letterSpacing: -0.3,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   signUpBtnWrap: { borderRadius: 10, marginTop: 4 },
   signUpBtn: { borderRadius: 10, padding: 17, alignItems: 'center' },
   signUpBtnText: {
-    fontSize: 15,
+    fontSize: 15, lineHeight: 23,
     fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: '#FFF',
   },

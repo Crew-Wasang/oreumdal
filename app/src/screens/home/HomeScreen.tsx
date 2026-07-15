@@ -45,7 +45,7 @@ const guestBannerStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   text: { fontSize: 12, color: '#92400E', flex: 1 },
-  cta: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#B45309', marginLeft: 8 },
+  cta: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#B45309', marginLeft: 8 },
 });
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
@@ -412,10 +412,9 @@ const styles = StyleSheet.create({
   ctaAiTag: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   ctaAiTagText: { fontSize: 11, color: 'rgba(255,255,255,0.8)' },
   ctaTitle: {
-    fontSize: 26,
+    fontSize: 26, lineHeight: 39,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: '#FFF',
-    lineHeight: 26 * 1.3,
     marginTop: 12,
   },
   ctaSubtitle: {
@@ -439,8 +438,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  ctaPrimaryPillText: { fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.cta },
-  sectionTitle: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
+  ctaPrimaryPillText: { fontSize: 13, lineHeight: 20, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.cta },
+  sectionTitle: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 12 },
 
   // 최근 코칭
   sectionHeader: {
@@ -463,7 +462,7 @@ const styles = StyleSheet.create({
   },
   recentCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recentCardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  recentCardStock: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  recentCardStock: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   recentCardTime: { fontSize: 11, color: Colors.textMuted },
   recentCardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recentCardVerdict: { fontSize: 13, color: Colors.textSubtle },
@@ -491,7 +490,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   statsStreakNum: {
-    fontSize: 15,
+    fontSize: 15, lineHeight: 23,
     fontFamily: 'A2Z-Bold',
     fontWeight: '700',
     color: Colors.cta,
@@ -521,7 +520,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 20, paddingBottom: 16,
   },
-  modalTitle: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  modalTitle: { fontSize: 18, lineHeight: 27, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   modalClose: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
   modalCloseText: { fontSize: 18, color: Colors.textSecondary },
   modalContent: { padding: 20, gap: 12 },
@@ -530,7 +529,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
   notifCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  notifCardLabel: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  notifCardLabel: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   notifCardTime: { fontSize: 12, color: Colors.textSecondary },
   notifCardDesc: { fontSize: 13, color: Colors.textMuted, lineHeight: 13 * 1.6 },
 });

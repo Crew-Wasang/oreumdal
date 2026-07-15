@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
   content: { padding: 20, gap: 20, paddingBottom: 48 },
-  pageTitle: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  pageTitle: { fontSize: 22, lineHeight: 33, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
 
   profileCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
 
   section: { gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  sectionTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  sectionTitle: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   sectionDesc: { fontSize: 12, color: Colors.textMuted, marginTop: -4 },
 
   principleList: { gap: 8 },
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     padding: 14, borderRadius: 16,
     backgroundColor: Colors.surface, borderWidth: 0.5, borderColor: Colors.border,
   },
-  principleIndex: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta, marginTop: 1, minWidth: 20 },
+  principleIndex: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta, marginTop: 1, minWidth: 20 },
   principleText: { flex: 1, fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.5 },
   principleDelete: { padding: 2 },
   principleDeleteText: { fontSize: 13, color: Colors.textMuted },
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 20, paddingBottom: 16,
   },
-  modalTitle: { fontSize: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  modalTitle: { fontSize: 18, lineHeight: 27, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   modalClose: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
   modalCloseText: { fontSize: 18, color: Colors.textSecondary },
   modalContent: { padding: 20, gap: 12 },
@@ -505,18 +505,18 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border, gap: 10,
   },
   notifCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  notifCardLabel: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  notifCardLabel: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   notifCardTime: { fontSize: 12, color: Colors.textSecondary },
   notifCardDesc: { fontSize: 13, color: Colors.textMuted, lineHeight: 13 * 1.6 },
 
-  editLink: { fontSize: 13, color: Colors.accent, fontFamily: 'A2Z-Medium', fontWeight: '500' },
+  editLink: { fontSize: 13, lineHeight: 20, color: Colors.accent, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   accountValue: { fontSize: 14, color: Colors.textPrimary },
   nicknameInputRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   nicknameCount: { fontSize: 12, color: Colors.textMuted },
   saveNicknameBtn: {
     backgroundColor: Colors.cta, borderRadius: 12, padding: 13, alignItems: 'center',
   },
-  saveNicknameBtnText: { color: '#FFF', fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600' },
+  saveNicknameBtnText: { color: '#FFF', fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 
   withdrawBtn: {
     paddingVertical: 14, alignItems: 'center', marginTop: 8,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   loginRequiredBody: {
     flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12,
   },
-  loginRequiredTitle: { fontSize: 17, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  loginRequiredTitle: { fontSize: 17, lineHeight: 26, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   loginRequiredDesc: {
     fontSize: 13, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20,
   },
@@ -538,5 +538,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cta, borderRadius: 16,
     paddingVertical: 14, paddingHorizontal: 40, marginTop: 8,
   },
-  loginBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
+  loginBtnText: { color: '#FFF', fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });

@@ -152,18 +152,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  headerTitle: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   deleteBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 
   content: { padding: 20, gap: 16 },
 
   metaDate: { fontSize: 12, color: Colors.textMuted },
   metaNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  metaStock: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  metaStock: { fontSize: 22, lineHeight: 33, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   infoRows: { marginTop: 12, gap: 6 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   infoLabel: { fontSize: 13, color: Colors.textSecondary },
-  infoValue: { fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  infoValue: { fontSize: 13, lineHeight: 20, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
 
   resultCard: {
     borderRadius: 20, padding: 16, borderWidth: 1, gap: 8,
@@ -171,14 +171,14 @@ const styles = StyleSheet.create({
   resultCardAmber: { backgroundColor: '#FFFBEB', borderColor: '#FCD34D' },
   resultCardOk: { backgroundColor: '#F0FDF4', borderColor: '#6EE7B7' },
   resultCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  resultVerdict: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '600' },
+  resultVerdict: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '600' },
   verdictAmberText: { color: Colors.impulse },
   verdictOkText: { color: Colors.ok },
-  resultScore: { fontSize: 14, fontFamily: 'A2Z-Bold', fontWeight: '700' },
+  resultScore: { fontSize: 14, lineHeight: 21, fontFamily: 'A2Z-Bold', fontWeight: '700' },
   resultReason: { fontSize: 12, color: Colors.textSubtle, lineHeight: 12 * 1.7 },
 
   sectionLabel: {
-    fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
+    fontSize: 13, lineHeight: 20, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 8,
   },
 
   chatSection: { gap: 0 },

@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: Colors.border },
 
   scrollContent: { paddingHorizontal: 24, paddingTop: 8, paddingBottom: 8, gap: 24 },
-  title: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary, lineHeight: 22 * 1.4 },
+  title: { fontSize: 22, lineHeight: 33, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   subtitle: { fontSize: 13, color: Colors.textSecondary, marginTop: -16 },
 
   section: { gap: 10 },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.border,
   },
-  suggestionName: { fontSize: 14, color: Colors.textPrimary, fontFamily: 'A2Z-Medium', fontWeight: '500' },
+  suggestionName: { fontSize: 14, lineHeight: 21, color: Colors.textPrimary, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   suggestionCode: { fontSize: 12, color: Colors.textMuted },
 
   dirRow: { flexDirection: 'row', gap: 12 },
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   dirDot: { width: 8, height: 8, borderRadius: 4 },
   dirDotBuy: { backgroundColor: '#F43F5E' },
   dirDotSell: { backgroundColor: '#6366F1' },
-  dirBtnText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textLight },
+  dirBtnText: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textLight },
   dirBtnTextSelected: { color: '#FFF' },
 
   emotionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -289,5 +289,5 @@ const styles = StyleSheet.create({
   startBtnWrap: { borderRadius: 16 },
   startBtnDisabled: { opacity: 0.35 },
   startBtn: { borderRadius: 16, padding: 17, alignItems: 'center' },
-  startBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
+  startBtnText: { color: '#FFF', fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });

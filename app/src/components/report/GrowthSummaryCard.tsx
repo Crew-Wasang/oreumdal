@@ -65,12 +65,12 @@ const styles = StyleSheet.create({
   },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerLabel: { fontSize: 12, color: Colors.textMuted },
-  trendText: { fontSize: 11, fontFamily: 'A2Z-Bold', fontWeight: '700' },
+  trendText: { fontSize: 11, lineHeight: 16, fontFamily: 'A2Z-Bold', fontWeight: '700' },
   trendGood: { color: Colors.ok },
   trendBad: { color: '#D97706' },
 
   scoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
-  score: { fontSize: 28, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  score: { fontSize: 28, lineHeight: 42, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   lastWeekNote: { fontSize: 12, color: Colors.textMuted },
 
   miniBarGrid: { flexDirection: 'row', gap: 10 },

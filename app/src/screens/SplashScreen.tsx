@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   title: {
-    fontSize: 28,
+    fontSize: 28, lineHeight: 42,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
     letterSpacing: -0.5,

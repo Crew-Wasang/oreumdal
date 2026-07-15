@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   tag: {
-    fontSize: 12,
+    fontSize: 12, lineHeight: 18,
     fontFamily: 'A2Z-Medium', fontWeight: '500',
     color: Colors.cta,
   },
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
-    lineHeight: 26 * 1.4,
+    lineHeight: 39,
   },
   desc: {
     fontSize: 14,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   pointText: { gap: 2, flex: 1 },
-  pointLabel: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  pointLabel: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   pointDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 13 * 1.6 },
   cta: {
     backgroundColor: Colors.cta,
@@ -116,5 +116,5 @@ const styles = StyleSheet.create({
     padding: 17,
     alignItems: 'center',
   },
-  ctaText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
 });

@@ -105,12 +105,12 @@ const legalStyles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.border,
   },
-  sheetTitle: { fontSize: 16, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  sheetTitle: { fontSize: 16, lineHeight: 24, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   closeBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   closeBtnText: { fontSize: 16, color: Colors.textMuted },
   body: { paddingHorizontal: 20, paddingTop: 16 },
   section: { marginBottom: 16 },
-  sectionHeading: { fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 4 },
+  sectionHeading: { fontSize: 13, lineHeight: 20, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, marginBottom: 4 },
   sectionBody: { fontSize: 12, color: Colors.textSecondary, lineHeight: 12 * 1.7 },
   effectiveDate: { fontSize: 11, color: Colors.textMuted, marginBottom: 24 },
   footer: {
@@ -124,7 +124,7 @@ const legalStyles = StyleSheet.create({
     padding: 14,
     alignItems: 'center',
   },
-  confirmBtnText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  confirmBtnText: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
 });
 
 const API_BASE = 'https://oreumdal.co.kr';
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
-    lineHeight: 26 * 1.3,
+    lineHeight: 39,
   },
   desc: {
     fontSize: 14,
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEE500',
   },
   kakaoBtnText: {
-    fontSize: 15,
+    fontSize: 15, lineHeight: 23,
     fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: '#191600',
   },
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#18181B',
   },
   appleBtnText: {
-    fontSize: 15,
+    fontSize: 15, lineHeight: 23,
     fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: '#FFFFFF',
   },
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   googleBtnText: {
-    fontSize: 15,
+    fontSize: 15, lineHeight: 23,
     fontFamily: 'A2Z-Bold', fontWeight: '600',
     color: Colors.textPrimary,
   },
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxActive: { borderColor: Colors.cta, backgroundColor: Colors.cta },
-  checkmark: { fontSize: 12, color: '#FFF', fontFamily: 'A2Z-Bold', fontWeight: '700' },
+  checkmark: { fontSize: 12, lineHeight: 18, color: '#FFF', fontFamily: 'A2Z-Bold', fontWeight: '700' },
   checkLabel: { fontSize: 14, color: Colors.textSecondary, flex: 1 },
   required: { color: Colors.cta, fontFamily: 'A2Z-Bold', fontWeight: '600' },
   optional: { color: Colors.textMuted },
@@ -514,5 +514,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   completeBtnDisabled: { opacity: 0.35 },
-  completeBtnText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  completeBtnText: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
 });

@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: Colors.border },
-  title: { fontSize: 22, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
+  title: { fontSize: 22, lineHeight: 33, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
   subtitle: { fontSize: 12, color: Colors.cta, marginTop: 2 },
 
   searchWrap: { paddingHorizontal: 20, paddingVertical: 10 },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   directionPillBuy: { backgroundColor: Colors.buyBg, borderColor: Colors.buy },
   directionPillSell: { backgroundColor: Colors.sellBg, borderColor: Colors.sell },
-  directionPillText: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.textSecondary },
+  directionPillText: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.textSecondary },
   directionPillBuyText: { color: Colors.buy },
   directionPillSellText: { color: Colors.sell },
   tabPill: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border,
   },
   tabPillActive: { backgroundColor: Colors.textPrimary, borderColor: Colors.textPrimary },
-  tabPillText: { fontSize: 12, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSecondary },
+  tabPillText: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textSecondary },
   tabPillTextActive: { color: '#FFF' },
 
   list: { paddingHorizontal: 20, gap: 12 },
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  cardStock: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
+  cardStock: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   cardDate: { fontSize: 11, color: Colors.textMuted },
   cardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardVerdict: { fontSize: 13, color: Colors.textSubtle },
@@ -263,11 +263,11 @@ const styles = StyleSheet.create({
   scoreBadgeNeutralText: { color: Colors.textMuted },
 
   lockedWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
-  lockedTitle: { fontSize: 17, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
+  lockedTitle: { fontSize: 17, lineHeight: 26, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary, textAlign: 'center' },
   lockedDesc: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   lockedBtn: {
     marginTop: 8, backgroundColor: Colors.cta, borderRadius: 16,
     paddingVertical: 14, paddingHorizontal: 40,
   },
-  lockedBtnText: { color: '#FFF', fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600' },
+  lockedBtnText: { color: '#FFF', fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600' },
 });

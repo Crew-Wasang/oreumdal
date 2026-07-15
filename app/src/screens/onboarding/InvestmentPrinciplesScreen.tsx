@@ -165,13 +165,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
   },
-  tag: { fontSize: 12, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
+  tag: { fontSize: 12, lineHeight: 18, fontFamily: 'A2Z-Medium', fontWeight: '500', color: Colors.cta },
 
   title: {
     fontSize: 22,
     fontFamily: 'A2Z-Bold', fontWeight: '700',
     color: Colors.textPrimary,
-    lineHeight: 22 * 1.4,
+    lineHeight: 33,
   },
   titleAccent: { color: Colors.cta },
   desc: { fontSize: 12, color: Colors.textSecondary },
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   checkboxActive: { backgroundColor: Colors.cta, borderColor: Colors.cta },
-  checkmark: { fontSize: 11, color: '#FFF', fontFamily: 'A2Z-Bold', fontWeight: '700' },
+  checkmark: { fontSize: 11, lineHeight: 16, color: '#FFF', fontFamily: 'A2Z-Bold', fontWeight: '700' },
   itemText: { fontSize: 14, color: Colors.textSubtle, flex: 1 },
   itemTextActive: { color: Colors.ctaLightText, fontFamily: 'A2Z-Medium', fontWeight: '500' },
   itemTextDisabled: { color: Colors.textMuted },
@@ -237,6 +237,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   ctaDisabled: { opacity: 0.4 },
-  ctaText: { fontSize: 15, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
+  ctaText: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: '#FFF' },
   ctaTextSecondary: { color: Colors.textLight },
 });
