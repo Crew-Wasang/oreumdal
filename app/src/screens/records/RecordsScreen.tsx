@@ -1,6 +1,6 @@
 ﻿import React, { useState, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, SafeAreaView, ScrollView, TextInput,
+  View, Text, StyleSheet, SafeAreaView, ScrollView, TextInput, Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -147,7 +147,7 @@ export default function RecordsScreen() {
           <ScaleButton
             key={value}
             style={[styles.tabPill, tab === value && styles.tabPillActive]}
-            onPress={() => setTab(value)}
+            onPress={() => { Keyboard.dismiss(); setTab(value); }}
           >
             <Text style={[styles.tabPillText, tab === value && styles.tabPillTextActive]}>
               {label}
@@ -167,7 +167,7 @@ export default function RecordsScreen() {
                 styles.directionPill,
                 active && (isBuy ? styles.directionPillBuy : styles.directionPillSell),
               ]}
-              onPress={() => toggleDirection(value)}
+              onPress={() => { Keyboard.dismiss(); toggleDirection(value); }}
             >
               <Text style={[
                 styles.directionPillText,
