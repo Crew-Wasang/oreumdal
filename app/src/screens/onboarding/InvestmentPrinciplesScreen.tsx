@@ -75,7 +75,7 @@ export default function InvestmentPrinciplesScreen() {
         >
           <View style={styles.tagRow}>
             <Sparkle size={13} color={Colors.cta} />
-            <Text style={styles.tag}>최초 1회 설정</Text>
+            <Text style={styles.tag}>처음 설정 후 언제든 변경 가능</Text>
           </View>
 
           <Text style={styles.title}>
