@@ -278,7 +278,7 @@ export default function HomeScreen() {
         {isLoggedIn && (
           <View>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>최근 코칭</Text>
+              <Text style={styles.sectionTitle}>최근 코칭 3개</Text>
               <ScaleButton onPress={() => navigation.navigate('Tabs', { screen: 'Records' } as any)}>
                 <Text style={styles.sectionMore}>전체보기</Text>
               </ScaleButton>
