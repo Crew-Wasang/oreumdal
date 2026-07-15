@@ -5,6 +5,7 @@ import {
   Dimensions, TouchableWithoutFeedback, PanResponder, Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { EmotionType, TradeDirection } from '../../types';
 import ScaleButton from '../common/ScaleButton';
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
+  const { bottom: bottomInset } = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const panY = useRef(new Animated.Value(0)).current;
@@ -189,7 +191,7 @@ export default function CheckBottomSheet({ visible, onStart, onClose }: Props) {
             </View>
           </ScrollView>
 
-          <View style={styles.footer}>
+          <View style={[styles.footer, { paddingBottom: 16 + bottomInset }]}>
             <ScaleButton
               style={[styles.startBtnWrap, !canStart && styles.startBtnDisabled]}
               onPress={() => canStart && direction && onStart({ stockName: stockName.trim(), direction, emotions })}
