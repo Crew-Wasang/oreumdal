@@ -124,7 +124,7 @@ export default function CheckChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), delay);
 
   useEffect(() => {
-    const sub = Keyboard.addListener('keyboardWillShow', scrollToBottom);
+    const sub = Keyboard.addListener('keyboardWillShow', () => scrollToBottom());
     return () => sub.remove();
   }, []);
 
@@ -570,10 +570,10 @@ const styles = StyleSheet.create({
   typingDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.textMuted },
 
   // 결과 영역
-  resultWrap: { gap: 12, marginTop: 4 },
+  resultWrap: { gap: 8, marginTop: 4 },
 
   verdictCard: {
-    borderRadius: 24, padding: 20, borderWidth: 1, overflow: 'hidden', gap: 12,
+    borderRadius: 20, padding: 16, borderWidth: 1, overflow: 'hidden', gap: 8,
   },
   verdictGlow: {
     position: 'absolute', right: -40, top: -40,
@@ -589,8 +589,8 @@ const styles = StyleSheet.create({
   verdictReason: { fontSize: 13, color: Colors.textSubtle, lineHeight: 13 * 1.7 },
 
   scoreCard: {
-    backgroundColor: Colors.surface, borderRadius: 24, padding: 20,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
+    backgroundColor: Colors.surface, borderRadius: 20, padding: 14,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 8,
   },
   scoreHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   scoreLabel: { fontSize: 13, color: Colors.textSecondary },
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
   basisList: { gap: 8 },
   basisRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 12, paddingVertical: 10,
+    paddingHorizontal: 12, paddingVertical: 7,
     backgroundColor: Colors.background, borderRadius: 12,
     borderWidth: 0.5, borderColor: Colors.border,
   },
@@ -610,13 +610,13 @@ const styles = StyleSheet.create({
   basisValue: { fontSize: 13, color: Colors.textPrimary },
 
   outcomeCard: {
-    backgroundColor: Colors.surface, borderRadius: 20, padding: 20,
-    borderWidth: 0.5, borderColor: Colors.border, gap: 12,
+    backgroundColor: Colors.surface, borderRadius: 20, padding: 14,
+    borderWidth: 0.5, borderColor: Colors.border, gap: 8,
   },
   outcomeSectionLabel: { fontSize: 13, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
   outcomeButtons: { gap: 8 },
   outcomeBtn: {
-    paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12,
+    paddingVertical: 9, paddingHorizontal: 16, borderRadius: 12,
     backgroundColor: Colors.background, borderWidth: 0.5, borderColor: Colors.border,
     alignItems: 'center',
   },
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
 
   principlesCard: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    padding: 16, borderRadius: 20,
+    padding: 12, borderRadius: 16,
     backgroundColor: Colors.ctaLight, borderWidth: 0.5, borderColor: Colors.ctaBorder,
   },
   principlesLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
