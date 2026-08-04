@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator,
 } from 'react-native';
 import Svg, { Path, Circle, Defs, LinearGradient as SvgGrad, Stop as SvgStop } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../../constants/colors';
 import { MainStackParamList } from '../../types';
@@ -336,6 +336,7 @@ function TickerTrendCard({ ticker, trend, count }: { ticker: string; trend: numb
 // ── 메인 ─────────────────────────────────────────────────────────────────────
 export default function ReportScreen() {
   const navigation = useNavigation<Nav>();
+  const isFocused = useIsFocused();
   const records = useRecordStore((s) => s.records);
   const isLoggedIn = useUserStore((s) => s.isLoggedIn);
 
@@ -357,8 +358,8 @@ export default function ReportScreen() {
   const remaining10 = Math.max(10 - checkCount, 0);
 
   // ── 회원가입 프롬프트 ─────────────────────────────────────────────────────
-  // 비로그인 상태면 무조건 노출. 상태 관리 없이 isLoggedIn에서 직접 파생.
-  const showSignUp = !isLoggedIn;
+  // isFocused 조합: 탭 이탈 시 visible=false로 토글되어 복귀 시 Modal이 재실행됨
+  const showSignUp = !isLoggedIn && isFocused;
 
   // ── 기존 AI 인사이트 (섹션 3·4) ──────────────────────────────────────────
   const [outcomeInsight, setOutcomeInsight] = useState<string | null>(null);

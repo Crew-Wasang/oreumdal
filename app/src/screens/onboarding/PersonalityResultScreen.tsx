@@ -65,6 +65,7 @@ export default function PersonalityResultScreen() {
     if (route.params?.fromRedo) {
       setPersonalityType(myType);
       navigation.setOptions({ gestureEnabled: false });
+      navigation.getParent()?.setOptions({ gestureEnabled: false });
     }
   }, []);
 

@@ -1,7 +1,7 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TextInput, ScrollView, SafeAreaView,
-  KeyboardAvoidingView, Platform, Animated, Alert, Keyboard,
+  KeyboardAvoidingView, Platform, Animated, Alert, Keyboard, Linking,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -267,7 +267,14 @@ export default function CheckChatScreen() {
   const handleLaterOutcomeNotify = async () => {
     const granted = await requestNotificationPermission();
     if (!granted) {
-      Alert.alert('알림 권한 필요', '설정 > 오름달에서 알림을 허용해주세요.');
+      Alert.alert(
+        '알림 권한 없음',
+        '알림 없이 나중에 알려주기로 처리할게요. 알림을 받으려면 설정에서 허용해주세요.',
+        [
+          { text: '설정으로 이동', onPress: () => Linking.openSettings() },
+          { text: '알림 없이 계속', style: 'cancel', onPress: () => handleTradeOutcome('pending') },
+        ],
+      );
       return;
     }
     await scheduleFollowUp(stockName, direction);

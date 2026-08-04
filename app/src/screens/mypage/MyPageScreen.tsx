@@ -23,6 +23,14 @@ import {
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+const PRESET_PRINCIPLES = [
+  '손절은 -10% 이내로 한다.',
+  '뉴스/공시 확인 후에만 매매한다.',
+  '한 종목에 30% 이상 넣지 않는다.',
+  '충동이 오면 하루 기다린다.',
+  '수익률보다 원칙을 먼저 지킨다.',
+];
+
 const PERSONALITY_LABEL: Record<string, string> = {
   analytical: '신중한 분석형',
   reactive: '감정적 반응형',
@@ -73,6 +81,8 @@ export default function MyPageScreen() {
   const principleLines = principles
     ? principles.split('\n').filter(l => l.trim().length > 0)
     : [];
+
+  const availablePresets = PRESET_PRINCIPLES.filter(p => !principleLines.includes(p));
 
   const PRINCIPLE_ALLOWED = /^[가-힣a-zA-Z0-9\s\-\.%,]+$/;
 
@@ -258,6 +268,27 @@ export default function MyPageScreen() {
                 />
               ))}
             </View>
+
+            {availablePresets.length > 0 && principleLines.length < MAX_PRINCIPLES && (
+              <View style={styles.presetSection}>
+                <Text style={styles.presetLabel}>추천 원칙</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.presetRow}
+                >
+                  {availablePresets.map(p => (
+                    <ScaleButton
+                      key={p}
+                      style={styles.presetChip}
+                      onPress={() => setPrinciples([...principleLines, p].join('\n'))}
+                    >
+                      <Text style={styles.presetChipText}>{p}</Text>
+                    </ScaleButton>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
 
             <View style={styles.principleAddRow}>
               <TextInput
@@ -458,6 +489,19 @@ const styles = StyleSheet.create({
   principleText: { flex: 1, fontSize: 14, color: Colors.textSubtle, lineHeight: 14 * 1.5 },
   principleDelete: { padding: 2 },
   principleDeleteText: { fontSize: 13, color: Colors.textMuted },
+
+  presetSection: { gap: 8 },
+  presetLabel: { fontSize: 11, color: Colors.textMuted, paddingLeft: 2 },
+  presetRow: { gap: 8, paddingBottom: 2 },
+  presetChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: Colors.ctaLight,
+    borderWidth: 0.5,
+    borderColor: Colors.ctaBorder,
+  },
+  presetChipText: { fontSize: 13, color: Colors.cta },
 
   principleAddRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
