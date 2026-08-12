@@ -124,7 +124,8 @@ export default function CheckChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), delay);
 
   useEffect(() => {
-    const sub = Keyboard.addListener('keyboardWillShow', () => scrollToBottom());
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const sub = Keyboard.addListener(showEvent, () => scrollToBottom());
     return () => sub.remove();
   }, []);
 
@@ -154,7 +155,10 @@ export default function CheckChatScreen() {
       }]);
     } finally {
       setIsTyping(false);
-      scrollToBottom();
+      scrollToBottom(100);
+      // 직전 입력에서 키보드가 이미 열려있던 경우 keyboardWillShow가 다시 발생하지
+      // 않을 수 있어, 키보드 애니메이션이 끝난 뒤 한 번 더 보정 스크롤한다.
+      scrollToBottom(400);
     }
   };
 
