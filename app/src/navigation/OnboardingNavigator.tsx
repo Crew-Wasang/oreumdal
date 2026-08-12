@@ -15,9 +15,7 @@ export default function OnboardingNavigator() {
       <Stack.Screen
         name="PersonalityTest"
         component={PersonalityTestScreen}
-        options={({ route }) => ({
-          gestureEnabled: !route.params?.fromRedo,
-        })}
+        options={{ gestureEnabled: false }}
       />
       <Stack.Screen
         name="PersonalityResult"
