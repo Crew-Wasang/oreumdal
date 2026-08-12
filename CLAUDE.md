@@ -92,14 +92,21 @@
 |------|-----------|
 | 내비게이션 | `@react-navigation/native` + `@react-navigation/native-stack` + `@react-navigation/bottom-tabs` |
 | 상태 관리 | Zustand (`useRecordStore`, `useUserStore`) — principles는 `useUserStore` 내부 필드 |
-| 백엔드/인증 | Supabase |
+| 백엔드/인증 | 자체 EC2 서버 (`oreumdal.co.kr`) — Supabase 아님. 아래 "실제 백엔드 아키텍처" 참고 |
 | 그라디언트 | `expo-linear-gradient` |
 | SVG 아이콘 | `react-native-svg` (커스텀 컴포넌트, 외부 아이콘 라이브러리 미사용) |
 | 폰트 | `expo-font` — Spoqa Han Sans Neo (`SpoqaHanSansNeo-Regular/Medium/Bold`) |
 | AI | OpenAI API (`EXPO_PUBLIC_OPENAI_API_KEY`) — preview/production 빌드 실사용 |
 
+### 실제 백엔드 아키텍처 (2026-08 코드 확인 기준)
+- **로그인/인증**: `src/screens/onboarding/SignUpScreen.tsx`의 `API_BASE = 'https://oreumdal.co.kr'`가 Google/Apple/Kakao OAuth를 처리하고 accessToken/refreshToken을 발급. 서버는 AWS EC2 인스턴스 1대(+ 그 앞의 ALB) 위에서 nginx로 서빙됨. 이 EC2가 유일한 자체 백엔드.
+- **Supabase는 미사용**: `src/lib/supabase.ts`에 클라이언트 초기화 코드가 있고 `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_ANON_KEY` 환경변수도 정의돼 있지만, **앱 어디에서도 import되어 실제로 호출되지 않음** (grep 결과 `src/lib/supabase.ts` 자체 외 참조 0건). 초기 계획 단계의 잔재로 추정되며, 신규 기능에서 Supabase를 백엔드로 가정하고 코드를 짜면 안 됨.
+- **사용자 데이터는 서버에 동기화되지 않음**: 매매 기록(`useRecordStore`), 투자 원칙/성향 테스트 결과(`useUserStore`)는 전부 `AsyncStorage`(기기 로컬)에만 저장됨. 서버로 POST하는 코드가 없어서, 로그인 상태여도 기기를 바꾸거나 앱을 재설치하면 기록이 사라짐. 향후 클라우드 동기화가 필요하면 이 EC2 서버에 엔드포인트를 추가하거나 Supabase를 실제로 연결해야 함 (지금은 둘 다 아님).
+- **AI 코칭**: `src/lib/ai/openaiProvider.ts`, `claudeProvider.ts` — 클라이언트에서 OpenAI/Claude API 직접 호출. 자체 서버 경유 없음.
+- **시장 맥락(공포탐욕지수)**: `src/lib/ai/marketContext.ts`, `ReportScreen.tsx` — CNN 퍼블릭 API(`production.dataviz.cnn.io`)를 클라이언트에서 직접 호출.
+
 ### 환경 변수
-- `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+- `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` — 정의는 돼 있으나 위 이유로 **현재 미사용**
 - `EXPO_PUBLIC_OPENAI_API_KEY` — EAS 대시보드에서 관리 (Sensitive visibility)
 - `EXPO_PUBLIC_AI_PROVIDER` — `eas.json` preview/production에 `"openai"` 하드코딩
 - `.env` 파일은 gitignore됨. `.env.example`을 참조해 로컬 설정
@@ -201,6 +208,30 @@
 ### 보안 주의
 - `EXPO_PUBLIC_` prefix가 붙은 키는 클라이언트 번들에 포함됨
 - AI API 키(`ANTHROPIC_API_KEY`)는 `EXPO_PUBLIC_` 없이 유지 — 현재는 직접 호출 중이나 향후 서버 프록시 전환 필요
+
+## 백엔드 인프라 (AWS — `oreumdal.co.kr`)
+
+이 저장소(RN 앱)에는 백엔드 소스가 없음. `oreumdal.co.kr`은 별도 AWS 인프라에서 운영되며, 로그인(OAuth)을 처리하는 **유일한 자체 백엔드**임 (위 "실제 백엔드 아키텍처" 참고). 2026-08-06 장애 복구 중 확인/재구성된 구조:
+
+```
+사용자 → Route 53 (oreumdal.co.kr, pwa.oreumdal.co.kr)
+       → ALB "oreumdal-alb" (HTTPS:443, ACM 인증서 종료) — HTTP:80은 443으로 리다이렉트
+       → 타겟 그룹 "ore-tg" (HTTP:80)
+       → EC2 인스턴스 1대 (`i-04aa29cb64ab22e0d`, 이름 "oleumdal", ap-northeast-2c)
+           - nginx가 80번에서 대기: 정적 웹앱(oleumdal-web) 서빙 + /api/auth/* 프록시
+           - PostgreSQL로 추정되는 DB도 같은 인스턴스에 존재 (5432 포트가 SG에 열려있음)
+```
+
+- VPC: `vpc-0c3728b92882a63d6` (default VPC, ap-northeast-2 전체 4개 AZ 서브넷 존재)
+- 보안 그룹: `launch-wizard-1` (`sg-0482ae7f1a2f9567a`) — EC2와 ALB가 공유. 인바운드: 22(SSH), 80(HTTP), 443(HTTPS), 5432(PostgreSQL), 8000, 8001 — **전부 0.0.0.0/0으로 열려있음**
+- ACM 인증서: `oreumdal.co.kr`(`682bbb36-...`), `*.oreumdal.co.kr`(`da29953f-...`) — 둘 다 서울 리전, 발급됨 상태
+
+### ⚠️ 절대 지우면 안 되는 리소스
+- **ALB `oreumdal-alb`** — 삭제 시 EC2가 살아있어도 HTTPS 종료 지점이 사라져서 즉시 전체 로그인 장애 발생 (2026-08-06 실제 발생한 장애). EC2만 봐서는 "안 쓰는 것 같다"고 착각하기 쉬우니 주의.
+- ACM 인증서, 타겟 그룹 `ore-tg`, Route 53 A 레코드(`oreumdal.co.kr`, `pwa.oreumdal.co.kr`)
+
+### 알려진 보안 이슈 (미해결)
+- PostgreSQL(5432)이 보안 그룹에서 전 세계(0.0.0.0/0)에 열려있음. EC2 자체 프로세스가 DB에 붙는 거라면 SG 규칙 자체가 필요 없을 가능성이 높음(로컬 연결은 SG를 안 거침) — 소스를 "내 IP" 또는 특정 관리자 IP로 제한하거나 규칙을 아예 제거하는 게 안전함.
 
 ## 배포 (EAS)
 
