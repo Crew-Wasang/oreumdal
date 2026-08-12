@@ -2,7 +2,7 @@
   "expo": {
     "name": "오름달",
     "slug": "oremdal",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "orientation": "portrait",
     "icon": "./assets/oremdal-icon-tile.png",
     "userInterfaceStyle": "light",
