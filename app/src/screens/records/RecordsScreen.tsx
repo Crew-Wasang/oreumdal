@@ -111,6 +111,7 @@ export default function RecordsScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.header}>
+          <Text style={styles.subtitle}>총 0회의 코칭 기록</Text>
           <Text style={styles.title}>매매 기록</Text>
         </View>
         <View style={styles.lockedWrap}>
@@ -203,9 +204,9 @@ export default function RecordsScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
-  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: Colors.border },
+  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 4, borderBottomWidth: 0.5, borderBottomColor: Colors.border },
   title: { fontSize: 22, lineHeight: 33, fontFamily: 'A2Z-Bold', fontWeight: '700', color: Colors.textPrimary },
-  subtitle: { fontSize: 12, color: Colors.cta, marginTop: 2 },
+  subtitle: { fontSize: 12, color: Colors.cta },
 
   searchWrap: { paddingHorizontal: 20, paddingVertical: 10 },
   searchInput: {

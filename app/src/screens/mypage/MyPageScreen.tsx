@@ -474,7 +474,7 @@ export default function MyPageScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   stickyHeader: {
-    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12,
+    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, gap: 4,
     borderBottomWidth: 0.5, borderBottomColor: Colors.border,
   },
   content: { padding: 20, gap: 20, paddingBottom: 48 },
@@ -491,12 +491,12 @@ const styles = StyleSheet.create({
   },
   profileAvatarText: { fontSize: 18, fontWeight: '700', color: '#FFF' },
   profileName: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  profileSub: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+  profileSub: { fontSize: 12, color: Colors.cta, marginTop: 2 },
 
   section: { gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionTitle: { fontSize: 15, lineHeight: 22, fontFamily: 'A2Z-Bold', fontWeight: '600', color: Colors.textPrimary },
-  sectionDesc: { fontSize: 12, color: Colors.textMuted, marginTop: -4 },
+  sectionDesc: { fontSize: 12, color: Colors.cta, marginTop: -4 },
 
   principleList: { gap: 8 },
   principleItem: {
