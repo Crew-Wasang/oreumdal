@@ -1,4 +1,8 @@
-# 오름달 (Oremdal) — AI 투자 심리 코칭 앱
+# 오름달 (oreumdal) — AI 투자 심리 코칭 앱
+
+## 명칭 표기
+- "오름달"의 영문명은 **`oreumdal`로 통일**. 신규 코드/문서/변수명/파일명은 모두 이 표기를 사용
+- 과거에 `oremdal`, `oleumdal` 표기가 섞여 들어간 곳이 남아있음(예: `app.json`의 `bundleIdentifier`/`package`/`scheme`, 딥링크 `DEEP_LINK_BASE`, 에셋 파일명 `oremdal-icon*.png`, AWS EC2 인스턴스명 `oleumdal`). 이들은 App Store Connect/Play Console/OAuth 리다이렉트/실제 인프라와 연결된 **실제 식별자**라 임의로 바꾸면 로그인·스토어 연결이 깨짐 — 별도로 마이그레이션 계획을 세우기 전까지는 그대로 유지
 
 ## 비전
 수익률을 높여주는 앱이 아니다.

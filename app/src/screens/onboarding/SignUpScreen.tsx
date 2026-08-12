@@ -13,7 +13,7 @@ import { Colors } from '../../constants/colors';
 import { useUserStore } from '../../store/userStore';
 import { useRecordStore } from '../../store/recordStore';
 import ScaleButton from '../../components/common/ScaleButton';
-import { OremdalLogo, Sparkle } from '../../components/common/Icons';
+import { OreumdalLogo, Sparkle } from '../../components/common/Icons';
 
 type Nav = NativeStackNavigationProp<MainStackParamList, 'SignUp'>;
 type Provider = 'google' | 'kakao' | 'apple';
@@ -245,7 +245,7 @@ export default function SignUpScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.logoBox}
             >
-              <OremdalLogo size={34} />
+              <OreumdalLogo size={34} />
             </LinearGradient>
             <Text style={styles.title}>매매하기 전,{'\n'}잠깐 들러보세요</Text>
             <Text style={styles.desc}>

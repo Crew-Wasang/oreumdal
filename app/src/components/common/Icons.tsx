@@ -73,8 +73,8 @@ export function MoodIcon({
   }
 }
 
-// OremdalLogo — 로그인/스플래시 로고
-export function OremdalLogo({ size = 28 }: { size?: number }) {
+// OreumdalLogo — 로그인/스플래시 로고
+export function OreumdalLogo({ size = 28 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64" fill="none">
       <Defs>

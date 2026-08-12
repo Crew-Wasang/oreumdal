@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../types';
 import { Colors } from '../constants/colors';
-import { OremdalLogo } from '../components/common/Icons';
+import { OreumdalLogo } from '../components/common/Icons';
 import { useUserStore } from '../store/userStore';
 import { useRecordStore } from '../store/recordStore';
 
@@ -43,7 +43,7 @@ export default function SplashScreen({ navigation }: Props) {
           end={{ x: 1, y: 1 }}
           style={styles.logoBox}
         >
-          <OremdalLogo size={54} />
+          <OreumdalLogo size={54} />
         </LinearGradient>
       </View>
       <Text style={styles.title}>오름달</Text>
