@@ -451,9 +451,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 17,
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
+    backgroundColor: Colors.surfaceElevated,
+    borderWidth: 1.5,
+    borderColor: Colors.textMuted,
   },
   googleBtnText: {
     fontSize: 15, lineHeight: 23,
