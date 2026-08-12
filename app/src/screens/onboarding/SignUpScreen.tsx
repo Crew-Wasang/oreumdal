@@ -1,8 +1,8 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TextInput,
   ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
-  Modal, TouchableOpacity,
+  Modal, TouchableOpacity, Animated, Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -49,13 +49,45 @@ const DOC_CONTENT: Record<DocKey, { title: string; sections: { heading: string; 
 
 function LegalDocModal({ docKey, onClose }: { docKey: DocKey; onClose: () => void }) {
   const doc = DOC_CONTENT[docKey];
+  const sheetHeight = Dimensions.get('window').height;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(sheetHeight)).current;
+
+  useEffect(() => {
+    Animated.timing(backdropOpacity, {
+      toValue: 1,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 280,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const handleClose = () => {
+    Animated.timing(backdropOpacity, {
+      toValue: 0,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(translateY, {
+      toValue: sheetHeight,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
+
   return (
-    <Modal visible animationType="slide" transparent onRequestClose={onClose}>
-      <TouchableOpacity style={legalStyles.backdrop} activeOpacity={1} onPress={onClose} />
-      <View style={legalStyles.sheet}>
+    <Modal visible animationType="none" transparent onRequestClose={handleClose}>
+      <Animated.View style={[legalStyles.backdrop, { opacity: backdropOpacity }]}>
+        <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={handleClose} />
+      </Animated.View>
+      <Animated.View style={[legalStyles.sheet, { transform: [{ translateY }] }]}>
         <View style={legalStyles.sheetHeader}>
           <Text style={legalStyles.sheetTitle}>{doc.title}</Text>
-          <ScaleButton onPress={onClose} style={legalStyles.closeBtn}>
+          <ScaleButton onPress={handleClose} style={legalStyles.closeBtn}>
             <Text style={legalStyles.closeBtnText}>✕</Text>
           </ScaleButton>
         </View>
@@ -69,11 +101,11 @@ function LegalDocModal({ docKey, onClose }: { docKey: DocKey; onClose: () => voi
           <Text style={legalStyles.effectiveDate}>시행일: 2026년 1월 1일</Text>
         </ScrollView>
         <View style={legalStyles.footer}>
-          <ScaleButton style={legalStyles.confirmBtn} onPress={onClose}>
+          <ScaleButton style={legalStyles.confirmBtn} onPress={handleClose}>
             <Text style={legalStyles.confirmBtnText}>확인</Text>
           </ScaleButton>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
