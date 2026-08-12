@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback } from 'react';
+﻿import React, { useState, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TextInput, ScrollView,
   KeyboardAvoidingView, Platform, Alert, Modal, Switch,
@@ -72,6 +72,21 @@ export default function MyPageScreen() {
   const [showAccount, setShowAccount] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
 
+  const scrollRef = useRef<ScrollView>(null);
+  const principleInputRef = useRef<TextInput>(null);
+
+  const scrollToPrincipleInput = () => {
+    requestAnimationFrame(() => {
+      if (principleInputRef.current && scrollRef.current) {
+        principleInputRef.current.measureLayout(
+          scrollRef.current as unknown as number,
+          (_x, y) => scrollRef.current?.scrollTo({ y: y - 120, animated: true }),
+          () => {},
+        );
+      }
+    });
+  };
+
   useFocusEffect(useCallback(() => {
     if (consumeNotifTrigger()) setShowNotif(true);
   }, []));
@@ -111,6 +126,7 @@ export default function MyPageScreen() {
     setPrinciples(updated.join('\n'));
     setNewPrinciple('');
     setPrincipleError('');
+    scrollToPrincipleInput();
   };
 
   const handlePrincipleChange = (text: string) => {
@@ -221,6 +237,7 @@ export default function MyPageScreen() {
       </View>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
+          ref={scrollRef}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -292,9 +309,11 @@ export default function MyPageScreen() {
 
             <View style={styles.principleAddRow}>
               <TextInput
+                ref={principleInputRef}
                 style={[styles.principleInput, !!principleError && styles.principleInputError]}
                 value={newPrinciple}
                 onChangeText={handlePrincipleChange}
+                onFocus={scrollToPrincipleInput}
                 placeholder="새로운 원칙 추가하기"
                 placeholderTextColor={Colors.textMuted}
                 returnKeyType="done"
