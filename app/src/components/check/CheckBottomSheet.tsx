@@ -275,15 +275,15 @@ const styles = StyleSheet.create({
   emotionPill: {
     paddingVertical: 8, paddingHorizontal: 14,
     borderRadius: 24, backgroundColor: Colors.surface,
-    borderWidth: 0.5, borderColor: Colors.border,
+    borderWidth: 1.5, borderColor: Colors.border,
   },
   emotionPillActive: {
     backgroundColor: Colors.ctaLight,
-    borderColor: Colors.cta, borderWidth: 1.5,
+    borderColor: Colors.cta,
   },
   emotionPillDisabled: { opacity: 0.35 },
-  emotionPillText: { fontSize: 13, color: Colors.textLight },
-  emotionPillTextActive: { color: Colors.ctaLightText, fontFamily: 'A2Z-Medium', fontWeight: '500' },
+  emotionPillText: { fontSize: 13, fontFamily: 'A2Z-Medium', color: Colors.textLight },
+  emotionPillTextActive: { color: Colors.ctaLightText },
 
   footer: { paddingHorizontal: 20, paddingVertical: 16, borderTopWidth: 0.5, borderTopColor: Colors.border },
   startBtnWrap: { borderRadius: 16 },
