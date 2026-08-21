@@ -18,7 +18,7 @@
       }
     },
     "android": {
-      "package": "com.oremdal.app",
+      "package": "com.oleumdalapp",
       "intentFilters": [
         {
           "action": "VIEW",
