@@ -7,6 +7,8 @@
     "icon": "./assets/oremdal-icon-tile.png",
     "userInterfaceStyle": "light",
     "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
     "scheme": "oremdal",
