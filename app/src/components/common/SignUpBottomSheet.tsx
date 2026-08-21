@@ -1,6 +1,7 @@
-﻿import React from 'react';
+﻿import React, { useRef, useEffect } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, Pressable,
+  Animated, PanResponder,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -35,6 +36,25 @@ const CONTENT: Record<Props['trigger'], { title: string; desc: string }> = {
 export default function SignUpBottomSheet({ visible, trigger, onClose }: Props) {
   const navigation = useNavigation<Nav>();
   const { title, desc } = CONTENT[trigger];
+  const panY = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 8 && Math.abs(g.dy) > Math.abs(g.dx),
+      onPanResponderMove: (_, g) => { if (g.dy > 0) panY.setValue(g.dy); },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 80 || g.vy > 0.5) {
+          Animated.timing(panY, { toValue: 500, duration: 200, useNativeDriver: true }).start(() => onClose());
+        } else {
+          Animated.spring(panY, { toValue: 0, tension: 65, friction: 11, useNativeDriver: true }).start();
+        }
+      },
+    })
+  ).current;
+
+  useEffect(() => {
+    if (visible) panY.setValue(0);
+  }, [visible]);
 
   const handleSignUp = () => {
     onClose();
@@ -49,7 +69,7 @@ export default function SignUpBottomSheet({ visible, trigger, onClose }: Props) 
       onRequestClose={onClose}
     >
       <Pressable style={styles.backdrop} onPress={onClose} />
-      <View style={styles.sheet}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: panY }] }]} {...panResponder.panHandlers}>
         <View style={styles.handle} />
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.desc}>{desc}</Text>
@@ -68,7 +88,7 @@ export default function SignUpBottomSheet({ visible, trigger, onClose }: Props) 
         <TouchableOpacity onPress={onClose} style={styles.cancelBtn}>
           <Text style={styles.cancelText}>나중에 할게요</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }

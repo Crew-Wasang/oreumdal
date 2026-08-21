@@ -358,8 +358,9 @@ export default function MyPageScreen() {
       </KeyboardAvoidingView>
 
       {/* 알림 설정 모달 */}
-      <Modal visible={showNotif} animationType="slide" presentationStyle="pageSheet">
+      <Modal visible={showNotif} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowNotif(false)}>
         <SafeAreaView style={styles.modalSafe}>
+          <View style={styles.modalDragHandle} />
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>알림 설정</Text>
             <ScaleButton onPress={() => setShowNotif(false)} style={styles.modalClose}>
@@ -408,8 +409,9 @@ export default function MyPageScreen() {
       </Modal>
 
       {/* 계정 설정 모달 */}
-      <Modal visible={showAccount} animationType="slide" presentationStyle="pageSheet">
+      <Modal visible={showAccount} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => { setShowAccount(false); setEditingNickname(false); }}>
         <SafeAreaView style={styles.modalSafe}>
+          <View style={styles.modalDragHandle} />
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>계정 설정</Text>
             <ScaleButton
@@ -554,6 +556,10 @@ const styles = StyleSheet.create({
   menuLabelDanger: { color: Colors.reconsider },
 
   modalSafe: { flex: 1, backgroundColor: Colors.background },
+  modalDragHandle: {
+    width: 36, height: 4, backgroundColor: Colors.border,
+    borderRadius: 2, alignSelf: 'center', marginTop: 12,
+  },
   modalHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 20, paddingBottom: 16,

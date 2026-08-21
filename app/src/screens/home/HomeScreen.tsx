@@ -312,8 +312,9 @@ export default function HomeScreen() {
         onClose={() => setSheetVisible(false)}
       />
 
-      <Modal visible={showNotif} animationType="slide" presentationStyle="pageSheet">
+      <Modal visible={showNotif} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowNotif(false)}>
         <SafeAreaView style={styles.modalSafe}>
+          <View style={styles.modalDragHandle} />
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>알림 설정</Text>
             <ScaleButton onPress={() => setShowNotif(false)} style={styles.modalClose}>
@@ -516,6 +517,10 @@ const styles = StyleSheet.create({
   bottomPad: { height: 8 },
 
   modalSafe: { flex: 1, backgroundColor: Colors.background },
+  modalDragHandle: {
+    width: 36, height: 4, backgroundColor: Colors.border,
+    borderRadius: 2, alignSelf: 'center', marginTop: 12,
+  },
   modalHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 20, paddingBottom: 16,
