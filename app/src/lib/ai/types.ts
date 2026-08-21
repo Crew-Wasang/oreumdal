@@ -12,7 +12,7 @@ export interface CoachingInput {
 }
 
 export interface CoachingResult {
-  conclusion: 'ok' | 'reconsider';
+  conclusion: 'ok' | 'reconsider' | 'invalid';
   impulseScore: number;
   reason: string;
 }

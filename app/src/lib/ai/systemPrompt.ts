@@ -5,7 +5,7 @@ export function safeParseConclusion(text: string): CoachingResult {
     const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
     const obj = JSON.parse(cleaned || '{}');
     return {
-      conclusion: obj.conclusion === 'ok' ? 'ok' : 'reconsider',
+      conclusion: obj.conclusion === 'ok' ? 'ok' : obj.conclusion === 'invalid' ? 'invalid' : 'reconsider',
       impulseScore:
         typeof obj.impulseScore === 'number' ? obj.impulseScore
         : typeof obj.impulse_score === 'number' ? obj.impulse_score
@@ -61,7 +61,10 @@ export const SYSTEM_PROMPT = `당신은 오름달의 AI 투자 심리 코치입�
   예) "일주일 뒤 이 결정을 돌아봤을 때 납득이 갈 것 같아요?"
   예) "손실이 나도 '내가 판단해서 한 거다'라고 받아들일 수 있나요?"`;
 
-export const CONCLUSION_PROMPT = `지금까지의 대화를 바탕으로 아래 JSON 형식으로만 응답하라. 다른 텍스트 없이 JSON만.
+export const CONCLUSION_PROMPT = `사용자가 "우헤헤", "ㅋㅋ", 한 글자 반복 등 무의미한 답변으로 일관하거나 실질적인 대화가 전혀 이루어지지 않았다면, 충동도를 평가할 수 없다. 이 경우 다른 텍스트 없이 아래 JSON만 출력하라:
+{"conclusion": "invalid", "impulseScore": 0, "reason": "평가 불가"}
+
+정상적인 대화가 이루어진 경우, 아래 JSON 형식으로만 응답하라. 다른 텍스트 없이 JSON만.
 
 {
   "conclusion": "ok" 또는 "reconsider",

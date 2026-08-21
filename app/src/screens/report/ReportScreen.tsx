@@ -465,7 +465,7 @@ export default function ReportScreen() {
 
         <LockedSection
           locked={tier === 'insufficient'}
-          lockMessage={`코칭 ${remaining5}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/5 완료 · ${remaining5}번 남았어요`}
         >
           <GrowthSummaryCard
             thisWeekAvg={thisWeekAvg}
@@ -476,7 +476,7 @@ export default function ReportScreen() {
 
         <LockedSection
           locked={tier === 'insufficient'}
-          lockMessage={`코칭 ${remaining5}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/5 완료 · ${remaining5}번 남았어요`}
         >
           <ImpulseGraph
             points={graphPoints}
@@ -491,7 +491,7 @@ export default function ReportScreen() {
 
         <LockedSection
           locked={tier !== 'full'}
-          lockMessage={`코칭 ${remaining10}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/10 완료 · ${remaining10}번 남았어요`}
         >
           <OutcomeComparisonCard
             stats={outcomeStats}
@@ -502,7 +502,7 @@ export default function ReportScreen() {
 
         <LockedSection
           locked={tier !== 'full'}
-          lockMessage={`코칭 ${remaining10}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/10 완료 · ${remaining10}번 남았어요`}
         >
           <EmotionPatternCard
             stats={emotionStats}
@@ -528,7 +528,7 @@ export default function ReportScreen() {
               : undefined
           }
           locked={checkCount < 10}
-          lockMessage={`코칭 ${remaining10}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/10 완료 · ${remaining10}번 남았어요`}
           comment={i1Comment}
           commentLoading={advLoading && complianceRate === null && checkCount >= 10}
         />
@@ -542,7 +542,7 @@ export default function ReportScreen() {
               : '아직 패턴이 보이지 않아요.'
           }
           locked={checkCount < 5}
-          lockMessage={`코칭 ${remaining5}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/5 완료 · ${remaining5}번 남았어요`}
           comment={i2Comment}
           commentLoading={advLoading && !emotionImpulse && checkCount >= 5}
         />
@@ -571,7 +571,7 @@ export default function ReportScreen() {
               : '아직 패턴 분석에 데이터가 부족해요.'
           }
           locked={checkCount < 10}
-          lockMessage={`코칭 ${remaining10}번 더 하면 열려요`}
+          lockMessage={`${checkCount}/10 완료 · ${remaining10}번 남았어요`}
           comment={i4Comment}
           commentLoading={advLoading && !q1Impulse && checkCount >= 10}
         />
@@ -579,7 +579,7 @@ export default function ReportScreen() {
         {/* ── 심화 인사이트 ── */}
         <Text style={styles.sectionHeader}>심화 인사이트</Text>
 
-        <LockedSection locked={checkCount < 7} lockMessage={`코칭 ${remaining7}번 더 하면 열려요`}>
+        <LockedSection locked={checkCount < 7} lockMessage={`${checkCount}/7 완료 · ${remaining7}번 남았어요`}>
           <Heatmap7Day data={heatmapData} hasData={heatmapHasData} />
         </LockedSection>
 

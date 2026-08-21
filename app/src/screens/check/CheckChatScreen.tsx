@@ -32,7 +32,7 @@ const PLACEHOLDERS: Record<string, string> = {
 
 interface ResultData {
   score: number;
-  verdict: '다시 생각해봐요' | '괜찮아요';
+  verdict: '다시 생각해봐요' | '괜찮아요' | '평가할 수 없음';
   reason: string;
 }
 
@@ -182,7 +182,7 @@ export default function CheckChatScreen() {
       resultScrolledRef.current = false;
       setResult({
         score: res.impulseScore,
-        verdict: res.conclusion === 'ok' ? '괜찮아요' : '다시 생각해봐요',
+        verdict: res.conclusion === 'ok' ? '괜찮아요' : res.conclusion === 'invalid' ? '평가할 수 없음' : '다시 생각해봐요',
         reason: res.reason,
       });
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
@@ -293,6 +293,7 @@ export default function CheckChatScreen() {
   };
 
   const isOk = result?.verdict === '괜찮아요';
+  const isInvalid = result?.verdict === '평가할 수 없음';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -342,54 +343,70 @@ export default function CheckChatScreen() {
             >
               {/* 판정 카드 */}
               <LinearGradient
-                colors={isOk
-                  ? ['#D1FAE5', '#ECFDF5']
-                  : ['rgba(167,243,208,0.55)', 'rgba(110,231,183,0.35)', 'rgba(253,186,116,0.35)', 'rgba(251,146,60,0.45)']}
+                colors={isInvalid
+                  ? ['#F4F4F5', '#FAFAFA']
+                  : isOk
+                    ? ['#D1FAE5', '#ECFDF5']
+                    : ['rgba(167,243,208,0.55)', 'rgba(110,231,183,0.35)', 'rgba(253,186,116,0.35)', 'rgba(251,146,60,0.45)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={[styles.verdictCard, { borderColor: isOk ? '#6EE7B7' : 'rgba(110,231,183,0.5)' }]}
+                style={[styles.verdictCard, { borderColor: isInvalid ? Colors.border : isOk ? '#6EE7B7' : 'rgba(110,231,183,0.5)' }]}
               >
-                <View style={[styles.verdictGlow, { backgroundColor: isOk ? 'rgba(52,211,153,0.3)' : 'rgba(167,243,208,0.3)' }]} />
-                <View style={[styles.verdictTag, { backgroundColor: isOk ? '#A7F3D0' : 'rgba(255,255,255,0.7)' }]}>
-                  <Sparkle size={11} color={isOk ? Colors.ok : Colors.textSecondary} />
-                  <Text style={[styles.verdictTagText, { color: isOk ? Colors.ok : '#3F3F46' }]}>AI 코치 의견</Text>
+                <View style={[styles.verdictGlow, { backgroundColor: isInvalid ? 'transparent' : isOk ? 'rgba(52,211,153,0.3)' : 'rgba(167,243,208,0.3)' }]} />
+                <View style={[styles.verdictTag, { backgroundColor: isInvalid ? Colors.surfaceElevated : isOk ? '#A7F3D0' : 'rgba(255,255,255,0.7)' }]}>
+                  <Sparkle size={11} color={isInvalid ? Colors.textMuted : isOk ? Colors.ok : Colors.textSecondary} />
+                  <Text style={[styles.verdictTagText, { color: isInvalid ? Colors.textMuted : isOk ? Colors.ok : '#3F3F46' }]}>AI 코치 의견</Text>
                 </View>
-                <Text style={[styles.verdictText, { color: isOk ? Colors.ok : Colors.textPrimary }]}>
-                  {isOk ? '지금\n매매해도 괜찮아요' : '한 번 더\n생각해봐요'}
+                <Text style={[styles.verdictText, { color: isInvalid ? Colors.textSecondary : isOk ? Colors.ok : Colors.textPrimary }]}>
+                  {isInvalid ? '평가할 수\n없어요' : isOk ? '지금\n매매해도 괜찮아요' : '한 번 더\n생각해봐요'}
                 </Text>
-                <Text style={styles.verdictReason}>{result.reason}</Text>
+                <Text style={styles.verdictReason}>
+                  {isInvalid ? '충분한 대화가 이루어지지 않아 충동도를 측정할 수 없어요' : result.reason}
+                </Text>
               </LinearGradient>
 
               {/* 충동도 카드 */}
-              <View style={styles.scoreCard}>
-                <View style={styles.scoreHeader}>
-                  <Text style={styles.scoreLabel}>충동도</Text>
-                  <Text style={[styles.scoreValue, { color: result.score >= 55 ? Colors.impulse : Colors.ok }]}>
-                    {result.score}%
+              {isInvalid ? (
+                <View style={styles.scoreCard}>
+                  <View style={styles.scoreHeader}>
+                    <Text style={styles.scoreLabel}>충동도</Text>
+                    <Text style={[styles.scoreValue, { color: Colors.textMuted }]}>-</Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: Colors.textMuted, marginTop: 4 }}>
+                    대화 내용이 충분하지 않아 충동도를 측정하지 않았어요
                   </Text>
                 </View>
-                <View style={styles.barBg}>
-                  <LinearGradient
-                    colors={[Colors.impulseGradientLow, Colors.impulseGradientMid, '#F59E0B']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={[styles.barFill, { width: `${result.score}%` as any }]}
-                  />
+              ) : (
+                <View style={styles.scoreCard}>
+                  <View style={styles.scoreHeader}>
+                    <Text style={styles.scoreLabel}>충동도</Text>
+                    <Text style={[styles.scoreValue, { color: result.score >= 55 ? Colors.impulse : Colors.ok }]}>
+                      {result.score}%
+                    </Text>
+                  </View>
+                  <View style={styles.barBg}>
+                    <LinearGradient
+                      colors={[Colors.impulseGradientLow, Colors.impulseGradientMid, '#F59E0B']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={[styles.barFill, { width: `${result.score}%` as any }]}
+                    />
+                  </View>
+                  <View style={styles.barLabels}>
+                    <Text style={styles.barLabelText}>차분</Text>
+                    <Text style={styles.barLabelText}>주의</Text>
+                    <Text style={styles.barLabelText}>충동</Text>
+                  </View>
+                  <View style={styles.basisList}>
+                    <BasisRow label="감정 상태" value={emotionLabel} />
+                    <BasisRow label="매매 방향" value={`${stockName} ${directionText}`} />
+                    <BasisRow
+                      label="충동 위험도"
+                      value={result.score >= 70 ? '높음' : result.score >= 45 ? '보통' : '낮음'}
+                    />
+                  </View>
                 </View>
-                <View style={styles.barLabels}>
-                  <Text style={styles.barLabelText}>차분</Text>
-                  <Text style={styles.barLabelText}>주의</Text>
-                  <Text style={styles.barLabelText}>충동</Text>
-                </View>
-                <View style={styles.basisList}>
-                  <BasisRow label="감정 상태" value={emotionLabel} />
-                  <BasisRow label="매매 방향" value={`${stockName} ${directionText}`} />
-                  <BasisRow
-                    label="충동 위험도"
-                    value={result.score >= 70 ? '높음' : result.score >= 45 ? '보통' : '낮음'}
-                  />
-                </View>
-              </View>
+              )}
 
               {/* 결국 어떻게? */}
               <View style={styles.outcomeCard}>
