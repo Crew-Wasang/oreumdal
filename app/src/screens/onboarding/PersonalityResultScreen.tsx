@@ -72,7 +72,7 @@ export default function PersonalityResultScreen() {
   const handleNext = () => {
     setPersonalityType(myType);
     if (route.params?.fromRedo) {
-      (navigation as any).navigate('Main');
+      (navigation as any).navigate('Main', { screen: 'Tabs', params: { screen: 'MyPage' } });
     } else {
       navigation.navigate('InvestmentPrinciples');
     }

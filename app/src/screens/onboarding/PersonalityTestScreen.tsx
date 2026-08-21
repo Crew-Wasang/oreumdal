@@ -115,7 +115,7 @@ export default function PersonalityTestScreen() {
   const handleBack = () => {
     if (current === 0) {
       if (fromRedo) {
-        (navigation as any).navigate('Main');
+        (navigation as any).navigate('Main', { screen: 'Tabs', params: { screen: 'MyPage' } });
       } else {
         navigation.goBack();
       }
